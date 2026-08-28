@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trustdata"
+version = "0.1.0"
+description = "Evidence-aware trust assessment and governance for crowdsourced evaluation data"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy==2.5.2",
+  "pandas==3.0.5",
+  "scipy==1.18.0",
+  "scikit-learn==1.9.0",
+  "matplotlib==3.11.1",
+  "PyYAML==6.0.3",
+  "pyarrow>=21.0.0,<24",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.4,<10"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+

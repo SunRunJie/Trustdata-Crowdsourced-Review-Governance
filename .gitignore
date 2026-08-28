@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+data/interim/
+data/processed/*.csv
+data/processed/*.parquet
+data/processed/*.jsonl
+outputs/runs/
+outputs/cache/
+logs/
+prior_research/.git/
+
+# Keep directory structure and small, auditable manifests/results.
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+!outputs/runs/.gitkeep
+!logs/.gitkeep
+

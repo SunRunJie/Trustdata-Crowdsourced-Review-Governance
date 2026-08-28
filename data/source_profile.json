@@ -1,0 +1,678 @@
+{
+  "source_root": "prior_research/data",
+  "file_count": 26,
+  "csv_count": 17,
+  "total_bytes": 64243618,
+  "profiles": {
+    "prior_research/data/external/aoty_metacritic_30000/album_ratings.csv": {
+      "rows": 32358,
+      "columns": [
+        "Artist",
+        "Title",
+        "Release Month",
+        "Release Day",
+        "Release Year",
+        "Format",
+        "Label",
+        "Genre",
+        "Metacritic Critic Score",
+        "Metacritic Reviews",
+        "Metacritic User Score",
+        "Metacritic User Reviews",
+        "AOTY Critic Score",
+        "AOTY Critic Reviews",
+        "AOTY User Score",
+        "AOTY User Reviews"
+      ],
+      "dtypes_first_chunk": {
+        "Artist": "str",
+        "Title": "str",
+        "Release Month": "str",
+        "Release Day": "str",
+        "Release Year": "int64",
+        "Format": "str",
+        "Label": "str",
+        "Genre": "str",
+        "Metacritic Critic Score": "float64",
+        "Metacritic Reviews": "float64",
+        "Metacritic User Score": "float64",
+        "Metacritic User Reviews": "float64",
+        "AOTY Critic Score": "int64",
+        "AOTY Critic Reviews": "int64",
+        "AOTY User Score": "int64",
+        "AOTY User Reviews": "int64"
+      },
+      "missing_counts": {
+        "Artist": 0,
+        "Title": 2,
+        "Release Month": 589,
+        "Release Day": 590,
+        "Release Year": 0,
+        "Format": 0,
+        "Label": 3456,
+        "Genre": 7960,
+        "Metacritic Critic Score": 18474,
+        "Metacritic Reviews": 18474,
+        "Metacritic User Score": 23259,
+        "Metacritic User Reviews": 21784,
+        "AOTY Critic Score": 0,
+        "AOTY Critic Reviews": 0,
+        "AOTY User Score": 0,
+        "AOTY User Reviews": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/external/aoty_metacritic_30000/Review excerpts for NLP/test.csv": {
+      "rows": 49879,
+      "columns": [
+        "Artist",
+        "Title",
+        "Source",
+        "Rating",
+        "Review",
+        "Reception"
+      ],
+      "dtypes_first_chunk": {
+        "Artist": "str",
+        "Title": "str",
+        "Source": "str",
+        "Rating": "int64",
+        "Review": "str",
+        "Reception": "str"
+      },
+      "missing_counts": {
+        "Artist": 0,
+        "Title": 0,
+        "Source": 0,
+        "Rating": 0,
+        "Review": 2,
+        "Reception": 0
+      },
+      "duplicate_rows_exact": 12,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/external/aoty_metacritic_30000/Review excerpts for NLP/train.csv": {
+      "rows": 116384,
+      "columns": [
+        "Artist",
+        "Title",
+        "Source",
+        "Rating",
+        "Review",
+        "Reception"
+      ],
+      "dtypes_first_chunk": {
+        "Artist": "str",
+        "Title": "str",
+        "Source": "str",
+        "Rating": "int64",
+        "Review": "str",
+        "Reception": "str"
+      },
+      "missing_counts": {
+        "Artist": 0,
+        "Title": 0,
+        "Source": 0,
+        "Rating": 0,
+        "Review": 2,
+        "Reception": 0
+      },
+      "duplicate_rows_exact": 73,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/external/aoty_top5000/aoty.csv": {
+      "rows": 5000,
+      "columns": [
+        "id",
+        "title",
+        "artist",
+        "release_date",
+        "genres",
+        "user_score",
+        "rating_count",
+        "album_link"
+      ],
+      "dtypes_first_chunk": {
+        "id": "int64",
+        "title": "str",
+        "artist": "str",
+        "release_date": "str",
+        "genres": "str",
+        "user_score": "int64",
+        "rating_count": "str",
+        "album_link": "str"
+      },
+      "missing_counts": {
+        "id": 0,
+        "title": 0,
+        "artist": 0,
+        "release_date": 0,
+        "genres": 0,
+        "user_score": 0,
+        "rating_count": 0,
+        "album_link": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/external/rym_top5000/rym_clean1.csv": {
+      "rows": 5000,
+      "columns": [
+        "Unnamed: 0",
+        "position",
+        "release_name",
+        "artist_name",
+        "release_date",
+        "release_type",
+        "primary_genres",
+        "secondary_genres",
+        "descriptors",
+        "avg_rating",
+        "rating_count",
+        "review_count"
+      ],
+      "dtypes_first_chunk": {
+        "Unnamed: 0": "int64",
+        "position": "int64",
+        "release_name": "str",
+        "artist_name": "str",
+        "release_date": "str",
+        "release_type": "str",
+        "primary_genres": "str",
+        "secondary_genres": "str",
+        "descriptors": "str",
+        "avg_rating": "float64",
+        "rating_count": "int64",
+        "review_count": "int64"
+      },
+      "missing_counts": {
+        "Unnamed: 0": 0,
+        "position": 0,
+        "release_name": 0,
+        "artist_name": 0,
+        "release_date": 0,
+        "release_type": 0,
+        "primary_genres": 1,
+        "secondary_genres": 495,
+        "descriptors": 0,
+        "avg_rating": 0,
+        "rating_count": 0,
+        "review_count": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/external/rym_top5000/rym_raw1.csv": {
+      "rows": 5000,
+      "columns": [
+        "Unnamed: 0",
+        "position",
+        "release_name",
+        "artist_name",
+        "release_date",
+        "release_type",
+        "primary_genres",
+        "secondary_genres",
+        "descriptors",
+        "avg_rating",
+        "rating_count",
+        "review_count"
+      ],
+      "dtypes_first_chunk": {
+        "Unnamed: 0": "int64",
+        "position": "float64",
+        "release_name": "str",
+        "artist_name": "str",
+        "release_date": "str",
+        "release_type": "str",
+        "primary_genres": "str",
+        "secondary_genres": "str",
+        "descriptors": "str",
+        "avg_rating": "float64",
+        "rating_count": "str",
+        "review_count": "int64"
+      },
+      "missing_counts": {
+        "Unnamed: 0": 0,
+        "position": 0,
+        "release_name": 0,
+        "artist_name": 0,
+        "release_date": 0,
+        "release_type": 0,
+        "primary_genres": 0,
+        "secondary_genres": 0,
+        "descriptors": 0,
+        "avg_rating": 0,
+        "rating_count": 0,
+        "review_count": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/external/source_manifest.csv": {
+      "rows": 3,
+      "columns": [
+        "source_id",
+        "dataset_title",
+        "publisher",
+        "snapshot_or_coverage",
+        "rows_used",
+        "license",
+        "source_url",
+        "download_url",
+        "archive_sha256",
+        "provenance_class",
+        "limits"
+      ],
+      "dtypes_first_chunk": {
+        "source_id": "str",
+        "dataset_title": "str",
+        "publisher": "str",
+        "snapshot_or_coverage": "str",
+        "rows_used": "str",
+        "license": "str",
+        "source_url": "str",
+        "download_url": "str",
+        "archive_sha256": "str",
+        "provenance_class": "str",
+        "limits": "str"
+      },
+      "missing_counts": {
+        "source_id": 0,
+        "dataset_title": 0,
+        "publisher": 0,
+        "snapshot_or_coverage": 0,
+        "rows_used": 0,
+        "license": 0,
+        "source_url": 0,
+        "download_url": 0,
+        "archive_sha256": 0,
+        "provenance_class": 0,
+        "limits": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/processed/cross_platform_exact_matches.csv": {
+      "rows": 4102,
+      "columns": [
+        "album_key",
+        "artist",
+        "title",
+        "release_year",
+        "aoty_user_score",
+        "aoty_critic_score",
+        "artist_name",
+        "release_name",
+        "avg_rating",
+        "rating_count",
+        "review_count",
+        "aoty_user_score_5",
+        "aoty_minus_rym"
+      ],
+      "dtypes_first_chunk": {
+        "album_key": "str",
+        "artist": "str",
+        "title": "str",
+        "release_year": "int64",
+        "aoty_user_score": "int64",
+        "aoty_critic_score": "int64",
+        "artist_name": "str",
+        "release_name": "str",
+        "avg_rating": "float64",
+        "rating_count": "int64",
+        "review_count": "int64",
+        "aoty_user_score_5": "float64",
+        "aoty_minus_rym": "float64"
+      },
+      "missing_counts": {
+        "album_key": 0,
+        "artist": 0,
+        "title": 0,
+        "release_year": 0,
+        "aoty_user_score": 0,
+        "aoty_critic_score": 0,
+        "artist_name": 0,
+        "release_name": 0,
+        "avg_rating": 0,
+        "rating_count": 0,
+        "review_count": 0,
+        "aoty_user_score_5": 0,
+        "aoty_minus_rym": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/processed/data_provenance_audit.csv": {
+      "rows": 7,
+      "columns": [
+        "dataset",
+        "rows_total",
+        "rows_empirical",
+        "rows_synthetic",
+        "rows_unknown",
+        "status",
+        "reason"
+      ],
+      "dtypes_first_chunk": {
+        "dataset": "str",
+        "rows_total": "int64",
+        "rows_empirical": "int64",
+        "rows_synthetic": "int64",
+        "rows_unknown": "int64",
+        "status": "str",
+        "reason": "str"
+      },
+      "missing_counts": {
+        "dataset": 0,
+        "rows_total": 0,
+        "rows_empirical": 0,
+        "rows_synthetic": 0,
+        "rows_unknown": 0,
+        "status": 0,
+        "reason": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/processed/observed_genre_summary.csv": {
+      "rows": 12,
+      "columns": [
+        "genre",
+        "aoty_albums",
+        "aoty_median_score",
+        "aoty_median_ratings",
+        "rym_albums",
+        "rym_median_score",
+        "rym_median_ratings",
+        "rym_median_review_share",
+        "minimum_platform_count"
+      ],
+      "dtypes_first_chunk": {
+        "genre": "str",
+        "aoty_albums": "int64",
+        "aoty_median_score": "float64",
+        "aoty_median_ratings": "float64",
+        "rym_albums": "int64",
+        "rym_median_score": "float64",
+        "rym_median_ratings": "float64",
+        "rym_median_review_share": "float64",
+        "minimum_platform_count": "int64"
+      },
+      "missing_counts": {
+        "genre": 0,
+        "aoty_albums": 0,
+        "aoty_median_score": 0,
+        "aoty_median_ratings": 0,
+        "rym_albums": 0,
+        "rym_median_score": 0,
+        "rym_median_ratings": 0,
+        "rym_median_review_share": 0,
+        "minimum_platform_count": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/raw/aoty_album_ratings.csv": {
+      "rows": 2400,
+      "columns": [
+        "album_id",
+        "rating",
+        "has_review",
+        "user_age_days",
+        "timestamp",
+        "is_verified_user",
+        "is_synthetic",
+        "collection_date",
+        "source",
+        "provenance_status"
+      ],
+      "dtypes_first_chunk": {
+        "album_id": "str",
+        "rating": "float64",
+        "has_review": "bool",
+        "user_age_days": "int64",
+        "timestamp": "str",
+        "is_verified_user": "bool",
+        "is_synthetic": "bool",
+        "collection_date": "str",
+        "source": "str",
+        "provenance_status": "str"
+      },
+      "missing_counts": {
+        "album_id": 0,
+        "rating": 0,
+        "has_review": 0,
+        "user_age_days": 0,
+        "timestamp": 0,
+        "is_verified_user": 0,
+        "is_synthetic": 0,
+        "collection_date": 0,
+        "source": 0,
+        "provenance_status": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/raw/aoty_collection_events.csv": {
+      "rows": 7,
+      "columns": [
+        "url",
+        "status",
+        "http_status",
+        "collection_date"
+      ],
+      "dtypes_first_chunk": {
+        "url": "str",
+        "status": "str",
+        "http_status": "int64",
+        "collection_date": "str"
+      },
+      "missing_counts": {
+        "url": 0,
+        "status": 0,
+        "http_status": 0,
+        "collection_date": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/raw/aoty_genre_trends_2010_2026.csv": {
+      "rows": 289,
+      "columns": [
+        "year",
+        "genre",
+        "avg_rating",
+        "albums_count",
+        "ratings_count",
+        "critic_score",
+        "user_score",
+        "score_gap",
+        "ai_sensitivity",
+        "collection_date",
+        "source",
+        "is_synthetic",
+        "provenance_status"
+      ],
+      "dtypes_first_chunk": {
+        "year": "int64",
+        "genre": "str",
+        "avg_rating": "float64",
+        "albums_count": "int64",
+        "ratings_count": "int64",
+        "critic_score": "float64",
+        "user_score": "float64",
+        "score_gap": "float64",
+        "ai_sensitivity": "float64",
+        "collection_date": "str",
+        "source": "str",
+        "is_synthetic": "bool",
+        "provenance_status": "str"
+      },
+      "missing_counts": {
+        "year": 0,
+        "genre": 0,
+        "avg_rating": 0,
+        "albums_count": 0,
+        "ratings_count": 0,
+        "critic_score": 0,
+        "user_score": 0,
+        "score_gap": 0,
+        "ai_sensitivity": 0,
+        "collection_date": 0,
+        "source": 0,
+        "is_synthetic": 0,
+        "provenance_status": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/raw/rym_collection_events.csv": {
+      "rows": 1,
+      "columns": [
+        "url",
+        "year",
+        "status",
+        "collection_date"
+      ],
+      "dtypes_first_chunk": {
+        "url": "str",
+        "year": "int64",
+        "status": "str",
+        "collection_date": "str"
+      },
+      "missing_counts": {
+        "url": 0,
+        "year": 0,
+        "status": 0,
+        "collection_date": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/raw/rym_forum_ai_discussions.csv": {
+      "rows": 15,
+      "columns": [
+        "date",
+        "title",
+        "replies",
+        "views",
+        "sentiment",
+        "topic",
+        "page",
+        "source",
+        "is_synthetic",
+        "provenance_status"
+      ],
+      "dtypes_first_chunk": {
+        "date": "str",
+        "title": "str",
+        "replies": "int64",
+        "views": "int64",
+        "sentiment": "str",
+        "topic": "str",
+        "page": "int64",
+        "source": "str",
+        "is_synthetic": "bool",
+        "provenance_status": "str"
+      },
+      "missing_counts": {
+        "date": 0,
+        "title": 0,
+        "replies": 0,
+        "views": 0,
+        "sentiment": 0,
+        "topic": 0,
+        "page": 0,
+        "source": 0,
+        "is_synthetic": 0,
+        "provenance_status": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/raw/rym_ratings_timeline.csv": {
+      "rows": 11870,
+      "columns": [
+        "date",
+        "avg_daily_rating",
+        "rating_count",
+        "review_ratio",
+        "estimated_ai_ratio",
+        "album_id",
+        "source",
+        "is_synthetic",
+        "provenance_status"
+      ],
+      "dtypes_first_chunk": {
+        "date": "str",
+        "avg_daily_rating": "float64",
+        "rating_count": "int64",
+        "review_ratio": "float64",
+        "estimated_ai_ratio": "float64",
+        "album_id": "int64",
+        "source": "str",
+        "is_synthetic": "bool",
+        "provenance_status": "str"
+      },
+      "missing_counts": {
+        "date": 0,
+        "avg_daily_rating": 0,
+        "rating_count": 0,
+        "review_ratio": 0,
+        "estimated_ai_ratio": 0,
+        "album_id": 0,
+        "source": 0,
+        "is_synthetic": 0,
+        "provenance_status": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    },
+    "prior_research/data/raw/rym_yearly_charts_2000_2026.csv": {
+      "rows": 2700,
+      "columns": [
+        "title",
+        "artist",
+        "year",
+        "avg_rating",
+        "ratings_count",
+        "genres",
+        "source",
+        "collection_date",
+        "rank",
+        "is_synthetic",
+        "provenance_status"
+      ],
+      "dtypes_first_chunk": {
+        "title": "str",
+        "artist": "str",
+        "year": "int64",
+        "avg_rating": "float64",
+        "ratings_count": "int64",
+        "genres": "str",
+        "source": "str",
+        "collection_date": "str",
+        "rank": "int64",
+        "is_synthetic": "bool",
+        "provenance_status": "str"
+      },
+      "missing_counts": {
+        "title": 0,
+        "artist": 0,
+        "year": 0,
+        "avg_rating": 0,
+        "ratings_count": 0,
+        "genres": 0,
+        "source": 0,
+        "collection_date": 0,
+        "rank": 0,
+        "is_synthetic": 0,
+        "provenance_status": 0
+      },
+      "duplicate_rows_exact": 0,
+      "encoding": "utf-8-sig"
+    }
+  }
+}

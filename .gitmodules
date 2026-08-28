@@ -1,0 +1,4 @@
+[submodule "prior_research"]
+	path = prior_research
+	url = https://github.com/SunRunJie/AI-Driven-Transformation-of-Music-Information-Ecosystems.git
+

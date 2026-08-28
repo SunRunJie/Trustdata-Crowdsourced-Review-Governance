@@ -1,0 +1,27 @@
+﻿path,bytes,sha256,extension,evidence_class,rows,columns,duplicate_rows_exact,encoding,status
+prior_research/data/external/aoty_metacritic_30000/album_ratings.csv,2741344,0089d6b3affef3bd1fe20fac29d5bfac0a8c90ca3255952f95e63d588fbc2da6,.csv,third_party_archive,32358.0,16.0,0.0,utf-8-sig,profiled
+prior_research/data/external/aoty_metacritic_30000/kaggle_metadata.json,7520,591e0e5a0da916f96008828d3801da63394fdd2018d812763dc829ec2b8802af,.json,third_party_archive,,,,,hashed
+prior_research/data/external/aoty_metacritic_30000/Review excerpts for NLP/test.csv,10836016,fe7c6becd1dd2da1e2db1b51147d094c5486e49aa7d0d40788e2c90a2f12fe68,.csv,third_party_archive,49879.0,6.0,12.0,utf-8-sig,profiled
+prior_research/data/external/aoty_metacritic_30000/Review excerpts for NLP/train.csv,25288983,13bc8029086165c31870aa65026b4901a7ba5fc4086fc0586cf4ce9589d004fb,.csv,third_party_archive,116384.0,6.0,73.0,utf-8-sig,profiled
+prior_research/data/external/aoty_metacritic_30000.zip,14640645,b32bc999964deee9244c13bc1df55afa2277e7ccc32bda34b5bc913d07cd65eb,.zip,third_party_archive,,,,,hashed
+prior_research/data/external/aoty_top5000/aoty.csv,874671,6014d4ba9fc068329bfcf13b5639b8e8928abc64270047d0d05c4bf2b4543bc4,.csv,third_party_archive,5000.0,8.0,0.0,utf-8-sig,profiled
+prior_research/data/external/aoty_top5000/kaggle_metadata.json,4790,c55669535408a592e5605195ff82268213e4427e22283275d87c355d617557b1,.json,third_party_archive,,,,,hashed
+prior_research/data/external/aoty_top5000.zip,279016,d14fd33233701fe48508096104c2d9bac7648523c5783ea5c77da8f514b274f1,.zip,third_party_archive,,,,,hashed
+prior_research/data/external/README.md,2276,465b6f019c6efef419339fccb6dd19c94ceb8354db202520fe84d10995b3d2ea,.md,third_party_archive,,,,,hashed
+prior_research/data/external/rym_top5000/kaggle_metadata.json,6319,113f46bbf711ed049cb35b79eb7b332d7efe10faab088c370b9e9d579a26651d,.json,third_party_archive,,,,,hashed
+prior_research/data/external/rym_top5000/rym_clean1.csv,1172587,5e190508893dbc55e44107dec673b6b04ce1085f55d5eb08937cd5b899415440,.csv,third_party_archive,5000.0,12.0,0.0,utf-8-sig,profiled
+prior_research/data/external/rym_top5000/rym_raw1.csv,4979232,8b55f2578ffc8ad7fbafe15620ea8ff20f869ded5267fab169b9613c8012b169,.csv,third_party_archive,5000.0,12.0,0.0,utf-8-sig,profiled
+prior_research/data/external/rym_top5000.zip,883280,e41350ef9202c5b09911404d5d14d78742ae80054a9784acaf87758e08aeaee1,.zip,third_party_archive,,,,,hashed
+prior_research/data/external/source_manifest.csv,1519,d75484e974da8eadc287495a8ae3dd6cd4da961fa0a5b0eaa3de1458398d0d7d,.csv,third_party_archive,3.0,11.0,0.0,utf-8-sig,profiled
+prior_research/data/processed/cross_platform_exact_matches.csv,556642,fb4022907ae77a16065068312482f02fbf78319ed1f2e946c18dc81a9bb06ea9,.csv,documentation,4102.0,13.0,0.0,utf-8-sig,profiled
+prior_research/data/processed/data_provenance_audit.csv,781,2c43e110736801cdfad3f2e85e41e3d22dbc844702fce508b762c4ad2caeb8c9,.csv,documentation,7.0,7.0,0.0,utf-8-sig,profiled
+prior_research/data/processed/observed_archive_summary.json,1099,6432c8397e557b810723ec588b2c97f5c7cbedc1205078e7743877cc557b8555,.json,documentation,,,,,hashed
+prior_research/data/processed/observed_genre_summary.csv,983,2e94312c8fbf95e74398a83d160337f7a526a1385866d2aec4806802b556ae60,.csv,documentation,12.0,9.0,0.0,utf-8-sig,profiled
+prior_research/data/raw/aoty_album_ratings.csv,319616,dfe8e8a53d8d8da4140bd4c3253958e664e02c8752a96fd9635b17b638eeefe9,.csv,legacy_synthetic,2400.0,10.0,0.0,utf-8-sig,profiled
+prior_research/data/raw/aoty_collection_events.csv,834,30804774eb6fc0c7007fb8db737c045fde5e8a6c9e41150d69982c89009cffa5,.csv,collection_audit,7.0,4.0,0.0,utf-8-sig,profiled
+prior_research/data/raw/aoty_genre_trends_2010_2026.csv,32315,486fe8215045d21a802683031e9aaf9a3d1d0e09987f0012116ced03faa3c064,.csv,legacy_synthetic,289.0,13.0,0.0,utf-8-sig,profiled
+prior_research/data/raw/rym_collection_events.csv,138,bdf305e2c6760c9bb5be326500322c83f8ad382fa0b6967ca2618d959bdfbbcb,.csv,collection_audit,1.0,4.0,0.0,utf-8-sig,profiled
+prior_research/data/raw/rym_forum_ai_discussions.csv,1802,eb3ac7d7a4b15fec6c836f2ec17acea936dca14b2af1d173da51ea7f3b755bc1,.csv,legacy_synthetic,15.0,10.0,0.0,utf-8-sig,profiled
+prior_research/data/raw/rym_ratings_timeline.csv,1245183,eff1efa9c2af34d7cc38f6a2317133c24c9fde4fdeb8ecef4695892b6f074df5,.csv,legacy_synthetic,11870.0,9.0,0.0,utf-8-sig,profiled
+prior_research/data/raw/rym_yearly_charts_2000_2026.csv,362489,cad254a6d14d89d890b714623f23ce38be2d2a6b135e0fcdc9a2390b0aee7495,.csv,legacy_synthetic,2700.0,11.0,0.0,utf-8-sig,profiled
+prior_research/data/README.md,3538,7efb0037ee61dc6f801e1adca3ee89aa3b33e125ed7b135d23180ba30c57b406,.md,documentation,,,,,hashed
