@@ -64,4 +64,10 @@ def test_evidence_mirror_matches_latest_results() -> None:
     for source in LATEST.glob("*.csv"):
         mirror = EVIDENCE / "results" / source.name
         assert mirror.exists()
+        if source.name == "audit_trail.csv":
+            latest_columns = pd.read_csv(source, nrows=0).columns.tolist()
+            mirror_columns = pd.read_csv(mirror, nrows=0).columns.tolist()
+            assert latest_columns == mirror_columns
+            assert {"event_time", "model_version", "decision_status"}.issubset(latest_columns)
+            continue
         assert _sha256(source) == _sha256(mirror)

@@ -1,5 +1,6 @@
 const DATA_URL = "../app/data/dashboard.json";
 const ROUTES = {
+  solution: "解决方案总览",
   overview: "治理总览",
   passports: "可信护照",
   risk: "风险监测",
@@ -20,6 +21,21 @@ const tierLetter = (tier) => String(tier || "C").charAt(0);
 const scoreOf = (p) => Number(p.dts ?? p.data_trust_score ?? 0);
 const coverageOf = (p) => Number(p.coverage ?? p.evidence_coverage ?? 0);
 const uncertaintyOf = (p) => Number(p.uncertainty ?? 0);
+
+function solution(d) {
+  const h = d.headline;
+  return `<div class="hero-grid solution-hero">
+    <article class="panel"><p class="eyebrow">TRUSTDATA SOLUTION BLUEPRINT</p><h2>从评价数据到可审计治理动作</h2><p class="lead">TrustData 是面向 UGC 平台数据运营、内容完整性和算法团队的离线可信评估解决方案。它把来源、行为、内容、跨源和时序证据转化为可解释的 Trust Vector、DTS、A–E 等级和处置建议。</p><div class="evidence-strip"><b>边界</b><span>当前交付是可复现、可迁移的离线解决方案；在线 API、多租户与生产 SLA 属于试点后的产品化范围。</span></div></article>
+    <article class="panel"><h3>当前验证证据</h3><div class="solution-score"><strong>${pct(h.risk_detection_auprc_at_30pct)}</strong><span>30% 受控污染 AUPRC</span></div><p class="notice">效能证据等级 E2。真实平台效果需使用授权样本、人工标签与本地误报成本重新校准。</p></article>
+  </div>
+  <div class="solution-grid">
+    <article class="panel solution-step"><span>INPUT</span><h3>标准化接入</h3><p>CSV、JSON/JSONL 或 Parquet；记录、对象、贡献者、评分、文本、时间、来源与关系字段。</p></article>
+    <article class="panel solution-step"><span>ASSESS</span><h3>五维证据评估</h3><p>P 来源、B 行为、C 内容、X 跨源、T 时序，并显式计算证据覆盖度和不确定性。</p></article>
+    <article class="panel solution-step"><span>DECIDE</span><h3>分级与治理</h3><p>A–E 可信等级，映射正常使用、监测、降权、人工复核与临时限制。</p></article>
+    <article class="panel solution-step"><span>VERIFY</span><h3>验证与审计</h3><p>受控污染、排序稳健性、公平性、敏感性、运行清单、哈希和适用范围。</p></article>
+  </div>
+  <article class="panel"><h2>解决方案交付闭环</h2><div class="flow-strip"><span>数据接入</span><i>→</i><span>来源建档</span><i>→</i><span>P/B/C/X/T</span><i>→</i><span>DTS 与置信度</span><i>→</i><span>A–E 分级</span><i>→</i><span>治理动作</span><i>→</i><span>审计记录</span></div><div class="metric-grid">${metric("观测数据记录",fmt(d.observed_data.entities_total+d.observed_data.reviews_total),"真实归档用于分布基线")}${metric("受控基准",fmt(d.benchmark.clean_records),"清洁贡献记录")}${metric("复核队列",fmt(d.review_queue_count),"D/E 等级")}${metric("部署形态","离线批处理","本地运行、数据不出域")}</div></article>`;
+}
 
 function metric(label, value, note) {
   return `<article class="metric"><small>${label}</small><strong>${value}</strong><em>${note}</em></article>`;
@@ -124,11 +140,11 @@ function bindInteractions() {
 
 function render() {
   if (!state.data) return;
-  state.route = (location.hash || "#overview").slice(1);
-  if (!ROUTES[state.route]) state.route = "overview";
+  state.route = (location.hash || "#solution").slice(1);
+  if (!ROUTES[state.route]) state.route = "solution";
   document.querySelector("#page-title").textContent = ROUTES[state.route];
   document.querySelectorAll("nav a").forEach(a => a.classList.toggle("active", a.dataset.route === state.route));
-  const views = { overview, passports, risk, queue, audit, benchmark };
+  const views = { solution, overview, passports, risk, queue, audit, benchmark };
   content.innerHTML = views[state.route](state.data);
   bindInteractions();
 }
@@ -141,9 +157,17 @@ document.querySelector("#export-button").addEventListener("click", () => {
   link.click(); URL.revokeObjectURL(link.href);
 });
 
-fetch(DATA_URL).then(r => { if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }).then(data => {
+async function loadDashboard() {
+  if (window.TRUSTDATA_DASHBOARD) return window.TRUSTDATA_DASHBOARD;
+  const response = await fetch(DATA_URL);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+loadDashboard().then(data => {
   state.data = data; loading.hidden = true; render();
-}).catch(error => {
+}).catch(loadError => {
   loading.hidden = true; errorBox.hidden = false;
-  errorBox.textContent = `实验数据读取失败：${error.message}。请通过项目根目录启动的本地服务访问本页面。`;
+  const command = "python scripts/serve_solution.py";
+  errorBox.innerHTML = `<b>解决方案数据读取失败：</b>${esc(loadError.message)}。<br>请确认 product/dashboard-data.js 已生成，或在项目根目录运行 <code>${command}</code> 后访问 <code>http://127.0.0.1:8000/product/</code>。`;
 });

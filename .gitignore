@@ -10,6 +10,7 @@ data/processed/*.parquet
 data/processed/*.jsonl
 outputs/runs/
 outputs/cache/
+outputs/examples/
 logs/
 tmp/
 prior_research/.git/

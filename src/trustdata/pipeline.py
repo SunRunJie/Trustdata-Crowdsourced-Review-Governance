@@ -61,6 +61,13 @@ def _write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(_json_safe(payload), ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _write_dashboard_script(path: Path, payload: Any) -> None:
+    """Write a browser-safe fallback so the demonstration also works from file://."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    serialized = json.dumps(_json_safe(payload), ensure_ascii=False, separators=(",", ":"))
+    path.write_text(f"window.TRUSTDATA_DASHBOARD = {serialized};\n", encoding="utf-8")
+
+
 def _build_training_frame(
     level_frames: dict[float, pd.DataFrame],
     levels: list[float],
@@ -411,6 +418,7 @@ def run_pipeline(root: Path, config_path: Path) -> dict[str, Any]:
         ],
     }
     _write_json(root / "app" / "data" / "dashboard.json", dashboard)
+    _write_dashboard_script(root / "product" / "dashboard-data.js", dashboard)
     _write_json(output / "result_summary.json", dashboard)
 
     # The manifest lists digests for completed sibling outputs; its own digest is maintained externally.

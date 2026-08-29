@@ -1,0 +1,13 @@
+record_id,entity_id,contributor_id,rating,review_text,created_at,source,version,verification_level,ai_disclosure,account_age_days,entity_reference_score,cross_source_gap
+r001,album_001,user_001,4.5,"Detailed review with specific comments on composition and production",2026-08-20T09:00:00Z,platform_export,v1,platform_verified,unknown,840,4.2,0.15
+r002,album_001,user_002,4.0,"Strong songwriting and a coherent sequence across the album",2026-08-20T12:10:00Z,platform_export,v1,platform_verified,unknown,420,4.2,0.15
+r003,album_001,user_003,5.0,"Amazing album",2026-08-20T12:11:00Z,platform_export,v1,platform_verified,unknown,2,4.2,0.15
+r004,album_002,user_001,3.5,"The middle section loses momentum but the closing tracks recover",2026-08-21T10:30:00Z,platform_export,v1,platform_verified,unknown,840,3.7,0.20
+r005,album_002,user_004,0.5,"best album ever",2026-08-21T10:31:00Z,platform_export,v1,platform_verified,unknown,1,3.7,0.20
+r006,album_002,user_005,0.5,"best album ever",2026-08-21T10:31:30Z,platform_export,v1,platform_verified,unknown,1,3.7,0.20
+r007,album_003,user_002,4.5,"The arrangements reward repeat listening and the mix remains clear",2026-08-22T08:00:00Z,platform_export,v1,platform_verified,unknown,420,4.0,0.10
+r008,album_003,user_006,5.0,"template version 1",2026-08-22T08:00:10Z,platform_export,v1,platform_verified,unknown,3,4.0,0.10
+r009,album_003,user_007,5.0,"template version 2",2026-08-22T08:00:12Z,platform_export,v1,platform_verified,unknown,3,4.0,0.10
+r010,album_004,user_008,2.5,"Uneven pacing, though several individual performances are convincing",2026-08-23T15:40:00Z,platform_export,v1,platform_verified,unknown,1250,3.0,0.25
+r011,album_004,user_009,2.0,"The record has interesting ideas but lacks a consistent direction",2026-08-24T16:15:00Z,platform_export,v1,platform_verified,unknown,730,3.0,0.25
+r012,album_004,user_010,5.0,,2026-08-24T16:15:05Z,platform_export,v1,platform_verified,unknown,4,3.0,0.25
