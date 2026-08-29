@@ -1,0 +1,248 @@
+{"kind":"deck","id":"pr/abn7eg","name":"Deck"}
+{"kind":"layout","layoutId":"bfee5a0b-c105-42ec-a2ab-d8010e53d2bc","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"01ffd937-b5c8-4d7f-b6de-9cddfc4db333","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/t1fvxn","slide":1,"title":"TrustData","textShapes":7}
+{"kind":"shape","id":"sh/ho3qpkn2","slide":1,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/u1s7up4b","slide":1,"bbox":[68,54,94,5]}
+{"kind":"textbox","id":"sh/vml8nu5w","slide":1,"text":"TrustData","textPreview":"TrustData","textChars":9,"textLines":1,"bbox":[68,104,700,80]}
+{"kind":"textbox","id":"sh/8zapsfm5","slide":1,"text":"UGC 数据使用风险的可解释评估与分级","textPreview":"UGC 数据使用风险的可解释评估与分级","textChars":19,"textLines":1,"bbox":[70,204,820,68]}
+{"kind":"textbox","id":"sh/t0jqlknq","slide":1,"text":"新域新质创新大赛｜项目路演稿","textPreview":"新域新质创新大赛｜项目路演稿","textChars":14,"textLines":1,"bbox":[72,292,520,34]}
+{"kind":"textbox","id":"sh/6xs7q54f","slide":1,"text":"以可复核证据连接数据、模型与处置","textPreview":"以可复核证据连接数据、模型与处置","textChars":16,"textLines":1,"bbox":[72,386,550,42]}
+{"kind":"shape","id":"sh/7y18ja5k","slide":1,"bbox":[72,470,520,0]}
+{"kind":"textbox","id":"sh/cve94zmp","slide":1,"text":"南京大学本科生项目组","textPreview":"南京大学本科生项目组","textChars":10,"textLines":1,"bbox":[72,496,400,28]}
+{"kind":"textbox","id":"sh/dwnqx43a","slide":1,"text":"TECHNICAL PRESENTATION","textPreview":"TECHNICAL PRESENTATION","textChars":22,"textLines":1,"bbox":[72,536,280,28]}
+{"kind":"shape","id":"sh/p0zyhwv2","slide":1,"bbox":[920,472,16,48]}
+{"kind":"shape","id":"sh/ozqxoreh","slide":1,"bbox":[962,452,16,68]}
+{"kind":"shape","id":"sh/nyhgfmdw","slide":1,"bbox":[1004,432,16,88]}
+{"kind":"shape","id":"sh/2x8fmhwb","slide":1,"bbox":[1046,412,16,108]}
+{"kind":"shape","id":"sh/1wzydcvq","slide":1,"bbox":[1088,392,16,128]}
+{"kind":"textbox","id":"sh/0vqxkrel","slide":1,"text":"DATA USE RISK\nEVIDENCE / CONTROL / TRACEABILITY","textPreview":"DATA USE RISK | EVIDENCE / CONTROL / TRACEABILITY","textChars":47,"textLines":2,"bbox":[904,246,270,90]}
+{"kind":"notes","id":"nt/t1fvxn","slide":1,"text":"开场说明项目边界：这里评估 UGC 数据在使用过程中的风险；内容真实性与生成来源由独立流程核验。全套材料的数字均可回到运行产物与哈希清单。\n\n[Sources]\n- Internal evidence: docs/01_COMPETITION_STRATEGY.md\n- Internal evidence: competition/evidence/INDEX.md\n- https://www.xyxzds.com/"}
+{"kind":"slide","id":"sl/8zmimx","slide":2,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":13}
+{"kind":"textbox","id":"sh/x4zupkja","slide":2,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/ah8vu5kj","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/v2hcna14","slide":2,"text":"核心问题：数据如何使用，依据如何说明","textPreview":"核心问题：数据如何使用，依据如何说明","textChars":18,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/k7ad0f21","slide":2,"bbox":[68,164,1144,0]}
+{"kind":"textbox","id":"sh/58jetkj6","slide":2,"text":"UGC 进入分析、推荐与运营流程后，风险常以局部信号出现：","textPreview":"UGC 进入分析、推荐与运营流程后，风险常以局部信号出现：","textChars":29,"textLines":1,"bbox":[80,198,900,34]}
+{"kind":"shape","id":"sh/i5svy5kv","slide":2,"bbox":[82,269,14,14]}
+{"kind":"textbox","id":"sh/j61cra1g","slide":2,"text":"来源与授权记录不完整","textPreview":"来源与授权记录不完整","textChars":10,"textLines":1,"bbox":[120,260,520,34]}
+{"kind":"shape","id":"sh/sbad4z2x","slide":2,"bbox":[82,351,14,14]}
+{"kind":"textbox","id":"sh/tcjex4ji","slide":2,"text":"异常行为被平均值掩盖","textPreview":"异常行为被平均值掩盖","textChars":10,"textLines":1,"bbox":[120,342,520,34]}
+{"kind":"shape","id":"sh/l0jypgfm","slide":2,"bbox":[82,433,14,14]}
+{"kind":"textbox","id":"sh/0zqxwby1","slide":2,"text":"高风险样本缺少处置依据","textPreview":"高风险样本缺少处置依据","textChars":11,"textLines":1,"bbox":[120,424,520,34]}
+{"kind":"textbox","id":"sh/zyhgn6xg","slide":2,"text":"证据链","textPreview":"证据链","textChars":3,"textLines":1,"bbox":[770,215,240,34]}
+{"kind":"shape","id":"sh/yx8fu1gv","slide":2,"bbox":[770,292,84,48]}
+{"kind":"textbox","id":"sh/9ojytgfi","slide":2,"text":"数据资产","textPreview":"数据资产","textChars":4,"textLines":1,"bbox":[778,304,68,24]}
+{"kind":"shape","id":"sh/8nah0byx","slide":2,"bbox":[854,316,20,0]}
+{"kind":"shape","id":"sh/nm1gr6xc","slide":2,"bbox":[874,292,84,48]}
+{"kind":"textbox","id":"sh/m1sfylgr","slide":2,"text":"特征证据","textPreview":"特征证据","textChars":4,"textLines":1,"bbox":[882,304,68,24]}
+{"kind":"shape","id":"sh/pszyhwfe","slide":2,"bbox":[958,316,20,0]}
+{"kind":"shape","id":"sh/or6xoryt","slide":2,"bbox":[978,292,84,48]}
+{"kind":"textbox","id":"sh/gbax4r6p","slide":2,"text":"分级结果","textPreview":"分级结果","textChars":4,"textLines":1,"bbox":[986,304,68,24]}
+{"kind":"shape","id":"sh/hcjydw7a","slide":2,"bbox":[1062,316,20,0]}
+{"kind":"shape","id":"sh/u9sf2hoj","slide":2,"bbox":[1082,292,84,48]}
+{"kind":"textbox","id":"sh/fa1gbmp4","slide":2,"text":"处置记录","textPreview":"处置记录","textChars":4,"textLines":1,"bbox":[1090,304,68,24]}
+{"kind":"textbox","id":"sh/4fuh8r6l","slide":2,"text":"可复核的判断，才可进入业务流程。","textPreview":"可复核的判断，才可进入业务流程。","textChars":16,"textLines":1,"bbox":[770,408,400,34]}
+{"kind":"notes","id":"nt/8zmimx","slide":2,"text":"本页将评审关注点收束到三个可检验维度：证据完整度、信号区分度和动作记录完整度。\n\n[Sources]\n- Internal evidence: docs/03_ALGORITHM_AND_METHODS.md\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md\n- https://www.iso.org/standard/81088.html"}
+{"kind":"slide","id":"sl/j4t3cc","slide":3,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":13}
+{"kind":"textbox","id":"sh/dgrmpw7e","slide":3,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/qd0ne18n","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/be94n6p8","slide":3,"text":"项目边界：数据使用风险评估与独立核验流程","textPreview":"项目边界：数据使用风险评估与独立核验流程","textChars":20,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/0j25kb65","slide":3,"bbox":[68,164,1144,0]}
+{"kind":"textbox","id":"sh/lkbmtg7a","slide":3,"text":"当前版本回答三个问题","textPreview":"当前版本回答三个问题","textChars":10,"textLines":1,"bbox":[82,208,430,32]}
+{"kind":"textbox","id":"sh/yh0ni1oz","slide":3,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[84,268,44,30]}
+{"kind":"textbox","id":"sh/zi94r6pk","slide":3,"text":"来源与过程证据的可用程度","textPreview":"来源与过程证据的可用程度","textChars":12,"textLines":1,"bbox":[148,268,490,54]}
+{"kind":"shape","id":"sh/gnyl87ql","slide":3,"bbox":[148,326,478,0]}
+{"kind":"textbox","id":"sh/1o7mhc76","slide":3,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[84,346,44,30]}
+{"kind":"textbox","id":"sh/hcbe507i","slide":3,"text":"异常信号的跨时间、主体与来源一致程度","textPreview":"异常信号的跨时间、主体与来源一致程度","textChars":18,"textLines":1,"bbox":[148,346,490,54]}
+{"kind":"shape","id":"sh/gb2xwv6x","slide":3,"bbox":[148,404,478,0]}
+{"kind":"textbox","id":"sh/vatw3qpc","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[84,424,44,30]}
+{"kind":"textbox","id":"sh/upkfu5or","slide":3,"text":"不同风险水平对应的复核动作","textPreview":"不同风险水平对应的复核动作","textChars":13,"textLines":1,"bbox":[148,424,490,54]}
+{"kind":"shape","id":"sh/5gvy9k7e","slide":3,"bbox":[148,482,478,0]}
+{"kind":"shape","id":"sh/4fmx0f6t","slide":3,"bbox":[764,214,400,274]}
+{"kind":"textbox","id":"sh/3etg7apo","slide":3,"text":"由独立流程承担","textPreview":"由独立流程承担","textChars":7,"textLines":1,"bbox":[800,250,300,30]}
+{"kind":"textbox","id":"sh/idkfy5o3","slide":3,"text":"内容真实性核验\n生成来源判别\n平台线上自动拦截\n法律责任认定","textPreview":"内容真实性核验 | 生成来源判别 | 平台线上自动拦截 | 法律责任认定","textChars":30,"textLines":4,"bbox":[800,306,300,132]}
+{"kind":"textbox","id":"sh/dkvydk7q","slide":3,"text":"边界清楚，结论才可被正确使用。","textPreview":"边界清楚，结论才可被正确使用。","textChars":15,"textLines":1,"bbox":[764,536,400,30]}
+{"kind":"notes","id":"nt/j4t3cc","slide":3,"text":"边界说明用于控制结论范围。项目输出风险分层与证据覆盖情况，平台或研究者结合业务规则完成最终判断。\n\n[Sources]\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md\n- Internal evidence: materials/APPLICATION_DRAFT.md\n- https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm"}
+{"kind":"slide","id":"sl/wumswk","slide":4,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":11}
+{"kind":"textbox","id":"sh/g3mtsva5","slide":4,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/f2dczq90","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/u14bqlsf","slide":4,"text":"五类证据进入同一条可解释评分链","textPreview":"五类证据进入同一条可解释评分链","textChars":15,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/p8fu50r2","slide":4,"bbox":[68,164,1144,0]}
+{"kind":"shape","id":"sh/476twfah","slide":4,"bbox":[86,254,54,54]}
+{"kind":"textbox","id":"sh/36dc3a9w","slide":4,"text":"P\n来源完整性","textPreview":"P | 来源完整性","textChars":7,"textLines":2,"bbox":[154,246,138,60]}
+{"kind":"shape","id":"sh/254bu5sb","slide":4,"bbox":[268,281,44,0]}
+{"kind":"shape","id":"sh/dwfu9kry","slide":4,"bbox":[312,254,54,54]}
+{"kind":"textbox","id":"sh/cv6d0fad","slide":4,"text":"B\n行为稳定性","textPreview":"B | 行为稳定性","textChars":7,"textLines":2,"bbox":[380,246,138,60]}
+{"kind":"shape","id":"sh/atsvap43","slide":4,"bbox":[494,281,44,0]}
+{"kind":"shape","id":"sh/bu1c3a5o","slide":4,"bbox":[538,254,54,54]}
+{"kind":"textbox","id":"sh/cvadcfm9","slide":4,"text":"C\n内容相似性","textPreview":"C | 内容相似性","textChars":7,"textLines":2,"bbox":[606,246,138,60]}
+{"kind":"shape","id":"sh/xgju5knu","slide":4,"bbox":[720,281,44,0]}
+{"kind":"shape","id":"sh/yhsvep4f","slide":4,"bbox":[764,254,54,54]}
+{"kind":"textbox","id":"sh/zi1c7u5k","slide":4,"text":"X\n跨源一致性","textPreview":"X | 跨源一致性","textChars":7,"textLines":2,"bbox":[832,246,138,60]}
+{"kind":"shape","id":"sh/kjadgzm5","slide":4,"bbox":[946,281,44,0]}
+{"kind":"shape","id":"sh/lk3u94nq","slide":4,"bbox":[990,254,54,54]}
+{"kind":"textbox","id":"sh/el8b2l4v","slide":4,"text":"T\n时间结构","textPreview":"T | 时间结构","textChars":6,"textLines":2,"bbox":[1058,246,138,60]}
+{"kind":"textbox","id":"sh/fmhcvq5g","slide":4,"text":"证据向量","textPreview":"证据向量","textChars":4,"textLines":1,"bbox":[86,394,160,28]}
+{"kind":"textbox","id":"sh/jqds3ml8","slide":4,"text":"P / B / C / X / T  →  场景权重  →  DTS  →  置信度与动作","textPreview":"P / B / C / X / T  →  场景权重  →  DTS  →  置信度与动作","textChars":45,"textLines":1,"bbox":[86,432,900,40]}
+{"kind":"textbox","id":"sh/i54ru1kn","slide":4,"text":"不同场景使用不同权重；每条结果保留证据覆盖、风险等级与复核建议。","textPreview":"不同场景使用不同权重；每条结果保留证据覆盖、风险等级与复核建议。","textChars":32,"textLines":1,"bbox":[86,506,830,34]}
+{"kind":"notes","id":"nt/wumswk","slide":4,"text":"五类特征分别对应来源、行为、内容、跨来源与时间结构，均可在护照与审计记录中回溯。\n\n[Sources]\n- Internal evidence: src/trustdata/features.py\n- Internal evidence: src/trustdata/scoring.py\n- Internal evidence: docs/03_ALGORITHM_AND_METHODS.md"}
+{"kind":"slide","id":"sl/ygf4sm","slide":5,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":12}
+{"kind":"textbox","id":"sh/8z25ofeh","slide":5,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/7yt4vaxw","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/mxknm5wb","slide":5,"text":"场景化 DTS：同一份数据，在不同任务中有不同风险","textPreview":"场景化 DTS：同一份数据，在不同任务中有不同风险","textChars":25,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/hov614fy","slide":5,"bbox":[68,164,1144,0]}
+{"kind":"textbox","id":"sh/wnm5szed","slide":5,"text":"DTS = Σ wₖ·Eₖ","textPreview":"DTS = Σ wₖ·Eₖ","textChars":13,"textLines":1,"bbox":[86,220,420,55]}
+{"kind":"textbox","id":"sh/v2t4zuxs","slide":5,"text":"权重向量随任务切换，证据项保持一致。","textPreview":"权重向量随任务切换，证据项保持一致。","textChars":18,"textLines":1,"bbox":[88,292,500,32]}
+{"kind":"textbox","id":"sh/u1knqpw7","slide":5,"text":"研究分析","textPreview":"研究分析","textChars":4,"textLines":1,"bbox":[670,206,150,28]}
+{"kind":"shape","id":"sh/xsrmp0fu","slide":5,"bbox":[684,406.4,18,103.6]}
+{"kind":"shape","id":"sh/cri5gve9","slide":5,"bbox":[709,450.8,18,59.2]}
+{"kind":"shape","id":"sh/y58vydg7","slide":5,"bbox":[734,421.2,18,88.8]}
+{"kind":"shape","id":"sh/z6hcrixc","slide":5,"bbox":[759,443.4,18,66.6]}
+{"kind":"shape","id":"sh/07qd03yx","slide":5,"bbox":[784,458.2,18,51.8]}
+{"kind":"textbox","id":"sh/l8zut8fi","slide":5,"text":"0.28  0.16  0.24  0.18  0.14","textPreview":"0.28  0.16  0.24  0.18  0.14","textChars":28,"textLines":1,"bbox":[654,530,180,30]}
+{"kind":"textbox","id":"sh/m98v2dg3","slide":5,"text":"内容分发","textPreview":"内容分发","textChars":4,"textLines":1,"bbox":[840,206,150,28]}
+{"kind":"shape","id":"sh/na1cvixo","slide":5,"bbox":[854,458.2,18,51.8]}
+{"kind":"shape","id":"sh/8bad4ny9","slide":5,"bbox":[879,406.4,18,103.6]}
+{"kind":"shape","id":"sh/9wjuxsfu","slide":5,"bbox":[904,436,18,74]}
+{"kind":"shape","id":"sh/axsv6xgf","slide":5,"bbox":[929,450.8,18,59.2]}
+{"kind":"shape","id":"sh/vy1cz2xk","slide":5,"bbox":[954,428.6,18,81.4]}
+{"kind":"textbox","id":"sh/r2lcn2ds","slide":5,"text":"0.14  0.28  0.20  0.16  0.22","textPreview":"0.14  0.28  0.20  0.16  0.22","textChars":28,"textLines":1,"bbox":[824,530,180,30]}
+{"kind":"textbox","id":"sh/61cbuxc7","slide":5,"text":"运营决策","textPreview":"运营决策","textChars":4,"textLines":1,"bbox":[1010,206,150,28]}
+{"kind":"shape","id":"sh/t43upsvy","slide":5,"bbox":[1024,436,18,74]}
+{"kind":"shape","id":"sh/s3utw7ud","slide":5,"bbox":[1049,428.6,18,81.4]}
+{"kind":"shape","id":"sh/jy1cjidw","slide":5,"bbox":[1074,443.4,18,66.6]}
+{"kind":"shape","id":"sh/idsbqdcb","slide":5,"bbox":[1099,413.8,18,96.2]}
+{"kind":"shape","id":"sh/50julsvm","slide":5,"bbox":[1124,458.2,18,51.8]}
+{"kind":"textbox","id":"sh/4zatsnuh","slide":5,"text":"0.20  0.22  0.18  0.26  0.14","textPreview":"0.20  0.22  0.18  0.26  0.14","textChars":28,"textLines":1,"bbox":[994,530,180,30]}
+{"kind":"textbox","id":"sh/va1sfidk","slide":5,"text":"权重表达证据在特定使用场景中的相对重要性。","textPreview":"权重表达证据在特定使用场景中的相对重要性。","textChars":21,"textLines":1,"bbox":[86,506,500,50]}
+{"kind":"notes","id":"nt/ygf4sm","slide":5,"text":"本页展示评分设计的可解释性：场景差异通过显式权重呈现。实际应用时，权重需要在目标平台上以历史标注和误报成本校准。\n\n[Sources]\n- Internal evidence: src/trustdata/scoring.py\n- Internal evidence: configs/trust.yaml\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md"}
+{"kind":"slide","id":"sl/yr3hz7","slide":6,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":15}
+{"kind":"textbox","id":"sh/zit4fu18","slide":6,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/k32lozit","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/l4bmhkje","slide":6,"text":"数据资产：可追溯的公开样本 + 受控污染基准","textPreview":"数据资产：可追溯的公开样本 + 受控污染基准","textChars":22,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/ad03i5kr","slide":6,"bbox":[68,164,1144,0]}
+{"kind":"textbox","id":"sh/be94ba1c","slide":6,"text":"208,615","textPreview":"208,615","textChars":7,"textLines":1,"bbox":[82,220,230,54]}
+{"kind":"textbox","id":"sh/cfilkf2x","slide":6,"text":"原始观测记录","textPreview":"原始观测记录","textChars":6,"textLines":1,"bbox":[82,280,230,30]}
+{"kind":"shape","id":"sh/xgbmdkji","slide":6,"bbox":[312,222,1,0]}
+{"kind":"textbox","id":"sh/2903e5kv","slide":6,"text":"4,102","textPreview":"4,102","textChars":5,"textLines":1,"bbox":[360,220,230,54]}
+{"kind":"textbox","id":"sh/na9k7a10","slide":6,"text":"AOTY–RYM 精确匹配","textPreview":"AOTY–RYM 精确匹配","textChars":13,"textLines":1,"bbox":[360,280,230,30]}
+{"kind":"shape","id":"sh/jypw3qxg","slide":6,"bbox":[590,222,1,0]}
+{"kind":"textbox","id":"sh/ixgvalgv","slide":6,"text":"30,000","textPreview":"30,000","textChars":6,"textLines":1,"bbox":[638,220,230,54]}
+{"kind":"textbox","id":"sh/507e5gf6","slide":6,"text":"受控注入样本","textPreview":"受控注入样本","textChars":6,"textLines":1,"bbox":[638,280,230,30]}
+{"kind":"shape","id":"sh/4zydcvyl","slide":6,"bbox":[868,222,1,0]}
+{"kind":"textbox","id":"sh/r29w7qxc","slide":6,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[916,220,230,54]}
+{"kind":"textbox","id":"sh/610velgr","slide":6,"text":"输入/输出哈希","textPreview":"输入/输出哈希","textChars":7,"textLines":1,"bbox":[916,280,230,30]}
+{"kind":"shape","id":"sh/tore90fi","slide":6,"bbox":[82,364,1080,0]}
+{"kind":"textbox","id":"sh/s3idgvyx","slide":6,"text":"公开样本","textPreview":"公开样本","textChars":4,"textLines":1,"bbox":[82,408,160,30]}
+{"kind":"textbox","id":"sh/765cv6x8","slide":6,"text":"AOTY / Metacritic 历史评分、AOTY Top 5000、RYM Top 5000、已发布评论摘录","textPreview":"AOTY / Metacritic 历史评分、AOTY Top 5000、RYM Top 5000、已发布评论摘录","textChars":57,"textLines":1,"bbox":[82,446,1000,34]}
+{"kind":"textbox","id":"sh/m5wv21gn","slide":6,"text":"基准样本","textPreview":"基准样本","textChars":4,"textLines":1,"bbox":[82,506,160,30]}
+{"kind":"textbox","id":"sh/ql4za90b","slide":6,"text":"行为操纵、协同行为、重复内容、时间突发、来源缺失；全部标记为 synthetic，仅用于评测","textPreview":"行为操纵、协同行为、重复内容、时间突发、来源缺失；全部标记为 synthetic，仅用于评测","textChars":46,"textLines":1,"bbox":[82,544,1000,34]}
+{"kind":"notes","id":"nt/yr3hz7","slide":6,"text":"数据清单区分公开来源与受控基准。受控污染属于方法验证标签，用于检验系统对已知扰动的敏感性；平台真实标注将在试点阶段获取。\n\n[Sources]\n- Internal evidence: docs/02_DATA_ASSETS.md\n- Internal evidence: competition/evidence/INDEX.md\n- Internal evidence: outputs/runs/latest/run_manifest.json"}
+{"kind":"slide","id":"sl/2x9ebs","slide":7,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":13}
+{"kind":"textbox","id":"sh/fm98ny5w","slide":7,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/0nipg36h","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/1orqp8n2","slide":7,"text":"评测设计：把“变差多少”变成可重复的实验","textPreview":"评测设计：把“变差多少”变成可重复的实验","textChars":20,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/qhg7a9of","slide":7,"bbox":[68,164,1144,0]}
+{"kind":"textbox","id":"sh/rip8je50","slide":7,"text":"污染比例","textPreview":"污染比例","textChars":4,"textLines":1,"bbox":[86,212,180,28]}
+{"kind":"shape","id":"sh/sjipcj6l","slide":7,"bbox":[100,285,26,26]}
+{"kind":"textbox","id":"sh/dkrqlon6","slide":7,"text":"1%","textPreview":"1%","textChars":2,"textLines":1,"bbox":[92,329,44,24]}
+{"kind":"shape","id":"sh/adk7mdoj","slide":7,"bbox":[128,298,152,0]}
+{"kind":"shape","id":"sh/bet8vi54","slide":7,"bbox":[280,285,26,26]}
+{"kind":"textbox","id":"sh/jahwzilo","slide":7,"text":"5%","textPreview":"5%","textChars":2,"textLines":1,"bbox":[272,329,44,24]}
+{"kind":"shape","id":"sh/i98vqdk3","slide":7,"bbox":[308,298,152,0]}
+{"kind":"shape","id":"sh/5cze183u","slide":7,"bbox":[460,285,26,26]}
+{"kind":"textbox","id":"sh/kbqds329","slide":7,"text":"10%","textPreview":"10%","textChars":3,"textLines":1,"bbox":[452,329,44,24]}
+{"kind":"shape","id":"sh/7e1w3il0","slide":7,"bbox":[488,298,152,0]}
+{"kind":"shape","id":"sh/6dsvudkf","slide":7,"bbox":[640,285,26,26]}
+{"kind":"textbox","id":"sh/tgje5s3q","slide":7,"text":"20%","textPreview":"20%","textChars":3,"textLines":1,"bbox":[632,329,44,24]}
+{"kind":"shape","id":"sh/sfadwn25","slide":7,"bbox":[668,298,152,0]}
+{"kind":"shape","id":"sh/fi1w72lw","slide":7,"bbox":[820,285,26,26]}
+{"kind":"textbox","id":"sh/uhsfyxkb","slide":7,"text":"30%","textPreview":"30%","textChars":3,"textLines":1,"bbox":[812,329,44,24]}
+{"kind":"textbox","id":"sh/qxwzq14j","slide":7,"text":"分组约束","textPreview":"分组约束","textChars":4,"textLines":1,"bbox":[86,412,180,28]}
+{"kind":"textbox","id":"sh/ry5gz654","slide":7,"text":"贡献者分组切分，5 个预设种子复算；每次训练、验证与测试均保持主体隔离。","textPreview":"贡献者分组切分，5 个预设种子复算；每次训练、验证与测试均保持主体隔离。","textChars":36,"textLines":1,"bbox":[86,450,1000,34]}
+{"kind":"textbox","id":"sh/czehsrmp","slide":7,"text":"判定约束","textPreview":"判定约束","textChars":4,"textLines":1,"bbox":[86,520,180,28]}
+{"kind":"textbox","id":"sh/d0ny1wna","slide":7,"text":"阈值按清洁样本 FPR ≤ 1% 选择；同时报告 Brier、ECE、AUROC、AUPRC 与排序稳定性。","textPreview":"阈值按清洁样本 FPR ≤ 1% 选择；同时报告 Brier、ECE、AUROC、AUPRC 与排序稳定性。","textChars":54,"textLines":1,"bbox":[86,558,1000,34]}
+{"kind":"notes","id":"nt/2x9ebs","slide":7,"text":"评测设置同时覆盖分类、概率校准、排序与分组切分敏感性。阈值依据清洁样本的误报约束确定。五次复算共享同一受控基准，检验贡献者分组变化带来的波动。\n\n[Sources]\n- Internal evidence: src/trustdata/evaluation.py\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md\n- Internal evidence: outputs/runs/latest/classification_metrics.csv\n- Internal evidence: outputs/runs/latest/split_sensitivity_summary.csv"}
+{"kind":"slide","id":"sl/4w1bmm","slide":8,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":6}
+{"kind":"textbox","id":"sh/a5sjqtwb","slide":8,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/x83i1ovm","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/w7u1sje1","slide":8,"text":"检测性能：污染越强，分层识别越稳定","textPreview":"检测性能：污染越强，分层识别越稳定","textChars":17,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/n210vedk","slide":8,"bbox":[68,164,1144,0]}
+{"kind":"textbox","id":"sh/94jixovq","slide":8,"text":"30% 污染","textPreview":"30% 污染","textChars":6,"textLines":1,"bbox":[850,244,260,32]}
+{"kind":"textbox","id":"sh/83a1oje5","slide":8,"text":"precision  0.992\nrecall     0.602\nF1         0.750\nAUPRC      0.949","textPreview":"precision  0.992 | recall     0.602 | F1         0.750 | AUPRC      0.949","textChars":67,"textLines":4,"bbox":[850,292,280,150]}
+{"kind":"shape","id":"sh/7y5k7ido","slide":8,"bbox":[850,484,292,0]}
+{"kind":"textbox","id":"sh/6xcjydwj","slide":8,"text":"5 次分组复算：F1 0.745–0.762\n主运行 FPR：0.17%","textPreview":"5 次分组复算：F1 0.745–0.762 | 主运行 FPR：0.17%","textChars":36,"textLines":2,"bbox":[850,516,300,66]}
+{"kind":"image","id":"im/vidozeh0","slide":8,"name":"","alt":"污染比例与检测性能关系图","bbox":[90,198,700,430]}
+{"kind":"notes","id":"nt/4w1bmm","slide":8,"text":"图中报告受控污染基准结果。30% 水平的精度、召回率与 AUPRC 来自主运行产物；五次贡献者分组复算的 F1 范围为 0.7451—0.7622。真实平台效果将在试点数据上独立评估。\n\n[Sources]\n- Internal evidence: competition/evidence/figures/risk_detection_by_contamination.png\n- Internal evidence: outputs/runs/latest/classification_metrics.csv\n- Internal evidence: outputs/runs/latest/split_sensitivity_summary.csv\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md"}
+{"kind":"slide","id":"sl/vg3xek","slide":9,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":6}
+{"kind":"textbox","id":"sh/yl4f2dov","slide":9,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/l8fydsnm","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/k7mx4n61","slide":9,"text":"排序权衡：中高污染改善，低污染优先监测","textPreview":"排序权衡：中高污染改善，低污染优先监测","textChars":19,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/7axgfi5s","slide":9,"bbox":[68,164,1144,0]}
+{"kind":"textbox","id":"sh/9cfyhsny","slide":9,"text":"30% 污染时","textPreview":"30% 污染时","textChars":7,"textLines":1,"bbox":[842,236,250,32]}
+{"kind":"textbox","id":"sh/8b6h8n6d","slide":9,"text":"Spearman ρ  0.994\nTop-100 overlap  0.70\nMRE reduction  25.6%","textPreview":"Spearman ρ  0.994 | Top-100 overlap  0.70 | MRE reduction  25.6%","textChars":60,"textLines":3,"bbox":[842,286,315,115]}
+{"kind":"textbox","id":"sh/3etg3y58","slide":9,"text":"20%–30% 降低平均排名误差；5%–30% 提高 Top-100 保留率。1% 场景进入监测与人工复核。","textPreview":"20%–30% 降低平均排名误差；5%–30% 提高 Top-100 保留率。1% 场景进入监测与人工复核。","textChars":54,"textLines":1,"bbox":[842,458,328,104]}
+{"kind":"image","id":"im/zixs32x0","slide":9,"name":"","alt":"污染比例下排序稳定性图","bbox":[88,204,690,400]}
+{"kind":"notes","id":"nt/vg3xek","slide":9,"text":"平均排名误差与 Top-100 保留率分别报告。加权排序在 20%—30% 污染下降低平均名次误差，在 5%—30% 污染下提高 Top-100 保留率；1% 污染下两项指标均下降，因此采用监测与人工复核策略。\n\n[Sources]\n- Internal evidence: competition/evidence/figures/ranking_robustness.png\n- Internal evidence: outputs/runs/latest/ranking_metrics.csv\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md"}
+{"kind":"slide","id":"sl/xbm56y","slide":10,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":15}
+{"kind":"textbox","id":"sh/5gvmhg3y","slide":10,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/id4n6147","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/3ed4f6ls","slide":10,"text":"产品交付：从总览到单条记录的审计路径","textPreview":"产品交付：从总览到单条记录的审计路径","textChars":18,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/sjm5cvm9","slide":10,"bbox":[68,164,1144,0]}
+{"kind":"shape","id":"sh/dkf6l03u","slide":10,"bbox":[88,286,46,46]}
+{"kind":"textbox","id":"sh/qh4nal4j","slide":10,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[99,298,24,20]}
+{"kind":"textbox","id":"sh/ridojqlo","slide":10,"text":"总览\nOverview","textPreview":"总览 | Overview","textChars":11,"textLines":2,"bbox":[78,358,120,52]}
+{"kind":"shape","id":"sh/0n65gvml","slide":10,"bbox":[136,309,170,0]}
+{"kind":"shape","id":"sh/18f6p036","slide":10,"bbox":[306,286,46,46]}
+{"kind":"textbox","id":"sh/50fit87e","slide":10,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[317,298,24,20]}
+{"kind":"textbox","id":"sh/4z61k3qt","slide":10,"text":"护照\nPassport","textPreview":"护照 | Passport","textChars":11,"textLines":2,"bbox":[296,358,120,52]}
+{"kind":"shape","id":"sh/jyx0ryp8","slide":10,"bbox":[354,309,170,0]}
+{"kind":"shape","id":"sh/ixozit8n","slide":10,"bbox":[524,286,46,46]}
+{"kind":"textbox","id":"sh/t4zixs7a","slide":10,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[535,298,24,20]}
+{"kind":"textbox","id":"sh/s3q1onq5","slide":10,"text":"风险\nRisk","textPreview":"风险 | Risk","textChars":7,"textLines":2,"bbox":[514,358,120,52]}
+{"kind":"shape","id":"sh/r2h0vipk","slide":10,"bbox":[572,309,170,0]}
+{"kind":"shape","id":"sh/61ojmd8z","slide":10,"bbox":[742,286,46,46]}
+{"kind":"textbox","id":"sh/98vilo76","slide":10,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[753,298,24,20]}
+{"kind":"textbox","id":"sh/87mhcjql","slide":10,"text":"队列\nQueue","textPreview":"队列 | Queue","textChars":8,"textLines":2,"bbox":[732,358,120,52]}
+{"kind":"shape","id":"sh/0bq18jyh","slide":10,"bbox":[790,309,170,0]}
+{"kind":"shape","id":"sh/1czi1of2","slide":10,"bbox":[960,286,46,46]}
+{"kind":"textbox","id":"sh/e98j6tgb","slide":10,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[971,298,24,20]}
+{"kind":"textbox","id":"sh/zah0zyxw","slide":10,"text":"审计\nAudit","textPreview":"审计 | Audit","textChars":8,"textLines":2,"bbox":[950,358,120,52]}
+{"kind":"textbox","id":"sh/ofq1c3yt","slide":10,"text":"每一步都保留来源、特征覆盖、等级、动作与哈希。","textPreview":"每一步都保留来源、特征覆盖、等级、动作与哈希。","textChars":23,"textLines":1,"bbox":[88,494,850,40]}
+{"kind":"textbox","id":"sh/9gji58fy","slide":10,"text":"当前交付为可离线运行的静态产品原型，读取 app/data/dashboard.json。","textPreview":"当前交付为可离线运行的静态产品原型，读取 app/data/dashboard.json。","textChars":45,"textLines":1,"bbox":[88,554,900,32]}
+{"kind":"notes","id":"nt/xbm56y","slide":10,"text":"演示时从总览进入单条护照，再进入风险队列与审计视图。该路径展示结论、证据与处置记录之间的对应关系。\n\n[Sources]\n- Internal evidence: product/index.html\n- Internal evidence: product/app.js\n- Internal evidence: docs/06_PRODUCT_AND_ARCHITECTURE.md"}
+{"kind":"slide","id":"sl/gmtrwo","slide":11,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":13}
+{"kind":"textbox","id":"sh/ihwja1or","slide":11,"text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
+{"kind":"textbox","id":"sh/5k725g7i","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
+{"kind":"textbox","id":"sh/4jy1cb6x","slide":11,"text":"从基准验证走向平台试点：四步转换路径","textPreview":"从基准验证走向平台试点：四步转换路径","textChars":18,"textLines":1,"bbox":[68,92,1030,58]}
+{"kind":"shape","id":"sh/rmpk7qp8","slide":11,"bbox":[68,164,1144,0]}
+{"kind":"shape","id":"sh/6lg3elon","slide":11,"bbox":[86,264,218,96]}
+{"kind":"textbox","id":"sh/to729g7e","slide":11,"text":"公开数据复核","textPreview":"公开数据复核","textChars":6,"textLines":1,"bbox":[104,286,180,30]}
+{"kind":"textbox","id":"sh/snylgv6t","slide":11,"text":"已完成","textPreview":"已完成","textChars":3,"textLines":1,"bbox":[104,326,180,20]}
+{"kind":"shape","id":"sh/fa9kbqpk","slide":11,"bbox":[304,312,52,0]}
+{"kind":"shape","id":"sh/epg3iloz","slide":11,"bbox":[356,264,218,96]}
+{"kind":"textbox","id":"sh/8j2lgzyl","slide":11,"text":"分组稳健性复算","textPreview":"分组稳健性复算","textChars":7,"textLines":1,"bbox":[374,286,180,30]}
+{"kind":"textbox","id":"sh/9kvm94fq","slide":11,"text":"已完成","textPreview":"已完成","textChars":3,"textLines":1,"bbox":[374,326,180,20]}
+{"kind":"shape","id":"sh/mhk3epgf","slide":11,"bbox":[574,312,52,0]}
+{"kind":"shape","id":"sh/7it47ux0","slide":11,"bbox":[626,264,218,96]}
+{"kind":"textbox","id":"sh/wnm5kzyh","slide":11,"text":"真实标注校准","textPreview":"真实标注校准","textChars":6,"textLines":1,"bbox":[644,286,180,30]}
+{"kind":"textbox","id":"sh/hovmd4f2","slide":11,"text":"下一阶段","textPreview":"下一阶段","textChars":4,"textLines":1,"bbox":[644,326,180,20]}
+{"kind":"shape","id":"sh/ul43i9gb","slide":11,"bbox":[844,312,52,0]}
+{"kind":"shape","id":"sh/vmd4buxw","slide":11,"bbox":[896,264,218,96]}
+{"kind":"textbox","id":"sh/4rm5ojyd","slide":11,"text":"平台影子运行","textPreview":"平台影子运行","textChars":6,"textLines":1,"bbox":[914,286,180,30]}
+{"kind":"textbox","id":"sh/5cfmhofy","slide":11,"text":"试点目标","textPreview":"试点目标","textChars":4,"textLines":1,"bbox":[914,326,180,20]}
+{"kind":"textbox","id":"sh/twrulk36","slide":11,"text":"关键补充","textPreview":"关键补充","textChars":4,"textLines":1,"bbox":[86,458,160,28]}
+{"kind":"textbox","id":"sh/svidcfml","slide":11,"text":"真实平台标注、跨平台偏移、阈值与误报成本、处置后复盘。","textPreview":"真实平台标注、跨平台偏移、阈值与误报成本、处置后复盘。","textChars":27,"textLines":1,"bbox":[86,500,980,34]}
+{"kind":"notes","id":"nt/gmtrwo","slide":11,"text":"这页把当前成果与下一步区分开。当前基准验证已经形成可复核证据；真实平台试点需要合作方提供标注与影子运行环境。\n\n[Sources]\n- Internal evidence: docs/01_COMPETITION_STRATEGY.md\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md\n- Internal evidence: materials/APPLICATION_DRAFT.md"}
+{"kind":"slide","id":"sl/u1hy1s","slide":12,"title":"12","textShapes":7}
+{"kind":"shape","id":"sh/dkfehofy","slide":12,"bbox":[68,58,88,5]}
+{"kind":"textbox","id":"sh/qh4fmtw7","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1144,48,60,26]}
+{"kind":"textbox","id":"sh/bidwfexs","slide":12,"text":"交付内容由使用证据、评测结果与处置路径共同构成。","textPreview":"交付内容由使用证据、评测结果与处置路径共同构成。","textChars":24,"textLines":1,"bbox":[70,138,1090,150]}
+{"kind":"textbox","id":"sh/0n6xs3e9","slide":12,"text":"数据资产清单  ·  受控评测基准  ·  可解释算法  ·  产品原型  ·  申报材料","textPreview":"数据资产清单  ·  受控评测基准  ·  可解释算法  ·  产品原型  ·  申报材料","textChars":45,"textLines":1,"bbox":[74,316,1040,36]}
+{"kind":"shape","id":"sh/lofel8fu","slide":12,"bbox":[74,410,780,0]}
+{"kind":"textbox","id":"sh/ylofqtwj","slide":12,"text":"请求评审关注：","textPreview":"请求评审关注：","textChars":7,"textLines":1,"bbox":[74,454,220,30]}
+{"kind":"textbox","id":"sh/zmxwjyx4","slide":12,"text":"真实平台试点所需条件","textPreview":"真实平台试点所需条件","textChars":10,"textLines":1,"bbox":[300,454,620,30]}
+{"kind":"textbox","id":"sh/gr2dgze5","slide":12,"text":"谢谢","textPreview":"谢谢","textChars":2,"textLines":1,"bbox":[74,580,180,42]}
+{"kind":"textbox","id":"sh/1sve94fq","slide":12,"text":"TrustData / E2","textPreview":"TrustData / E2","textChars":14,"textLines":1,"bbox":[980,586,210,28]}
+{"kind":"notes","id":"nt/u1hy1s","slide":12,"text":"结尾回到可验证性和下一步。受控基准结果按 E2 证据等级表述；讨论重点转向真实标注与试点条件。\n\n[Sources]\n- Internal evidence: competition/evidence/INDEX.md\n- Internal evidence: docs/07_REPRODUCIBILITY_AND_EVIDENCE.md\n- https://jw.nju.edu.cn/d9/36/c26263a842038/page.htm"}

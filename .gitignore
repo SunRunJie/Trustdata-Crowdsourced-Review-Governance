@@ -11,6 +11,7 @@ data/processed/*.jsonl
 outputs/runs/
 outputs/cache/
 logs/
+tmp/
 prior_research/.git/
 
 # Keep directory structure and small, auditable manifests/results.
@@ -18,4 +19,3 @@ prior_research/.git/
 !data/processed/.gitkeep
 !outputs/runs/.gitkeep
 !logs/.gitkeep
-

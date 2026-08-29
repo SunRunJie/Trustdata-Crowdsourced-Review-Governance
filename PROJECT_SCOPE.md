@@ -6,14 +6,12 @@ TrustData 接收平台自有或合法获得的一批评价数据，围绕来源�
 
 核心问题是：**哪些数据可以进入哪个下游场景、以何种权重进入，以及这一决定基于什么证据。**
 
-## 2. What TrustData does not do
+## 2. 功能边界
 
-- 不判断一条评论的绝对真假。
-- 不承诺识别所有 AI 生成文本。
-- 不做通用互联网事实核查或知识问答。
-- 不以单个特征（如新账号、短文本、AI disclosure）直接裁决。
-- 不把跨平台一致性当作 ground truth。
-- 不在 MVP 中训练自有大模型、引入区块链或搭建互联网级微服务。
+- 当前输出：记录在指定业务场景中的使用风险、证据覆盖度和治理建议。
+- 独立流程：内容事实核验、生成来源认定和互联网知识问答。
+- 决策规则：新账号、短文本、来源声明和跨平台差异均作为局部证据，与其余维度联合解释。
+- 技术范围：MVP 采用轻量、可复现的统计学习方案；大模型训练、区块链和互联网级微服务属于后续独立论证事项。
 
 ## 3. Primary users
 
@@ -23,7 +21,7 @@ TrustData 接收平台自有或合法获得的一批评价数据，围绕来源�
 
 ## 4. Primary data
 
-标准对象为 `record + contributor + entity + content + timestamp + source + relationship`。MVP 首先支持 CSV、JSON/JSONL 和 Parquet；缺失字段不会被默认为低可信，而会降低 evidence coverage。
+标准对象为 `record + contributor + entity + content + timestamp + source + relationship`。MVP 首先支持 CSV、JSON/JSONL 和 Parquet；缺失字段通过 evidence coverage 表达信息完整度，其余可信信号保持独立。
 
 ## 5. Primary outputs
 
@@ -41,7 +39,7 @@ TrustData 接收平台自有或合法获得的一批评价数据，围绕来源�
 
 `ingest → validate → P/B/C/X/T → coverage/uncertainty → DTS → tier → governance → audit → benchmark → dashboard`
 
-首版数据规模目标不是“爬遍互联网”，而是完整处理全部可合法复用归档，并能在受控基准中扩展到十万级贡献记录。真实数据与受控贡献数据分别存储和展示。
+首版完整处理全部可合法复用归档，并在受控基准中扩展到十万级贡献记录。真实数据与受控贡献数据分别存储、标记和展示。
 
 ## 7. Future scope
 
@@ -57,5 +55,4 @@ TrustData 接收平台自有或合法获得的一批评价数据，围绕来源�
 - P/B/C/X/T 消融与权重/阈值/缺失敏感性；
 - 新账号等群体的误伤率报告；
 - 可演示 Trust Passport、Risk Monitor、Governance Center、Audit Trail；
-- 每个申报 claim 有 evidence level、允许表述和禁止表述。
-
+- 每个申报 claim 配置 evidence level、适用表述和证据路径。

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="TrustData：面向众包内容平台的用户评价数据可信评估与分级系统" />
+  <title>TrustData · 可信数据治理台</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="TrustData 首页">
+        <span class="brand-mark">TD</span>
+        <span><strong>TrustData</strong><small>可信数据治理台</small></span>
+      </a>
+      <nav aria-label="主导航">
+        <a data-route="overview" href="#overview"><span>01</span>治理总览</a>
+        <a data-route="passports" href="#passports"><span>02</span>可信护照</a>
+        <a data-route="risk" href="#risk"><span>03</span>风险监测</a>
+        <a data-route="queue" href="#queue"><span>04</span>治理队列</a>
+        <a data-route="audit" href="#audit"><span>05</span>审计追溯</a>
+        <a data-route="benchmark" href="#benchmark"><span>06</span>基准验证</a>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="status-dot"></span>
+        <div><strong>验证原型</strong><small>证据等级 E2 · 受控评测</small></div>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">EVIDENCE-BASED UGC DATA GOVERNANCE</p>
+          <h1 id="page-title">治理总览</h1>
+        </div>
+        <div class="top-actions">
+          <span class="data-badge">受控基准 · 运行清单已归档</span>
+          <button id="export-button" type="button">导出本页摘要</button>
+        </div>
+      </header>
+      <div id="loading" class="loading">正在读取实验资产…</div>
+      <div id="error" class="error" hidden></div>
+      <section id="content" aria-live="polite"></section>
+    </main>
+  </div>
+  <script src="./app.js" defer></script>
+</body>
+</html>

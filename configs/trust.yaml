@@ -1,0 +1,53 @@
+version: "0.2.0"
+random_seed: 20260828
+
+evaluation:
+  primary_split_seed: 20260828
+  split_sensitivity_seeds: [20260828, 101, 211, 307, 401]
+  maximum_false_positive_rate: 0.01
+
+benchmark:
+  clean_records: 100000
+  contributors: 8000
+  entities: 2000
+  days: 180
+  max_contamination: 0.30
+  contamination_levels: [0.01, 0.05, 0.10, 0.20, 0.30]
+  review_probability: 0.20
+
+scenarios:
+  ranking_integrity:
+    provenance: 0.10
+    behavior: 0.30
+    content: 0.10
+    cross_source: 0.25
+    temporal: 0.25
+  training_data:
+    provenance: 0.30
+    behavior: 0.20
+    content: 0.35
+    cross_source: 0.05
+    temporal: 0.10
+  research_dataset:
+    provenance: 0.30
+    behavior: 0.10
+    content: 0.10
+    cross_source: 0.25
+    temporal: 0.25
+  content_display:
+    provenance: 0.20
+    behavior: 0.25
+    content: 0.40
+    cross_source: 0.05
+    temporal: 0.10
+
+tiers:
+  trusted: 85
+  standard: 70
+  watch: 55
+  review_required: 35
+
+governance:
+  minimum_weight: 0.05
+  high_confidence_coverage: 0.85
+  medium_confidence_coverage: 0.60

@@ -6,19 +6,26 @@ TrustData 面向 UGC 平台的数据运营与治理团队，评估一条或一�
 
 ## 当前状态
 
-项目已完成需求审计与范围冻结，正在建立可复现的数据、算法、产品和申报材料链路。前置研究位于 `prior_research/`，其真实归档、合成数据、受控实验和情景模型被严格区分；前置结果不自动视为本项目的新成果。
+项目已完成数据、算法、产品、内部证明与申报材料闭环。前置研究位于 `prior_research/`，其中的真实归档、合成数据、受控实验和情景模型分别归档；前置结果作为研究基础使用。当前版本加入五个贡献者分组种子敏感性评测、13 项自动化测试和跨交付物证据校验。提交前工作集中于填写团队信息、核对赛事系统字段与准备真实平台试点。
 
 ## 核心闭环
 
 数据接入 → 来源建档 → 行为/内容/跨源/时序信号 → Trust Vector → 场景化 Data Trust Score → 数据分级 → 治理动作 → 审计记录 → 可信数据输出
 
-## 证据纪律
+## 证据规则
 
-- 不判断数据的“绝对真假”。
-- 不把 AI 辅助等同于低质量。
-- 不把合成污染描述为真实平台攻击。
-- 不把受控文本实验描述为通用 AI 文本检测能力。
-- 任何申报指标必须能追溯到本仓库的输入、配置、代码、日志和结果文件。
+- 系统输出记录在指定用途下的风险与使用建议。
+- 生成辅助声明作为来源证据，与质量判断分别处理。
+- 合成污染统一标记为 E2 受控基准。
+- 文本实验用于内容结构特征验证。
+- 申报指标均可追溯到本仓库的输入、配置、代码、日志和结果文件。
 
-详见 [PROJECT_SCOPE.md](PROJECT_SCOPE.md)、[CURRENT_STATE.md](CURRENT_STATE.md) 与 [TASK_TREE.md](TASK_TREE.md)。
+交付物包括：`deliverables/` 中的申报书 Word/PDF 与路演 PPT，`product/` 中的静态原型，`competition/evidence/` 中的证据索引与运行产物。详见 [PROJECT_SCOPE.md](PROJECT_SCOPE.md)、[CURRENT_STATE.md](CURRENT_STATE.md) 与 [TASK_TREE.md](TASK_TREE.md)。
 
+## 最终验收
+
+```powershell
+python scripts/audit_competition_package.py
+python scripts/verify_run_manifest.py
+pytest -q
+```

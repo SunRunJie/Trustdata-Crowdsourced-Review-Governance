@@ -1,0 +1,16 @@
+{
+  "entities_total": 42356,
+  "entities_by_platform": {
+    "AOTY_history": 32356,
+    "AOTY": 5000,
+    "RYM": 5000
+  },
+  "unique_entity_ids": 34584,
+  "cross_source_entities": 4102,
+  "reviews_total": 166259,
+  "review_exact_duplicates": 965,
+  "review_sources": 131,
+  "review_text_missing": 0,
+  "observed_rows_total": 208615,
+  "evidence_boundary": "Observed archives support descriptive entity/content baselines; contributor-level longitudinal behavior belongs to the platform pilot dataset."
+}

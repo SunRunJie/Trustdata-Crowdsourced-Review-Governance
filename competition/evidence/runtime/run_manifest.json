@@ -1,0 +1,49 @@
+{
+  "run_status": "success",
+  "started_at": "2026-08-29T01:35:15.728800+00:00",
+  "finished_at": "2026-08-29T01:36:11.068770+00:00",
+  "elapsed_seconds": 55.339970111846924,
+  "code_version": "0.2.0",
+  "random_seed": 20260828,
+  "evidence_class": "E2_controlled_synthetic_benchmark_seeded_by_observed_distributions",
+  "inputs": {
+    "data\\processed\\observed_entities.csv": "30e076d5488c91704e002defefa99de6c4bd94bc19f9db4584128e61d2752a6c",
+    "data\\processed\\observed_reviews.csv": "7ce96e46e7ae6779e5c07b104b8a8363b9042b21ad41cde286dc94da5cebe7f2",
+    "configs\\trust.yaml": "fe410bce013284928c21c63c2d24ae6965d9076bad8c859fa310bd5e8b713506"
+  },
+  "environment": {
+    "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "numpy": "2.5.2",
+      "pandas": "3.0.5",
+      "scipy": "1.18.0",
+      "scikit-learn": "1.9.0",
+      "matplotlib": "3.11.1",
+      "PyYAML": "6.0.3"
+    }
+  },
+  "outputs": {
+    "outputs\\runs\\latest\\ablation_metrics.csv": "6447bb6dd4962097959507b8c7bf7869f14a9f0435493b81379b0b05a9c7f959",
+    "outputs\\runs\\latest\\audit_trail.csv": "a5b5e504dfaf81ce9cc21697c562839b5017d8b1894f0d3565ef4fc81c4da113",
+    "outputs\\runs\\latest\\classification_metrics.csv": "4622618a5c162f9d5bebb1d9aed8537984a7bbf7e7a3e53251f557dd4517a6f5",
+    "outputs\\runs\\latest\\fairness_metrics.csv": "57a410ec4545bfa08fd25058f3cbbff282758fb7d7d3828ad3c519deff054cca",
+    "outputs\\runs\\latest\\figures\\ablation_f1.png": "84e06402709136f6404aa37b8c048c030481c7e2e46b0dc08ae6007a4d476b18",
+    "outputs\\runs\\latest\\figures\\ranking_robustness.png": "4e1183652cf2793d977a2f86f813f6dccb9250a40780ae3243f98700eecd3e1c",
+    "outputs\\runs\\latest\\figures\\risk_detection_by_contamination.png": "2be1c8ddb2aae9b708bf388751dc54fd5426bff9e32a75f837be0e3333ed409d",
+    "outputs\\runs\\latest\\figures\\tier_distribution.png": "a3b9e48d89b4e14264e4ca7649d42948cd804a333cafd925d705811afaf8d47a",
+    "outputs\\runs\\latest\\headline_metrics.csv": "62df96c838ca268335f9d7e50452ef85cfdfa9791ee729cf03cbc40551b83338",
+    "outputs\\runs\\latest\\ranking_metrics.csv": "28ab8196b0f95a23700face6f5fedcfe427ac14da89744bd5cc1e64a17cec06f",
+    "outputs\\runs\\latest\\result_summary.json": "f050f65364337b53bfc67682c11d8bfa6a07243b11b4bd2b4d80340d22b3fa6b",
+    "outputs\\runs\\latest\\scored_records_sample.csv": "64b1fb55f6bdaaf364f58798fcf11ebcd27d9925b22dabc127db9aebeff57fbb",
+    "outputs\\runs\\latest\\split_sensitivity_metrics.csv": "5f8785af9abffe7d659db2cbc2af67920c619f99b39dfec4df8a8c5cce691fdd",
+    "outputs\\runs\\latest\\split_sensitivity_summary.csv": "1f573a65718ab811bb54892a4693395796bd38f0aee93b1b1102463a6f6e7ad6",
+    "outputs\\runs\\latest\\trust_passports.json": "2a8e89b513c97350966f9737b83c2dd491cac414091f22ba9dff31ce961bc1b2"
+  },
+  "figures": [
+    "outputs\\runs\\latest\\figures\\risk_detection_by_contamination.png",
+    "outputs\\runs\\latest\\figures\\ranking_robustness.png",
+    "outputs\\runs\\latest\\figures\\ablation_f1.png",
+    "outputs\\runs\\latest\\figures\\tier_distribution.png"
+  ]
+}
