@@ -25,6 +25,41 @@ TrustData 面向 UGC 平台的数据运营与治理团队，评估一条或一�
 
 输入评分需先统一到 0–5 量表。输出提供 DTS、证据覆盖度、不确定性、A–E 等级、风险标签、建议动作和版本信息；结论属于数据使用风险建议，不直接认定用户意图或作出不可逆处罚。
 
+### 2b. 使用 LLM 挖掘跨源验证数据
+
+TrustData 支持使用大模型 API 作为万能爬虫，从多个平台挖掘评价数据用于交叉验证。LLM 驱动搜索策略和页面解析，httpx 负责实际网页抓取，确保数据来自真实 Web 而非模型内部参数。
+
+```powershell
+# 安装挖掘依赖
+pip install httpx
+
+# 设置 LLM API Key
+$env:LLM_API_KEY = "your-api-key"
+
+# 使用自然语言描述挖掘任务
+.\.venv\Scripts\python.exe scripts\mine_data.py `
+  --task "查找AOTY和RYM上Radiohead OK Computer的评分" `
+  --output data\mined\okcomputer.csv
+
+# 使用 YAML 任务文件
+.\.venv\Scripts\python.exe scripts\mine_data.py `
+  --task tasks\cross_source_movies.yaml `
+  --output data\mined\movies.csv `
+  --verbose
+
+# 挖掘后用标准流水线评估可信度
+.\.venv\Scripts\python.exe scripts\assess_data.py `
+  --input data\mined\okcomputer.csv `
+  --output data\assessed\okcomputer_scored.csv `
+  --scenario ranking_integrity
+```
+
+**配置**：编辑 `configs/llm_mining.yaml` 选择 LLM 提供商（OpenAI 兼容 / Anthropic）、设置爬取间隔和验证阈值。支持 `base_url` 覆盖以接入 vLLM、Ollama 或其他兼容端点。
+
+**YAML 任务文件格式**：通过 `domain` 和 `entity_type` 字段切换领域（音乐/电影/餐饮等），详见 `configs/llm_mining.yaml` 中的示例。
+
+**反幻觉与证据规则**：每条提取的记录必须附带 `citation_snippet`（源页面原文子串），系统对引用片段做子串匹配验证，置信度低于阈值的记录自动丢弃。挖掘数据标记为 `verification_level="llm_mined_web_citation"`，进入评估流水线后 P 维度风险自动升高，确保下游使用者知悉数据来源特征。
+
 ### 3. 完整复现实验
 
 ```powershell

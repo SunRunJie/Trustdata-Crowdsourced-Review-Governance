@@ -1,0 +1,23 @@
+llm:
+  api_type: "openai"               # "openai" | "anthropic"
+  model: "gpt-4o"                  # 模型标识符
+  api_key_env: "LLM_API_KEY"       # 环境变量名
+  # base_url: "http://localhost:8000/v1"  # 取消注释以使用 vLLM/Ollama
+  max_tokens: 4096
+  temperature: 0.1
+
+crawl:
+  request_delay: 2.0               # 请求间隔（秒）
+  max_pages_total: 50              # 单次挖掘最大页面数
+  max_pages_per_entity: 5          # 每个实体每个平台最大页面数
+  user_agent: "TrustData-Miner/0.1 (academic-research)"
+  request_timeout: 30.0
+
+verification:
+  min_citation_score: 0.5          # 最低引用验证分数
+  verification_level: "llm_mined_web_citation"
+
+output:
+  include_source_url: true         # 输出中包含 source_url 列
+  include_citation_snippet: true   # 输出中包含 citation_snippet 列
+  include_content_hash: true       # 输出中包含 content_hash 列
