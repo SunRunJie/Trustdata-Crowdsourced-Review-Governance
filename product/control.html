@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrustData 本机控制台</title>
+  <link rel="stylesheet" href="/product/styles.css">
+  <link rel="stylesheet" href="/product/control.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#home"><span class="brand-mark">TD</span><span><strong>TrustData</strong><small>LOCAL CONTROL CONSOLE</small></span></a>
+      <nav id="nav">
+        <a class="active" href="#home"><span>01</span>运行总览</a>
+        <a href="#mining"><span>02</span>API 与挖掘</a>
+        <a href="#assessment"><span>03</span>数据评估</a>
+        <a href="#experiments"><span>04</span>主项目实验</a>
+        <a href="#research"><span>05</span>前置研究</a>
+        <a href="#results"><span>06</span>结果中心</a>
+      </nav>
+      <div class="sidebar-foot"><i class="status-dot"></i><span><strong id="server-status">正在检查</strong><small>仅限本机 127.0.0.1</small></span></div>
+    </aside>
+    <main>
+      <header class="topbar"><div><p class="eyebrow">LOCAL · AUDITABLE · USER-CONTROLLED</p><h1>TrustData 全流程控制台</h1></div><div class="top-actions"><a class="button-link" href="/product/index.html" target="_blank" rel="noopener">打开产品看板</a><span class="data-badge" id="env-badge">环境检查中</span></div></header>
+      <div id="notice" class="notice" hidden></div>
+
+      <section id="home" class="console-page active">
+        <div class="hero-grid"><article class="panel"><p class="eyebrow">START HERE</p><h2>从配置到可核验结果</h2><p class="lead">在本机完成 API 配置、文件接入、LLM 挖掘、可信评估、受控实验和前置研究。每次执行会形成独立工作区，保留日志、配置快照与可下载产物。</p><p class="callout">本控制台不会绕过登录、403、robots 或站点访问限制。联网采集仅在你明确确认后执行。</p></article><article class="panel"><h3>运行环境</h3><dl class="status-list" id="status-list"><dt>Python</dt><dd>检查中</dd><dt>.env</dt><dd>检查中</dd><dt>前置研究依赖</dt><dd>检查中</dd></dl></article></div>
+        <div class="metric-grid"><article class="metric"><small>支持输入</small><strong>4</strong><em>CSV · JSON · JSONL · Parquet</em></article><article class="metric"><small>执行隔离</small><strong>RUN</strong><em>outputs/ui-runs/&lt;ID&gt;</em></article><article class="metric"><small>密钥展示</small><strong>掩码</strong><em>只写入本机 .env</em></article><article class="metric"><small>运行队列</small><strong id="recent-run-count">0</strong><em>当前控制台会话</em></article></div>
+      </section>
+
+      <section id="mining" class="console-page">
+        <article class="panel"><p class="eyebrow">LLM MINING</p><h2>API 配置与跨源挖掘</h2><p class="lead">非敏感参数保存至 <code>configs/llm_mining.yaml</code>。密钥写入根目录 <code>.env</code>，界面只显示掩码。</p></article>
+        <div class="two-col"><form class="panel form-grid" id="llm-form"><h3>LLM 配置</h3><label>API 类型<select name="api_type"><option value="openai">OpenAI 兼容</option><option value="anthropic">Anthropic</option></select></label><label>模型<input name="model" required></label><label>Base URL<input name="base_url" placeholder="https://api.deepseek.com"></label><label>密钥变量名<input name="api_key_env" value="LLM_API_KEY" required></label><label>API Key（留空则不修改）<input name="api_key" type="password" autocomplete="new-password" placeholder="未配置"></label><label>最大输出 Token<input name="max_tokens" type="number" min="128"></label><label>Temperature<input name="temperature" type="number" min="0" max="2" step="0.1"></label><label>请求间隔（秒）<input name="request_delay" type="number" min="0" step="0.1"></label><label>总页数上限<input name="max_pages_total" type="number" min="1"></label><label>每实体页数<input name="max_pages_per_entity" type="number" min="1"></label><label>超时（秒）<input name="request_timeout" type="number" min="1"></label><label>最低引用分数<input name="min_citation_score" type="number" min="0" max="1" step="0.05"></label><label class="wide">自定义 User-Agent<input name="user_agent"></label><button>保存本机配置</button><p class="form-note" id="key-state"></p></form>
+          <form class="panel form-grid" id="mining-form"><h3>启动挖掘任务</h3><label class="wide">自然语言任务<textarea name="task" rows="4" placeholder="例如：查找 AOTY 和 RYM 上 Radiohead OK Computer 的评分"></textarea></label><label class="wide">或上传 YAML 任务文件<input name="task_file" type="file" accept=".yaml,.yml"></label><p class="form-note wide">任务会生成独立 CSV、挖掘摘要；若所有候选来源均为 403/404，会生成带 URL 的来源不可用报告。</p><button>开始 LLM 挖掘</button></form></div>
+      </section>
+
+      <section id="assessment" class="console-page">
+        <article class="panel"><p class="eyebrow">ASSESSMENT</p><h2>上传并评估评价数据</h2><p class="lead">选择 CSV、JSON、JSONL 或 Parquet。上传后会检查必填字段：<code>record_id</code>、<code>entity_id</code>、<code>rating</code>。</p></article>
+        <div class="two-col"><form class="panel form-grid" id="upload-form"><h3>选择文件</h3><label class="wide">数据文件<input name="file" type="file" accept=".csv,.json,.jsonl,.parquet" required></label><button>上传并预检</button><div class="preview wide" id="upload-preview">尚未选择文件。</div></form><form class="panel form-grid" id="assessment-form"><h3>可信评估</h3><label>业务场景<select name="scenario"><option value="ranking_integrity">排名完整性</option><option value="training_data">训练数据</option><option value="research_dataset">研究数据集</option><option value="content_display">内容展示</option></select></label><p class="form-note wide">必须先成功上传并通过字段预检。评估结果为数据使用风险建议，不直接判定用户意图或事实真假。</p><button id="assess-button" disabled>运行可信评估</button></form></div>
+      </section>
+
+      <section id="experiments" class="console-page"><article class="panel"><p class="eyebrow">REPRODUCIBILITY &amp; QA</p><h2>主项目实验与质量核验</h2><p class="lead">控制台任务默认写入独立工作区；受控实验不会覆盖正式产品看板、最新运行或竞赛证据镜像。</p></article><div class="task-grid" id="main-tasks"><button data-job="prepare_observed"><b>准备观测数据</b><small>将归档规范化至本次运行工作区</small></button><button data-job="trustdata"><b>运行受控基准</b><small>自动准备输入并生成指标、图表、清单</small></button><button data-job="profile_prior"><b>画像前置数据</b><small>源文件哈希、行列、缺失与重复检查</small></button><button data-job="audit_package"><b>审计竞赛包</b><small>校验当前正式交付物</small></button><button data-job="tests"><b>运行测试套件</b><small>执行项目 pytest 回归测试</small></button></div><form class="panel inline-form" id="verify-form"><label>校验控制台运行 ID<input name="run_id" placeholder="从结果中心复制，例如 20260830-xxxx"></label><button>验证运行清单</button></form><form class="panel inline-form" id="publish-form"><label>发布的受控基准运行 ID<input name="run_id" placeholder="仅限成功的 trustdata 运行"></label><label class="check"><input name="confirmed" type="checkbox"> 我确认将覆盖正式产品看板并同步竞赛证据镜像。</label><button>发布正式演示产物</button></form></section>
+
+      <section id="research" class="console-page"><article class="panel"><p class="eyebrow">PRIOR RESEARCH</p><h2>AOTY / RYM 前置研究</h2><p class="lead">可运行八阶段研究流程。控制台会复制已有归档数据至本次工作区，并使用独立输出目录。若研究依赖缺失，请先通过下方操作安装。</p></article><div class="two-col"><article class="panel"><h3>研究环境</h3><p class="form-note">安装会通过当前虚拟环境执行 <code>pip install -r prior_research/requirements.txt</code>，可能下载额外依赖。</p><button data-job="research_install">安装/更新研究依赖</button></article><form class="panel form-grid" id="research-form"><h3>运行八阶段研究</h3><label>模式<select name="mode"><option value="empirical">实证模式</option><option value="demo">演示模式（显式合成）</option></select></label><label class="check wide"><input name="collection_confirmed" type="checkbox"> 我确认采集仅用于合规目的，且遵守站点条款、robots 和频率限制。</label><label class="check wide"><input name="collect" type="checkbox"> 尝试实时公开页面采集（默认关闭）</label><button>启动前置研究</button></form></div></section>
+
+      <section id="results" class="console-page"><article class="panel"><p class="eyebrow">RESULT CENTER</p><h2>任务日志与产物</h2><p class="lead">运行中自动刷新。点击产物可在新标签页预览或下载；CSV、JSON、图片和报告都会保留在相应工作区。</p></article><div class="two-col"><article class="panel"><h3>本次会话任务</h3><div id="job-list" class="job-list"><p class="notice">尚未启动任务。</p></div></article><article class="panel"><h3 id="job-title">选择一个任务</h3><pre id="job-log" class="job-log">日志将显示在这里。</pre><div id="artifact-list" class="artifact-list"></div></article></div></section>
+    </main>
+  </div>
+  <script src="/product/control.js"></script>
+</body>
+</html>

@@ -137,19 +137,39 @@ def _truncate_for_context(text: str, max_chars: int = 60000) -> str:
 
 
 def _extract_json_block(text: str) -> str:
-    """Extract the first JSON array or object from LLM output.
+    """Extract the first complete JSON object or array from LLM output.
 
-    Handles markdown fenced blocks (```json ... ```) as well as raw JSON.
+    ``JSONDecoder.raw_decode`` avoids greedy regular expressions swallowing a
+    second JSON value when a provider emits repeated or trailing structured
+    content. Markdown fences are preferred but are not required.
     """
-    fenced = re.search(r"```(?:json)?\s*\n?([\s\S]*?)\n?```", text)
-    if fenced:
-        return fenced.group(1).strip()
-    # Try to find raw JSON array or object
-    for pattern in [r"(\[[\s\S]*\])", r"(\{[\s\S]*\})"]:
-        match = re.search(pattern, text)
-        if match:
-            return match.group(1).strip()
+    fenced_blocks = re.findall(r"```(?:json)?\s*\n?([\s\S]*?)\n?```", text)
+    candidates = [*fenced_blocks, text]
+    decoder = json.JSONDecoder()
+    for candidate in candidates:
+        for index, char in enumerate(candidate):
+            if char not in "[{":
+                continue
+            try:
+                _, end = decoder.raw_decode(candidate[index:])
+            except json.JSONDecodeError:
+                continue
+            return candidate[index:index + end]
     return text.strip()
+
+
+def _parse_llm_json(raw: str, expected_type: type, context: str) -> Any:
+    """Parse an LLM response and enforce its JSON container type safely."""
+    try:
+        parsed = json.loads(_extract_json_block(raw))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"LLM returned invalid JSON for {context}.") from exc
+    if not isinstance(parsed, expected_type):
+        raise ValueError(
+            f"LLM returned {type(parsed).__name__} for {context}; "
+            f"expected a JSON {expected_type.__name__}."
+        )
+    return parsed
 
 
 def _normalize_rating(value: float | None, scale: str) -> float | None:
@@ -317,7 +337,7 @@ def parse_task_natural_language(description: str, llm: LLMClient) -> MiningTask:
         "Return ONLY a JSON object, no explanation."
     )
     raw = llm.chat(system, description)
-    parsed = json.loads(_extract_json_block(raw))
+    parsed = _parse_llm_json(raw, dict, "natural-language task parsing")
     entities = parsed.get("entities", [])
     if entities and isinstance(entities[0], str):
         entities = [{"name": e} for e in entities]
@@ -399,6 +419,7 @@ class MiningPipeline:
         self._min_citation_score = min_citation_score
 
         self._crawl_plan: list[CrawlStep] = []
+        self._fetch_attempts: list[FetchedPage] = []
         self._fetched_pages: list[FetchedPage] = []
         self._records: list[ExtractedRecord] = []
         self._verified_records: list[ExtractedRecord] = []
@@ -423,7 +444,7 @@ class MiningPipeline:
         )
 
         raw = self._llm.chat(_STRATEGY_SYSTEM_PROMPT, user_msg)
-        steps_data = json.loads(_extract_json_block(raw))
+        steps_data = _parse_llm_json(raw, list, "crawl strategy generation")
         self._crawl_plan = []
         for item in steps_data:
             self._step_counter += 1
@@ -472,7 +493,7 @@ class MiningPipeline:
         )
         try:
             raw = self._llm.chat(_FOLLOW_UP_SYSTEM_PROMPT, user_msg)
-            items = json.loads(_extract_json_block(raw))
+            items = _parse_llm_json(raw, list, "follow-up link detection")
         except Exception:
             return []
 
@@ -503,8 +524,10 @@ class MiningPipeline:
             logger.info("Phase 2: fetching step %d — %s", step.step_id, step.url)
             page = self._fetch_url(step.url)
             step.completed = True
-            if page and page.status_code == 200:
+            if page:
                 step.fetched_page = page
+                self._fetch_attempts.append(page)
+            if page and page.status_code == 200:
                 self._fetched_pages.append(page)
                 pages_fetched += 1
                 follow_ups = self._detect_follow_ups(page, step)
@@ -514,6 +537,38 @@ class MiningPipeline:
                 time.sleep(self._delay)
         logger.info("Phase 2: fetched %d pages", pages_fetched)
         return self._fetched_pages
+
+    def source_unavailable_report(self) -> dict[str, Any] | None:
+        """Describe inaccessible candidate sources without attempting to bypass them."""
+        unavailable_statuses = {403, 404}
+        if (
+            not self._fetch_attempts
+            or self._fetched_pages
+            or any(page.status_code not in unavailable_statuses for page in self._fetch_attempts)
+        ):
+            return None
+
+        attempts = [
+            {"url": page.url, "status_code": page.status_code}
+            for page in self._fetch_attempts
+        ]
+        status_counts = {
+            str(status): sum(page.status_code == status for page in self._fetch_attempts)
+            for status in sorted({page.status_code for page in self._fetch_attempts})
+        }
+        return {
+            "status": "source_unavailable",
+            "reason": "All candidate URLs returned 403 or 404; no source page was accessible.",
+            "task_id": self._task.task_id,
+            "entities": self._task.entities,
+            "platforms": self._task.platforms,
+            "attempted_urls": attempts,
+            "status_counts": status_counts,
+            "manual_acquisition_guidance": (
+                "Use the listed URLs only through authorized access, official APIs, exports, or "
+                "platform-approved data requests. Do not attempt to bypass access controls."
+            ),
+        }
 
     # -- Phase 3: Intelligent extraction --------------------------------------
 
@@ -531,7 +586,7 @@ class MiningPipeline:
             )
             try:
                 raw = self._llm.chat(_EXTRACTION_SYSTEM_PROMPT, user_msg)
-                items = json.loads(_extract_json_block(raw))
+                items = _parse_llm_json(raw, list, "page record extraction")
             except Exception as exc:
                 logger.warning("Extraction failed for %s: %s", page.url, exc)
                 continue
@@ -747,6 +802,14 @@ def run_mining(
     if df.empty:
         logger.warning("No records survived verification. Output will be empty.")
         write_table(pd.DataFrame(), output_path)
+        unavailable_report = pipeline.source_unavailable_report()
+        if unavailable_report:
+            report_path = output_path.with_name(f"{output_path.stem}.source_unavailable.json")
+            report_path.write_text(
+                json.dumps(unavailable_report, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            logger.warning("All candidate sources were unavailable; report: %s", report_path)
         return df
 
     # Write output

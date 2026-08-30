@@ -258,13 +258,20 @@ def _plot_results(
     return paths
 
 
-def run_pipeline(root: Path, config_path: Path) -> dict[str, Any]:
+def run_pipeline(
+    root: Path,
+    config_path: Path,
+    *,
+    output_dir: Path | None = None,
+    processed_dir: Path | None = None,
+    publish: bool = True,
+) -> dict[str, Any]:
     started = time.time()
     started_at = datetime.now(timezone.utc).isoformat()
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-    output = root / "outputs" / "runs" / "latest"
+    output = output_dir or root / "outputs" / "runs" / "latest"
     output.mkdir(parents=True, exist_ok=True)
-    processed = root / "data" / "processed"
+    processed = processed_dir or root / "data" / "processed"
     entity_path = processed / "observed_entities.csv"
     review_path = processed / "observed_reviews.csv"
     if not entity_path.exists() or not review_path.exists():
@@ -443,8 +450,9 @@ def run_pipeline(root: Path, config_path: Path) -> dict[str, Any]:
             "场景权重属于可解释的原型策略参数；真实平台试点阶段将依据标注与误报成本校准。",
         ],
     }
-    _write_json(root / "app" / "data" / "dashboard.json", dashboard)
-    _write_dashboard_script(root / "product" / "dashboard-data.js", dashboard)
+    if publish:
+        _write_json(root / "app" / "data" / "dashboard.json", dashboard)
+        _write_dashboard_script(root / "product" / "dashboard-data.js", dashboard)
     _write_json(output / "result_summary.json", dashboard)
 
     # The manifest lists digests for completed sibling outputs; its own digest is maintained externally.
@@ -479,6 +487,7 @@ def run_pipeline(root: Path, config_path: Path) -> dict[str, Any]:
     }
     _write_json(output / "run_manifest.json", manifest)
     print(f"[OK] manifest={output / 'run_manifest.json'}")
-    copied = _sync_evidence_mirror(root, output)
-    print(f"[OK] evidence mirror artifacts={copied}")
+    if publish:
+        copied = _sync_evidence_mirror(root, output)
+        print(f"[OK] evidence mirror artifacts={copied}")
     return dashboard

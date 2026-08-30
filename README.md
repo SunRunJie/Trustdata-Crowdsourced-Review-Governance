@@ -6,13 +6,22 @@ TrustData 面向 UGC 平台的数据运营与治理团队，评估一条或一�
 
 ## 三种使用方式
 
-### 1. 直接查看解决方案
+### 1. 使用本机可视化控制台（推荐）
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\serve_solution.py
 ```
 
-访问 `http://127.0.0.1:8000/product/`。页面同时包含生成式数据脚本回退，已有 `product/dashboard-data.js` 时也可直接打开 `product/index.html`。
+访问 `http://127.0.0.1:8000/`。控制台只绑定本机回环地址，提供以下全流程操作：
+
+- 在页面中配置 LLM 提供商、模型、Base URL、抓取参数和 API Key；Key 只保存至本机 `.env`，页面仅显示掩码。
+- 选择 CSV、JSON、JSONL 或 Parquet 文件，预览字段并运行 TrustData 数据可信评估。
+- 输入自然语言任务或上传 YAML 任务，启动 LLM 跨源挖掘并查看 403/404 来源不可用报告。
+- 运行观测数据准备、受控基准、源数据画像、运行清单校验、竞赛包审计与完整测试套件。
+- 安装前置研究依赖、运行 AOTY/RYM 八阶段研究，并在明确确认合规后选择实时公开页面采集。
+- 在“结果中心”查看实时日志、历史运行和 CSV/JSON/图片/报告产物；每次运行保存在 `outputs/ui-runs/<运行ID>/`，不会默认覆盖正式看板或竞赛证据镜像。
+
+控制台页面右上角的“打开产品看板”保留原静态展示入口。若端口 8000 已被占用，可使用 `--port 8080`；服务仅接受 `127.0.0.1`、`localhost` 或 `::1`。
 
 ### 2. 评估一批新数据
 
@@ -29,34 +38,127 @@ TrustData 面向 UGC 平台的数据运营与治理团队，评估一条或一�
 
 TrustData 支持使用大模型 API 作为万能爬虫，从多个平台挖掘评价数据用于交叉验证。LLM 驱动搜索策略和页面解析，httpx 负责实际网页抓取，确保数据来自真实 Web 而非模型内部参数。
 
+#### 准备环境
+
+请在仓库根目录执行。项目要求 Python 3.12，推荐使用项目虚拟环境，避免系统中其他 Python 或依赖版本影响运行结果。
+
 ```powershell
-# 安装挖掘依赖
-pip install httpx
+# 首次使用：创建环境并安装全部锁定依赖
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
 
-# 设置 LLM API Key
-$env:LLM_API_KEY = "your-api-key"
+#### 1. 配置 API Key
 
-# 使用自然语言描述挖掘任务
+从模板创建本地配置文件，再用编辑器将占位值替换为真实密钥：
+
+```powershell
+
+Copy-Item .env.example .env
+notepad .env
+```
+
+默认 `.env` 内容如下：
+
+```dotenv
+LLM_API_KEY=your-api-key
+```
+
+`scripts/mine_data.py` 每次启动时都会读取仓库根目录的 `.env`。格式为每行一个 `KEY=VALUE`；空行和以 `#` 开头的注释会被忽略。请不要在 `configs/llm_mining.yaml`、命令行参数、日志或提交内容中写入真实密钥。
+
+若同时设置了操作系统环境变量和 `.env` 中的同名变量，**操作系统环境变量优先**。这便于 CI/CD 或团队统一注入密钥，而不会覆盖本机设置。
+
+#### 2. 选择提供商与模型
+
+在 `configs/llm_mining.yaml` 的 `llm` 区块配置提供商、模型和密钥变量名：
+
+| 场景 | `.env` | `configs/llm_mining.yaml` |
+| --- | --- | --- |
+| OpenAI 或 OpenAI 兼容服务 | `LLM_API_KEY=...` | `api_type: "openai"`、`api_key_env: "LLM_API_KEY"` |
+| Anthropic | `ANTHROPIC_API_KEY=...` | `api_type: "anthropic"`、`api_key_env: "ANTHROPIC_API_KEY"` |
+| 本地 vLLM、Ollama 或兼容网关 | 按网关要求填写 | 使用 `api_type: "openai"`，并填写 `base_url` |
+
+OpenAI 兼容服务示例：
+
+```yaml
+llm:
+  api_type: "openai"
+  model: "gpt-4o"
+  api_key_env: "LLM_API_KEY"
+  # 例如：http://localhost:8000/v1
+  # base_url: "http://localhost:8000/v1"
+  max_tokens: 4096
+  temperature: 0.1
+```
+
+`max_tokens` 控制单次解析的最大输出长度，`temperature` 建议保持较低值以提高结构化提取稳定性。`crawl` 区块中的 `request_delay`、`max_pages_total` 和 `max_pages_per_entity` 用于约束抓取频率和规模；请遵守目标网站条款、robots 规则与访问频率限制。
+
+#### 3. 运行挖掘任务
+
+可以直接传入自然语言任务：
+
+```powershell
 .\.venv\Scripts\python.exe scripts\mine_data.py `
   --task "查找AOTY和RYM上Radiohead OK Computer的评分" `
   --output data\mined\okcomputer.csv
+```
 
-# 使用 YAML 任务文件
+也可以使用 YAML 任务文件。任务文件中的 `domain`、`entity_type`、对象、平台和搜索提示都可按领域替换：
+
+```yaml
+task:
+  domain: "music"
+  entity_type: "album"
+  entities:
+    - name: "OK Computer"
+      year: "1997"
+  platforms: ["aoty", "rym"]
+  search_hints:
+    - "https://www.albumoftheyear.org/album/"
+  max_pages_per_entity: 3
+  language: "en"
+```
+
+将上述文件保存为 `tasks/okcomputer.yaml` 后运行：
+
+```powershell
 .\.venv\Scripts\python.exe scripts\mine_data.py `
-  --task tasks\cross_source_movies.yaml `
-  --output data\mined\movies.csv `
+  --task tasks\okcomputer.yaml `
+  --output data\mined\okcomputer.csv `
   --verbose
+```
 
-# 挖掘后用标准流水线评估可信度
+`--verbose` 会输出调试日志，适合定位搜索策略、抓取失败或引用验证失败。使用其他配置文件时增加 `--config configs\my_llm_mining.yaml`。
+
+#### 4. 查看输出并进行可信评估
+
+成功后会生成两类文件：
+
+- 指定的结果文件，例如 `data/mined/okcomputer.csv`；包含标准化记录、`source_url`、`citation_snippet`、`content_hash`、`verification_level` 与跨源字段。
+- 同目录的 `okcomputer.mining_summary.json`；记录任务、页面数量、提取和验证统计等摘要。
+- 若全部候选 URL 都返回 `403` 或 `404`，会额外生成 `okcomputer.source_unavailable.json`；其中列出每个尝试 URL、最终状态码和合规的数据获取建议，便于通过授权渠道自行取得数据。
+
+只保留通过引用验证的记录。随后可将结果送入标准可信度评估：
+
+```powershell
 .\.venv\Scripts\python.exe scripts\assess_data.py `
   --input data\mined\okcomputer.csv `
   --output data\assessed\okcomputer_scored.csv `
   --scenario ranking_integrity
 ```
 
-**配置**：编辑 `configs/llm_mining.yaml` 选择 LLM 提供商（OpenAI 兼容 / Anthropic）、设置爬取间隔和验证阈值。支持 `base_url` 覆盖以接入 vLLM、Ollama 或其他兼容端点。
+可用场景包括 `ranking_integrity`、`training_data`、`research_dataset` 和 `content_display`，定义见 `configs/trust.yaml`。输入评分应为 0–5 量表；评估输出是数据使用风险建议，不会直接判定用户意图或自动作出处罚。
 
-**YAML 任务文件格式**：通过 `domain` 和 `entity_type` 字段切换领域（音乐/电影/餐饮等），详见 `configs/llm_mining.yaml` 中的示例。
+#### 常见问题
+
+| 现象 | 处理方式 |
+| --- | --- |
+| `Environment variable 'LLM_API_KEY' is not set` | 确认 `.env` 位于仓库根目录、变量名与 `api_key_env` 一致，并重新运行命令。 |
+| 认证失败或 401 | 检查密钥是否有效、是否复制了占位符，以及 `api_type`、`base_url` 是否与服务商匹配。 |
+| 未提取到记录 | 使用 `--verbose` 检查页面抓取状态、搜索提示与页面正文；被拦截或无可验证引用的页面会被丢弃。 |
+| 全部 URL 返回 403/404 | 查看同目录的 `*.source_unavailable.json`，使用其中 URL 通过官方 API、数据导出或平台批准的数据请求自行获取数据；程序不会绕过访问控制。 |
+| 输出记录少于预期 | 降低范围而不是盲目提高抓取量；检查 `max_pages_total`、`max_pages_per_entity` 及 `min_citation_score`。 |
+| 需要无网络测试 | 运行 `python -m pytest -q tests/test_llm_mining.py`；该测试使用模拟请求，不需要 API Key。 |
 
 **反幻觉与证据规则**：每条提取的记录必须附带 `citation_snippet`（源页面原文子串），系统对引用片段做子串匹配验证，置信度低于阈值的记录自动丢弃。挖掘数据标记为 `verification_level="llm_mined_web_citation"`，进入评估流水线后 P 维度风险自动升高，确保下游使用者知悉数据来源特征。
 

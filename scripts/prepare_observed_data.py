@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 import sys
 from pathlib import Path
 
@@ -17,9 +18,15 @@ if str(SRC) not in sys.path:
 from trustdata.normalization import load_observed_entities, load_observed_reviews
 
 
-def main() -> int:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Prepare observed TrustData inputs.")
+    parser.add_argument("--output", type=Path, default=None, help="Optional processed-data destination")
+    return parser.parse_args()
+
+
+def prepare_observed_data(output: Path | None = None) -> dict:
     prior = ROOT / "prior_research"
-    output = ROOT / "data" / "processed"
+    output = output or ROOT / "data" / "processed"
     output.mkdir(parents=True, exist_ok=True)
 
     entities = load_observed_entities(prior)
@@ -53,8 +60,14 @@ def main() -> int:
 
     print(f"[OK] entities={len(entities):,} -> {entity_path}")
     print(f"[OK] reviews={len(reviews):,} -> {review_path}")
+    return summary
+
+
+def main() -> int:
+    args = parse_args()
+    summary = prepare_observed_data(args.output)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
-    if entities.empty or reviews.empty:
+    if not summary["entities_total"] or not summary["reviews_total"]:
         return 1
     return 0
 

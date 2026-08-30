@@ -30,6 +30,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from trustdata.env import load_env_file
 from trustdata.llm_mining import run_mining
 
 
@@ -64,6 +65,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    load_env_file(ROOT / ".env")
 
     # Determine whether --task is a file path or natural-language string
     task_path = Path(args.task)
@@ -84,6 +86,9 @@ def main() -> int:
     summary_path = args.output.with_name(f"{args.output.stem}.mining_summary.json")
     if summary_path.exists():
         print(f"[OK] summary={summary_path}")
+    unavailable_path = args.output.with_name(f"{args.output.stem}.source_unavailable.json")
+    if unavailable_path.exists():
+        print(f"[WARN] source unavailable report={unavailable_path}")
     return 0
 
 

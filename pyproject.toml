@@ -15,6 +15,9 @@ dependencies = [
   "matplotlib==3.11.1",
   "PyYAML==6.0.3",
   "pyarrow>=21.0.0,<24",
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.34,<1",
+  "python-multipart>=0.0.20,<1",
 ]
 
 [project.optional-dependencies]

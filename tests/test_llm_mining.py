@@ -27,7 +27,9 @@ from trustdata.llm_mining import (
     _html_to_text_snippet,
     _normalize_rating,
     enrich_cross_source_fields,
+    parse_task_natural_language,
     parse_task_yaml,
+    run_mining,
 )
 
 
@@ -118,6 +120,41 @@ class TestExtractJsonBlock:
         text = '```\n{"x": 42}\n```'
         result = json.loads(_extract_json_block(text))
         assert result["x"] == 42
+
+    def test_multiple_json_objects_returns_first_complete_object(self):
+        text = '{"domain": "music"}\n{"entity_type": "album"}'
+        assert json.loads(_extract_json_block(text)) == {"domain": "music"}
+
+    def test_multiple_json_arrays_returns_first_complete_array(self):
+        text = '[{"action": "fetch"}]\n[{"action": "paginate"}]'
+        assert json.loads(_extract_json_block(text)) == [{"action": "fetch"}]
+
+    def test_braces_inside_json_string_do_not_break_extraction(self):
+        text = 'Result: {"note": "keep {this} literal", "items": []} trailing text'
+        assert json.loads(_extract_json_block(text))["note"] == "keep {this} literal"
+
+
+class TestNaturalLanguageTaskParsing:
+    def test_multiple_json_objects_use_the_first_task_object(self):
+        llm = MagicMock()
+        llm.chat.return_value = (
+            '{"domain":"music","entity_type":"album",'
+            '"entities":[{"name":"OK Computer"}],"platforms":["aoty","rym"]}'
+            '\n{"note":"duplicate response"}'
+        )
+
+        task = parse_task_natural_language("Find OK Computer ratings", llm)
+
+        assert task.domain == "music"
+        assert task.entities == [{"name": "OK Computer"}]
+        assert task.platforms == ["aoty", "rym"]
+
+    def test_non_object_task_response_has_actionable_error(self):
+        llm = MagicMock()
+        llm.chat.return_value = '[{"name":"OK Computer"}]'
+
+        with pytest.raises(ValueError, match="natural-language task parsing; expected a JSON dict"):
+            parse_task_natural_language("Find ratings", llm)
 
 
 # ---------------------------------------------------------------------------
@@ -357,3 +394,65 @@ class TestMiningPipeline:
         assert df["verification_level"].iloc[0] == "llm_mined_web_citation"
         assert "entity_reference_score" in df.columns
         assert "cross_source_gap" in df.columns
+        assert pipeline.source_unavailable_report() is None
+
+    @patch("trustdata.llm_mining._lazy_import_httpx")
+    def test_all_403_404_attempts_produce_a_manual_source_report(self, mock_lazy_httpx):
+        task = self._make_task()
+        pipeline = MiningPipeline(MagicMock(), task, max_pages=10, delay=0.0)
+        pipeline._crawl_plan = [
+            CrawlStep(1, "fetch", "https://example.test/blocked", "blocked source"),
+            CrawlStep(2, "fetch", "https://example.test/missing", "missing source"),
+        ]
+        blocked = MagicMock(status_code=403, text="Access denied")
+        missing = MagicMock(status_code=404, text="Not found")
+        mock_httpx = MagicMock()
+        mock_httpx.get.side_effect = [blocked, missing]
+        mock_lazy_httpx.return_value = mock_httpx
+
+        assert pipeline.execute_crawl_plan() == []
+        report = pipeline.source_unavailable_report()
+
+        assert report is not None
+        assert report["status"] == "source_unavailable"
+        assert report["status_counts"] == {"403": 1, "404": 1}
+        assert report["attempted_urls"] == [
+            {"url": "https://example.test/blocked", "status_code": 403},
+            {"url": "https://example.test/missing", "status_code": 404},
+        ]
+
+    @patch("trustdata.llm_mining.MiningPipeline")
+    @patch("trustdata.llm_mining.LLMClient")
+    def test_empty_run_writes_source_unavailable_report(self, mock_client, mock_pipeline, tmp_path):
+        config_path = tmp_path / "config.yaml"
+        config_path.write_text(
+            "llm:\n"
+            "  api_type: openai\n"
+            "  model: test-model\n"
+            "  api_key_env: TEST_LLM_KEY\n",
+            encoding="utf-8",
+        )
+        task_path = tmp_path / "task.yaml"
+        task_path.write_text(
+            "task:\n"
+            "  domain: music\n"
+            "  entity_type: album\n"
+            "  entities: [OK Computer]\n"
+            "  platforms: [aoty, rym]\n",
+            encoding="utf-8",
+        )
+        output_path = tmp_path / "okcomputer.csv"
+        unavailable_report = {
+            "status": "source_unavailable",
+            "attempted_urls": [{"url": "https://example.test/blocked", "status_code": 403}],
+        }
+        pipeline = mock_pipeline.return_value
+        pipeline.to_canonical_dataframe.return_value = pd.DataFrame()
+        pipeline.source_unavailable_report.return_value = unavailable_report
+
+        result = run_mining(config_path, task_path, output_path)
+
+        assert result.empty
+        assert output_path.exists()
+        report_path = tmp_path / "okcomputer.source_unavailable.json"
+        assert json.loads(report_path.read_text(encoding="utf-8")) == unavailable_report

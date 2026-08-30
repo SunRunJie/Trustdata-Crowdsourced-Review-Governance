@@ -1,8 +1,8 @@
 llm:
   api_type: "openai"               # "openai" | "anthropic"
-  model: "gpt-4o"                  # 模型标识符
+  model: "deepseek-v4-flash"                  # 模型标识符
   api_key_env: "LLM_API_KEY"       # 环境变量名
-  # base_url: "http://localhost:8000/v1"  # 取消注释以使用 vLLM/Ollama
+  base_url: "https://api.deepseek.com"  # 取消注释以使用 vLLM/Ollama
   max_tokens: 4096
   temperature: 0.1
 

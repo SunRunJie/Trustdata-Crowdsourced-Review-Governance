@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import argparse
 from pathlib import Path
 from typing import Any
 
@@ -102,13 +103,15 @@ def evidence_class(relative: str) -> str:
     return "documentation"
 
 
-def main() -> int:
-    if not SOURCE_ROOT.exists():
-        raise FileNotFoundError(f"Missing source data directory: {SOURCE_ROOT}")
+def profile_prior_data(source_root: Path = SOURCE_ROOT, output: Path | None = None) -> dict[str, Any]:
+    if not source_root.exists():
+        raise FileNotFoundError(f"Missing source data directory: {source_root}")
+    catalog_path = (output / "source_catalog.csv") if output else CATALOG_PATH
+    profile_path = (output / "source_profile.json") if output else PROFILE_PATH
 
     records: list[dict[str, Any]] = []
     detailed: dict[str, Any] = {}
-    for path in sorted(item for item in SOURCE_ROOT.rglob("*") if item.is_file()):
+    for path in sorted(item for item in source_root.rglob("*") if item.is_file()):
         relative = path.relative_to(ROOT).as_posix()
         record: dict[str, Any] = {
             "path": relative,
@@ -137,22 +140,38 @@ def main() -> int:
         records.append(record)
 
     catalog = pd.DataFrame(records)
-    CATALOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    catalog.to_csv(CATALOG_PATH, index=False, encoding="utf-8-sig")
+    catalog_path.parent.mkdir(parents=True, exist_ok=True)
+    catalog.to_csv(catalog_path, index=False, encoding="utf-8-sig")
 
     payload = {
-        "source_root": SOURCE_ROOT.relative_to(ROOT).as_posix(),
+        "source_root": source_root.relative_to(ROOT).as_posix(),
         "file_count": len(records),
         "csv_count": int((catalog["extension"] == ".csv").sum()),
         "total_bytes": int(catalog["bytes"].sum()),
         "profiles": detailed,
     }
-    PROFILE_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-
+    profile_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     failed = catalog.loc[catalog["status"] == "failed"]
-    print(f"[OK] Catalog: {CATALOG_PATH}")
-    print(f"[OK] Detailed profile: {PROFILE_PATH}")
-    print(f"[INFO] Files={len(records)} CSV={payload['csv_count']} Bytes={payload['total_bytes']}")
+    return {"catalog_path": catalog_path, "profile_path": profile_path, "payload": payload, "failed": failed}
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Profile prior-research source data.")
+    parser.add_argument("--output", type=Path, default=None, help="Optional output directory")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    result = profile_prior_data(output=args.output)
+    catalog_path = result["catalog_path"]
+    profile_path = result["profile_path"]
+    payload = result["payload"]
+    failed = result["failed"]
+
+    print(f"[OK] Catalog: {catalog_path}")
+    print(f"[OK] Detailed profile: {profile_path}")
+    print(f"[INFO] Files={payload['file_count']} CSV={payload['csv_count']} Bytes={payload['total_bytes']}")
     if not failed.empty:
         print(f"[FAIL] Unreadable CSV files={len(failed)}")
         return 1
