@@ -29,6 +29,7 @@ from fastapi.staticfiles import StaticFiles
 from .assessment import REQUIRED_FIELDS, assess_records, prepare_canonical_records
 from .env import load_env_file, set_env_value
 from .io import SUPPORTED_SUFFIXES, read_table, write_table
+from .llm_mining import _normalise_platform_domains
 
 
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
@@ -47,7 +48,7 @@ JOB_KINDS = {
 }
 _CONFIG_KEYS = {
     "llm": {"api_type", "model", "api_key_env", "base_url", "max_tokens", "temperature"},
-    "crawl": {"request_delay", "max_pages_total", "max_pages_per_entity", "user_agent", "request_timeout"},
+    "crawl": {"request_delay", "max_pages_total", "max_pages_per_entity", "user_agent", "request_timeout", "platform_domains"},
     "verification": {"min_citation_score", "verification_level"},
     "output": {"include_source_url", "include_citation_snippet", "include_content_hash"},
 }
@@ -415,6 +416,11 @@ def create_app(root: Path) -> FastAPI:
             if not isinstance(values, dict) or set(values) - keys:
                 raise HTTPException(400, f"{section} 包含不允许的配置项")
             config.setdefault(section, {}).update(values)
+        platform_domains = config.get("crawl", {}).get("platform_domains")
+        try:
+            _normalise_platform_domains(platform_domains)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
         key_name = str(config.get("llm", {}).get("api_key_env", "LLM_API_KEY"))
         if not _ENV_NAME.fullmatch(key_name):
             raise HTTPException(400, "api_key_env 无效")

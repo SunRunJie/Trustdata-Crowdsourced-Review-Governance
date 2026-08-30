@@ -91,7 +91,19 @@ llm:
   temperature: 0.1
 ```
 
-`max_tokens` 控制单次解析的最大输出长度，`temperature` 建议保持较低值以提高结构化提取稳定性。`crawl` 区块中的 `request_delay`、`max_pages_total` 和 `max_pages_per_entity` 用于约束抓取频率和规模；请遵守目标网站条款、robots 规则与访问频率限制。
+在同一配置文件的 `crawl` 区块显式登记任务平台可访问的主机名：
+
+```yaml
+crawl:
+  platform_domains:
+    aoty: ["albumoftheyear.org"]
+    rym: ["rateyourmusic.com"]
+  request_delay: 2.0
+  max_pages_total: 50
+  max_pages_per_entity: 5
+```
+
+`platform_domains` 是必填安全边界：只有任务中平台对应的正式主域或子域可被访问；未知平台、HTTP、IP 地址、私网/回环解析结果以及白名单外的重定向都会被拒绝。`search_hints` 仅提供给模型生成策略，不能扩大可访问域名范围。`max_tokens` 控制单次解析的最大输出长度，`temperature` 建议保持较低值以提高结构化提取稳定性。`crawl` 区块中的 `request_delay`、`max_pages_total` 和 `max_pages_per_entity` 用于约束抓取频率和规模；请遵守目标网站条款、robots 规则与访问频率限制。
 
 #### 3. 运行挖掘任务
 
@@ -134,7 +146,7 @@ task:
 
 成功后会生成两类文件：
 
-- 指定的结果文件，例如 `data/mined/okcomputer.csv`；包含标准化记录、`source_url`、`citation_snippet`、`content_hash`、`verification_level` 与跨源字段。
+- 指定的结果文件，例如 `data/mined/okcomputer.csv`；包含标准化记录、`source_url`、完整 `content_hash`、`evidence_fingerprint`、字段级 `citation_field_evidence`、`citation_evidence_status`、`verification_level` 与跨源字段。
 - 同目录的 `okcomputer.mining_summary.json`；记录任务、页面数量、提取和验证统计等摘要。
 - 若全部候选 URL 都返回 `403` 或 `404`，会额外生成 `okcomputer.source_unavailable.json`；其中列出每个尝试 URL、最终状态码和合规的数据获取建议，便于通过授权渠道自行取得数据。
 
@@ -155,12 +167,13 @@ task:
 | --- | --- |
 | `Environment variable 'LLM_API_KEY' is not set` | 确认 `.env` 位于仓库根目录、变量名与 `api_key_env` 一致，并重新运行命令。 |
 | 认证失败或 401 | 检查密钥是否有效、是否复制了占位符，以及 `api_type`、`base_url` 是否与服务商匹配。 |
-| 未提取到记录 | 使用 `--verbose` 检查页面抓取状态、搜索提示与页面正文；被拦截或无可验证引用的页面会被丢弃。 |
+| 未提取到记录 | 使用 `--verbose` 检查页面抓取状态、搜索提示与页面正文；被安全策略拦截、缺少两个来源或无法用引文证明实体/评分等字段的记录会被丢弃。 |
+| `Task platforms must be explicitly configured` | 在 `crawl.platform_domains` 为任务使用的平台增加正式主机名；不要用 `search_hints` 绕过白名单。 |
 | 全部 URL 返回 403/404 | 查看同目录的 `*.source_unavailable.json`，使用其中 URL 通过官方 API、数据导出或平台批准的数据请求自行获取数据；程序不会绕过访问控制。 |
 | 输出记录少于预期 | 降低范围而不是盲目提高抓取量；检查 `max_pages_total`、`max_pages_per_entity` 及 `min_citation_score`。 |
 | 需要无网络测试 | 运行 `python -m pytest -q tests/test_llm_mining.py`；该测试使用模拟请求，不需要 API Key。 |
 
-**反幻觉与证据规则**：每条提取的记录必须附带 `citation_snippet`（源页面原文子串），系统对引用片段做子串匹配验证，置信度低于阈值的记录自动丢弃。挖掘数据标记为 `verification_level="llm_mined_web_citation"`，进入评估流水线后 P 维度风险自动升高，确保下游使用者知悉数据来源特征。
+**反幻觉与证据规则**：每条记录必须附带页面原文引文；系统先验证引文存在，再验证实体、原始评分与量表，以及所有非空的用户、日期和评论字段均由该引文证明。只有字段全部绑定的记录才会输出，并标记为 `verification_level="llm_mined_web_citation_field_bound"`、`citation_confidence=1.0`。单来源实体没有跨源参考分或跨源差距，其跨源覆盖度为零。
 
 ### 3. 完整复现实验
 

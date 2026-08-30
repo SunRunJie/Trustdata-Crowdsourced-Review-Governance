@@ -29,6 +29,7 @@ async function loadConfig() {
   const c = data.config, form = $("#llm-form");
   ["api_type", "model", "api_key_env", "base_url", "max_tokens", "temperature"].forEach(key => setInput(form, key, c.llm?.[key]));
   ["request_delay", "max_pages_total", "max_pages_per_entity", "request_timeout", "user_agent"].forEach(key => setInput(form, key, c.crawl?.[key]));
+  setInput(form, "platform_domains", JSON.stringify(c.crawl?.platform_domains || {}, null, 2));
   setInput(form, "min_citation_score", c.verification?.min_citation_score);
   $("#key-state").textContent = data.api_key_configured ? `当前密钥：${data.api_key_masked}` : "当前尚未配置 API Key。";
 }
@@ -36,7 +37,8 @@ async function loadConfig() {
 $("#llm-form").addEventListener("submit", async (event) => {
   event.preventDefault(); const f = event.currentTarget;
   const number = (name) => Number(formValue(f, name));
-  const payload = { config: { llm: { api_type: formValue(f,"api_type"), model: formValue(f,"model"), api_key_env: formValue(f,"api_key_env"), base_url: formValue(f,"base_url"), max_tokens: number("max_tokens"), temperature: number("temperature") }, crawl: { request_delay: number("request_delay"), max_pages_total: number("max_pages_total"), max_pages_per_entity: number("max_pages_per_entity"), request_timeout: number("request_timeout"), user_agent: formValue(f,"user_agent") }, verification: {min_citation_score: number("min_citation_score")} } };
+  let platformDomains; try { platformDomains = JSON.parse(formValue(f, "platform_domains")); } catch (_) { return showNotice("平台域名白名单必须是有效 JSON。", true); }
+  const payload = { config: { llm: { api_type: formValue(f,"api_type"), model: formValue(f,"model"), api_key_env: formValue(f,"api_key_env"), base_url: formValue(f,"base_url"), max_tokens: number("max_tokens"), temperature: number("temperature") }, crawl: { request_delay: number("request_delay"), max_pages_total: number("max_pages_total"), max_pages_per_entity: number("max_pages_per_entity"), request_timeout: number("request_timeout"), user_agent: formValue(f,"user_agent"), platform_domains: platformDomains }, verification: {min_citation_score: number("min_citation_score")} } };
   const key = formValue(f, "api_key"); if (key) payload.api_key = key;
   try { await api("/api/config/llm", { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify(payload) }); f.elements.api_key.value = ""; await loadConfig(); showNotice("本机配置已保存，API Key 未回显。"); } catch (e) { showNotice(e.message, true); }
 });

@@ -262,8 +262,8 @@ class TestEnrichCrossSource:
             "source": ["llm_mined:imdb"],
         })
         result = enrich_cross_source_fields(df)
-        assert np.isclose(result["entity_reference_score"].iloc[0], 3.5)
-        assert np.isclose(result["cross_source_gap"].iloc[0], 0.0)
+        assert pd.isna(result["entity_reference_score"].iloc[0])
+        assert pd.isna(result["cross_source_gap"].iloc[0])
 
     def test_empty_dataframe(self):
         df = pd.DataFrame()
@@ -316,15 +316,11 @@ class TestMiningPipeline:
         strategy_response = json.dumps([
             {"action": "fetch", "url": "https://www.imdb.com/title/tt1375666/reviews/", "purpose": "IMDB reviews for Inception"}
         ])
-        # Follow-up response (no follow-ups)
-        follow_up_response = "[]"
         # Extraction response
+        citation = "Inception rating 4.25/5 by user123 on 2024-03-15: Amazing movie with great visual effects and a mind-bending plot."
         page_content = (
             '<div class="review">'
-            '<span class="rating">8.5</span>'
-            '<span class="user">user123</span>'
-            '<p>Amazing movie with great visual effects and a mind-bending plot.</p>'
-            '<span class="date">2024-03-15</span>'
+            f'<p>{citation}</p>'
             '</div>'
         )
         extraction_response = json.dumps([{
@@ -335,7 +331,7 @@ class TestMiningPipeline:
             "contributor_id": "user123",
             "review_text": "Amazing movie with great visual effects and a mind-bending plot.",
             "created_at": "2024-03-15T00:00:00Z",
-            "citation_snippet": "Amazing movie with great visual effects and a mind-bending plot.",
+            "citation_snippet": citation,
         }])
 
         # Set up LLM chat mock to return different responses
@@ -344,10 +340,7 @@ class TestMiningPipeline:
             call_count[0] += 1
             if call_count[0] == 1:
                 return strategy_response
-            elif call_count[0] == 2:
-                return follow_up_response
-            else:
-                return extraction_response
+            return extraction_response
 
         llm.chat = mock_chat
 
@@ -362,6 +355,7 @@ class TestMiningPipeline:
             max_pages=10,
             delay=0.0,
             min_citation_score=0.3,
+            resolver=lambda _: ["8.8.8.8"],
         )
 
         # Phase 1
@@ -391,7 +385,8 @@ class TestMiningPipeline:
         assert "entity_id" in df.columns
         assert "rating" in df.columns
         assert "verification_level" in df.columns
-        assert df["verification_level"].iloc[0] == "llm_mined_web_citation"
+        assert df["verification_level"].iloc[0] == "llm_mined_web_citation_field_bound"
+        assert df["citation_evidence_status"].iloc[0] == "field_bound"
         assert "entity_reference_score" in df.columns
         assert "cross_source_gap" in df.columns
         assert pipeline.source_unavailable_report() is None
@@ -399,10 +394,10 @@ class TestMiningPipeline:
     @patch("trustdata.llm_mining._lazy_import_httpx")
     def test_all_403_404_attempts_produce_a_manual_source_report(self, mock_lazy_httpx):
         task = self._make_task()
-        pipeline = MiningPipeline(MagicMock(), task, max_pages=10, delay=0.0)
+        pipeline = MiningPipeline(MagicMock(), task, max_pages=10, delay=0.0, resolver=lambda _: ["8.8.8.8"])
         pipeline._crawl_plan = [
-            CrawlStep(1, "fetch", "https://example.test/blocked", "blocked source"),
-            CrawlStep(2, "fetch", "https://example.test/missing", "missing source"),
+            CrawlStep(1, "fetch", "https://www.imdb.com/blocked", "blocked source"),
+            CrawlStep(2, "fetch", "https://www.imdb.com/missing", "missing source"),
         ]
         blocked = MagicMock(status_code=403, text="Access denied")
         missing = MagicMock(status_code=404, text="Not found")
@@ -417,8 +412,8 @@ class TestMiningPipeline:
         assert report["status"] == "source_unavailable"
         assert report["status_counts"] == {"403": 1, "404": 1}
         assert report["attempted_urls"] == [
-            {"url": "https://example.test/blocked", "status_code": 403},
-            {"url": "https://example.test/missing", "status_code": 404},
+            {"url": "https://www.imdb.com/blocked", "status_code": 403},
+            {"url": "https://www.imdb.com/missing", "status_code": 404},
         ]
 
     @patch("trustdata.llm_mining.MiningPipeline")
@@ -429,7 +424,11 @@ class TestMiningPipeline:
             "llm:\n"
             "  api_type: openai\n"
             "  model: test-model\n"
-            "  api_key_env: TEST_LLM_KEY\n",
+            "  api_key_env: TEST_LLM_KEY\n"
+            "crawl:\n"
+            "  platform_domains:\n"
+            "    aoty: [albumoftheyear.org]\n"
+            "    rym: [rateyourmusic.com]\n",
             encoding="utf-8",
         )
         task_path = tmp_path / "task.yaml"
@@ -456,3 +455,134 @@ class TestMiningPipeline:
         assert output_path.exists()
         report_path = tmp_path / "okcomputer.source_unavailable.json"
         assert json.loads(report_path.read_text(encoding="utf-8")) == unavailable_report
+
+
+class TestSafeCrawling:
+    def _pipeline(self, *, resolver=lambda _: ["8.8.8.8"]):
+        task = MiningTask(
+            task_id="safe-crawl", domain="movies", entity_type="movie",
+            entities=[{"name": "Inception"}], platforms=["imdb"], request_delay=0.0,
+        )
+        return MiningPipeline(MagicMock(), task, delay=0.0, resolver=resolver)
+
+    @patch("trustdata.llm_mining._lazy_import_httpx")
+    def test_unsafe_urls_are_blocked_before_http(self, mock_lazy_httpx):
+        httpx = MagicMock()
+        mock_lazy_httpx.return_value = httpx
+        pipeline = self._pipeline(resolver=lambda _: ["127.0.0.1"])
+
+        assert pipeline._fetch_url("https://www.imdb.com/title/1") is None
+        assert pipeline._fetch_url("http://www.imdb.com/title/1") is None
+        assert pipeline._fetch_url("https://127.0.0.1/internal") is None
+        assert pipeline._fetch_url("https://attacker.example/anything") is None
+        for blocked_address in ("10.0.0.7", "169.254.3.9", "::1"):
+            assert self._pipeline(resolver=lambda _, address=blocked_address: [address])._fetch_url(
+                "https://www.imdb.com/title/1"
+            ) is None
+        assert httpx.get.call_count == 0
+        assert pipeline._blocked_urls
+
+    def test_unknown_task_platform_requires_explicit_allowlist_entry(self):
+        task = MiningTask(
+            task_id="unknown", domain="movies", entity_type="movie",
+            entities=[{"name": "Inception"}], platforms=["unlisted"],
+        )
+        with pytest.raises(ValueError, match="explicitly configured"):
+            MiningPipeline(MagicMock(), task, resolver=lambda _: ["8.8.8.8"])
+
+    @patch("trustdata.llm_mining._lazy_import_httpx")
+    def test_redirect_target_is_validated_before_second_request(self, mock_lazy_httpx):
+        redirect = MagicMock(status_code=302, text="")
+        redirect.headers = {"location": "https://127.0.0.1/admin"}
+        httpx = MagicMock()
+        httpx.get.return_value = redirect
+        mock_lazy_httpx.return_value = httpx
+        pipeline = self._pipeline()
+
+        assert pipeline._fetch_url("https://www.imdb.com/title/1") is None
+        assert httpx.get.call_count == 1
+
+    @patch("trustdata.llm_mining._lazy_import_httpx")
+    def test_relative_safe_redirect_is_followed_manually(self, mock_lazy_httpx):
+        redirect = MagicMock(status_code=302, text="")
+        redirect.headers = {"location": "/title/1/reviews?page=2"}
+        page = MagicMock(status_code=200, text="ok")
+        httpx = MagicMock()
+        httpx.get.side_effect = [redirect, page]
+        mock_lazy_httpx.return_value = httpx
+        pipeline = self._pipeline()
+
+        fetched = pipeline._fetch_url("https://www.imdb.com/title/1/reviews")
+        assert fetched is not None
+        assert fetched.url == "https://www.imdb.com/title/1/reviews?page=2"
+        assert httpx.get.call_count == 2
+        assert all(call.kwargs["follow_redirects"] is False for call in httpx.get.call_args_list)
+
+    def test_follow_ups_must_be_html_candidates_and_relative_links_are_resolved(self):
+        pipeline = self._pipeline()
+        pipeline._llm.chat.return_value = json.dumps([
+            {"action": "paginate", "url": "https://www.imdb.com/title/1/reviews?page=2", "purpose": "next"},
+            {"action": "follow_link", "url": "https://attacker.example/", "purpose": "bad"},
+        ])
+        page = FetchedPage(
+            url="https://www.imdb.com/title/1/reviews", status_code=200,
+            content='<a href="?page=2">Next</a><a href="https://attacker.example/">bad</a>',
+            fetched_at="now", content_hash="h", byte_length=1,
+        )
+        steps = pipeline._detect_follow_ups(page, CrawlStep(1, "fetch", page.url, "reviews"))
+
+        assert [step.url for step in steps] == ["https://www.imdb.com/title/1/reviews?page=2"]
+        assert any(item["url"] == "https://attacker.example/" for item in pipeline._blocked_urls)
+
+
+class TestFieldBoundEvidenceAndIdentity:
+    def _pipeline(self) -> MiningPipeline:
+        task = MiningTask(
+            task_id="evidence", domain="movies", entity_type="movie",
+            entities=[{"name": "Inception"}], platforms=["imdb"], request_delay=0.0,
+        )
+        return MiningPipeline(MagicMock(), task, delay=0.0, resolver=lambda _: ["8.8.8.8"])
+
+    @staticmethod
+    def _record(*, rating=4.0, snippet="Inception rating 4/5 by u1 on 2024-03-15: Great film.", url="https://www.imdb.com/title/1/reviews"):
+        return ExtractedRecord(
+            entity_name="Inception", platform="imdb", rating=rating, rating_scale="0-5",
+            contributor_id="u1", review_text="Great film.", created_at="2024-03-15T00:00:00Z",
+            source_url=url, content_hash="a" * 64, citation_snippet=snippet, confidence=0.0,
+        )
+
+    def test_fabricated_rating_is_rejected_even_when_citation_exists(self):
+        pipeline = self._pipeline()
+        record = self._record(rating=5.0)
+        pipeline._fetched_pages = [FetchedPage(record.source_url, 200, record.citation_snippet, "now", record.content_hash, 1)]
+        pipeline._records = [record]
+
+        assert pipeline.verify_records() == []
+        assert record.confidence < 1.0
+        assert record.evidence_status == "field_mismatch"
+
+    def test_full_evidence_is_bound_and_ids_use_complete_evidence(self):
+        pipeline = self._pipeline()
+        first = self._record(snippet="Inception rating 4/5 by u1 on 2024-03-15: Great film. First continuation.")
+        second = self._record(snippet="Inception rating 4/5 by u1 on 2024-03-15: Great film. Second continuation.")
+        page_content = f"{first.citation_snippet} {second.citation_snippet}"
+        pipeline._fetched_pages = [FetchedPage(first.source_url, 200, page_content, "now", first.content_hash, 1)]
+        pipeline._records = [first, second]
+
+        assert len(pipeline.verify_records()) == 2
+        frame = pipeline.to_canonical_dataframe()
+        assert frame["citation_confidence"].eq(1.0).all()
+        assert frame["record_id"].nunique() == 2
+        assert frame["evidence_fingerprint"].nunique() == 2
+
+    def test_exact_duplicate_evidence_is_deduplicated(self):
+        pipeline = self._pipeline()
+        first = self._record()
+        duplicate = self._record()
+        pipeline._fetched_pages = [FetchedPage(first.source_url, 200, first.citation_snippet, "now", first.content_hash, 1)]
+        pipeline._records = [first, duplicate]
+
+        pipeline.verify_records()
+        frame = pipeline.to_canonical_dataframe()
+        assert len(frame) == 1
+        assert pipeline._deduplicated_records == 1

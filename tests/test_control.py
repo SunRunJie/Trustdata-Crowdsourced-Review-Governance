@@ -40,6 +40,16 @@ def test_config_masks_key_and_persists_only_to_dotenv(tmp_path: Path) -> None:
     assert "super-secret-key" not in (tmp_path / "configs" / "llm_mining.yaml").read_text(encoding="utf-8")
 
 
+def test_console_rejects_url_shaped_platform_allowlist_entries(tmp_path: Path) -> None:
+    client = make_client(tmp_path)
+    response = client.put(
+        "/api/config/llm",
+        json={"config": {"crawl": {"platform_domains": {"imdb": ["https://attacker.example/path"]}}}},
+    )
+    assert response.status_code == 400
+    assert "hostname" in response.json()["detail"]
+
+
 def test_upload_preflight_and_assessment_job_are_isolated(tmp_path: Path) -> None:
     client = make_client(tmp_path)
     content = b"record_id,entity_id,rating\nr1,e1,4.5\nr2,e1,3.5\n"

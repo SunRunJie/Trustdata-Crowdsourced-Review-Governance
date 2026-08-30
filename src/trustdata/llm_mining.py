@@ -9,14 +9,18 @@ schema and can be fed directly into ``assess_data.py``.
 from __future__ import annotations
 
 import hashlib
+import ipaddress
 import json
 import logging
 import re
+import socket
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
+from urllib.parse import urljoin, urlsplit, urlunsplit
 
 import numpy as np
 import pandas as pd
@@ -25,6 +29,16 @@ import yaml
 from .normalization import normalize_name, stable_id
 
 logger = logging.getLogger(__name__)
+
+
+DEFAULT_PLATFORM_DOMAINS: dict[str, tuple[str, ...]] = {
+    "aoty": ("albumoftheyear.org",),
+    "rym": ("rateyourmusic.com",),
+    "imdb": ("imdb.com",),
+    "douban": ("douban.com",),
+}
+_REDIRECT_STATUSES = {301, 302, 303, 307, 308}
+_MAX_REDIRECTS = 5
 
 # ---------------------------------------------------------------------------
 # Lazy httpx import
@@ -81,7 +95,7 @@ class FetchedPage:
     status_code: int
     content: str
     fetched_at: str
-    content_hash: str               # SHA256[:20]
+    content_hash: str               # Full SHA256 digest
     byte_length: int
 
 
@@ -112,11 +126,125 @@ class ExtractedRecord:
     content_hash: str
     citation_snippet: str
     confidence: float               # 0.0-1.0
+    evidence_status: str = "unverified"
+    evidence_fields: dict[str, bool] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
 # Utility functions
 # ---------------------------------------------------------------------------
+
+
+class URLSafetyError(ValueError):
+    """Raised when a crawl target violates the local-only safe URL policy."""
+
+
+def _normalise_platform_domains(raw: dict[str, Any] | None) -> dict[str, tuple[str, ...]]:
+    """Validate an explicit platform-to-domain allowlist from configuration."""
+    if raw is None:
+        return dict(DEFAULT_PLATFORM_DOMAINS)
+    if not isinstance(raw, dict) or not raw:
+        raise ValueError("crawl.platform_domains must be a non-empty platform-to-domain mapping")
+    result: dict[str, tuple[str, ...]] = {}
+    for platform, domains in raw.items():
+        key = str(platform).strip().lower()
+        values = [domains] if isinstance(domains, str) else domains
+        if not key or not isinstance(values, list) or not values:
+            raise ValueError("Each platform_domains entry must contain at least one hostname")
+        cleaned: list[str] = []
+        for domain in values:
+            text = str(domain).strip().lower().rstrip(".")
+            if not text or "://" in text or "/" in text or "@" in text:
+                raise ValueError(f"Invalid allowlisted hostname for {key!r}: {domain!r}")
+            try:
+                ipaddress.ip_address(text)
+            except ValueError:
+                pass
+            else:
+                raise ValueError("platform_domains must contain hostnames, not IP addresses")
+            cleaned.append(text)
+        result[key] = tuple(dict.fromkeys(cleaned))
+    return result
+
+
+def _default_resolve(hostname: str) -> list[str]:
+    """Resolve every address for a hostname immediately before a request."""
+    answers = socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM)
+    return list(dict.fromkeys(answer[4][0] for answer in answers))
+
+
+def _normalise_text(value: object) -> str:
+    return re.sub(r"\s+", " ", str(value or "").casefold()).strip()
+
+
+def _value_in_text(value: object, text: str) -> bool:
+    candidate = _normalise_text(value)
+    return bool(candidate) and candidate in _normalise_text(text)
+
+
+def _rating_variants(value: float | None) -> set[str]:
+    if value is None:
+        return set()
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return set()
+    values = {str(value), str(number), f"{number:g}"}
+    if number.is_integer():
+        values.add(str(int(number)))
+    return {_normalise_text(item) for item in values if _normalise_text(item)}
+
+
+def _rating_in_text(value: float | None, text: str) -> bool:
+    """Match a rating as the score, never merely as the scale denominator."""
+    normalised = _normalise_text(text)
+    for variant in _rating_variants(value):
+        escaped = re.escape(variant)
+        if re.search(rf"(?:rating|score|rated)\s*[:=]?\s*{escaped}(?![\d.])", normalised):
+            return True
+        if re.search(rf"(?<![\d.]){escaped}\s*/\s*\d", normalised):
+            return True
+        if re.search(rf"(?<![\d.]){escaped}\s+stars?\b", normalised):
+            return True
+    return False
+
+
+def _scale_in_text(scale: str, text: str) -> bool:
+    normalised_scale = _normalise_text(scale).replace("–", "-")
+    normalised_text = _normalise_text(text).replace("–", "-")
+    if normalised_scale in normalised_text:
+        return True
+    match = re.fullmatch(r"(\d+)\s*-\s*(\d+)", normalised_scale)
+    if not match:
+        return False
+    upper = match.group(2)
+    return any(token in normalised_text for token in (f"/{upper}", f"out of {upper}", f"{upper} stars"))
+
+
+class _AnchorCollector(HTMLParser):
+    """Collect visible anchor targets before HTML is reduced to plain text."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.links: list[tuple[str, str]] = []
+        self._active_href: str | None = None
+        self._active_text: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() == "a":
+            values = dict(attrs)
+            self._active_href = values.get("href")
+            self._active_text = []
+
+    def handle_data(self, data: str) -> None:
+        if self._active_href is not None:
+            self._active_text.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() == "a" and self._active_href is not None:
+            self.links.append((self._active_href, " ".join(self._active_text).strip()))
+            self._active_href = None
+            self._active_text = []
 
 def _html_to_text_snippet(html: str, max_chars: int = 8000) -> str:
     """Strip HTML tags and collapse whitespace to produce a plain-text snippet."""
@@ -387,11 +515,12 @@ CRITICAL RULES:
 Return ONLY the JSON array, no explanation."""
 
 _FOLLOW_UP_SYSTEM_PROMPT = """\
-You are a web navigation assistant. Given the text content of a web page,
-identify pagination links or detail page links that would contain more
-user reviews or ratings for the same entity.
+You are a web navigation assistant. Given page text and a list of already
+validated candidate links, select pagination/detail links that would contain
+more user reviews or ratings for the same entity.
 Return a JSON array of at most 3 objects:
 [{"action": "paginate"|"follow_link", "url": "...", "purpose": "..."}]
+Each url MUST exactly match one Candidate URL. Do not invent URLs.
 If there are no useful follow-up links, return an empty array [].
 Return ONLY the JSON array, no explanation."""
 
@@ -409,6 +538,8 @@ class MiningPipeline:
         user_agent: str = "TrustData-Miner/0.1 (academic-research)",
         request_timeout: float = 30.0,
         min_citation_score: float = 0.5,
+        platform_domains: dict[str, Any] | None = None,
+        resolver: Callable[[str], list[str]] | None = None,
     ) -> None:
         self._llm = llm
         self._task = task
@@ -417,13 +548,95 @@ class MiningPipeline:
         self._user_agent = user_agent
         self._request_timeout = request_timeout
         self._min_citation_score = min_citation_score
+        self._platform_domains = _normalise_platform_domains(platform_domains)
+        self._resolver = resolver or _default_resolve
+        requested = {str(platform).strip().lower() for platform in self._task.platforms}
+        unknown = sorted(platform for platform in requested if platform not in self._platform_domains)
+        if unknown:
+            raise ValueError(
+                "Task platforms must be explicitly configured in crawl.platform_domains: "
+                + ", ".join(unknown)
+            )
+        self._allowed_domains = {
+            domain for platform in requested for domain in self._platform_domains[platform]
+        }
 
         self._crawl_plan: list[CrawlStep] = []
         self._fetch_attempts: list[FetchedPage] = []
         self._fetched_pages: list[FetchedPage] = []
         self._records: list[ExtractedRecord] = []
         self._verified_records: list[ExtractedRecord] = []
+        self._blocked_urls: list[dict[str, str]] = []
+        self._deduplicated_records = 0
         self._step_counter = 0
+
+    def _record_blocked_url(self, url: str, reason: str) -> None:
+        item = {"url": url, "reason": reason}
+        if item not in self._blocked_urls:
+            self._blocked_urls.append(item)
+        logger.warning("Blocked unsafe crawl URL %s: %s", url, reason)
+
+    def _validate_url(self, value: str) -> str:
+        """Return a safe canonical HTTPS URL or fail closed before networking."""
+        try:
+            parsed = urlsplit(value)
+            port = parsed.port
+        except ValueError as exc:
+            raise URLSafetyError("malformed URL or port") from exc
+        if parsed.scheme.lower() != "https" or not parsed.netloc:
+            raise URLSafetyError("only absolute https URLs are allowed")
+        if parsed.username or parsed.password:
+            raise URLSafetyError("credentials in URLs are not allowed")
+        if port not in {None, 443}:
+            raise URLSafetyError("only the default HTTPS port is allowed")
+        hostname = parsed.hostname
+        if not hostname:
+            raise URLSafetyError("URL has no hostname")
+        host = hostname.lower().rstrip(".")
+        try:
+            ipaddress.ip_address(host)
+        except ValueError:
+            pass
+        else:
+            raise URLSafetyError("IP-literal targets are not allowed")
+        if not any(host == domain or host.endswith(f".{domain}") for domain in self._allowed_domains):
+            raise URLSafetyError("hostname is outside the configured platform allowlist")
+        try:
+            addresses = self._resolver(host)
+        except Exception as exc:
+            raise URLSafetyError("hostname could not be resolved safely") from exc
+        if not addresses:
+            raise URLSafetyError("hostname resolved to no addresses")
+        try:
+            unsafe = [address for address in addresses if not ipaddress.ip_address(address).is_global]
+        except ValueError as exc:
+            raise URLSafetyError("hostname resolution returned an invalid address") from exc
+        if unsafe:
+            raise URLSafetyError("hostname resolved to a non-public address")
+        return urlunsplit(("https", parsed.netloc, parsed.path or "/", parsed.query, ""))
+
+    def _safe_links_from_html(self, html: str, base_url: str) -> list[dict[str, str]]:
+        parser = _AnchorCollector()
+        try:
+            parser.feed(html)
+            parser.close()
+        except Exception:
+            return []
+        candidates: list[dict[str, str]] = []
+        seen: set[str] = set()
+        for href, text in parser.links:
+            if not href:
+                continue
+            resolved = urljoin(base_url, href)
+            try:
+                safe_url = self._validate_url(resolved)
+            except URLSafetyError as exc:
+                self._record_blocked_url(resolved, str(exc))
+                continue
+            if safe_url not in seen:
+                candidates.append({"url": safe_url, "text": text[:240]})
+                seen.add(safe_url)
+        return candidates
 
     # -- Phase 1: Strategy generation -----------------------------------------
 
@@ -447,11 +660,17 @@ class MiningPipeline:
         steps_data = _parse_llm_json(raw, list, "crawl strategy generation")
         self._crawl_plan = []
         for item in steps_data:
+            raw_url = str(item.get("url", ""))
+            try:
+                safe_url = self._validate_url(raw_url)
+            except URLSafetyError as exc:
+                self._record_blocked_url(raw_url, str(exc))
+                continue
             self._step_counter += 1
             self._crawl_plan.append(CrawlStep(
                 step_id=self._step_counter,
                 action=item.get("action", "fetch"),
-                url=item["url"],
+                url=safe_url,
                 purpose=item.get("purpose", ""),
             ))
         logger.info("Phase 1: generated %d crawl steps", len(self._crawl_plan))
@@ -460,35 +679,52 @@ class MiningPipeline:
     # -- Phase 2: Web fetching ------------------------------------------------
 
     def _fetch_url(self, url: str) -> FetchedPage | None:
-        """Fetch a single URL with httpx."""
+        """Fetch a safe URL, validating every redirect hop before requesting it."""
         httpx = _lazy_import_httpx()
         try:
-            response = httpx.get(
-                url,
-                headers={"User-Agent": self._user_agent},
-                timeout=self._request_timeout,
-                follow_redirects=True,
-            )
-            content = response.text
-            content_bytes = content.encode("utf-8", errors="replace")
-            return FetchedPage(
-                url=url,
-                status_code=response.status_code,
-                content=content,
-                fetched_at=datetime.now(timezone.utc).isoformat(),
-                content_hash=hashlib.sha256(content_bytes).hexdigest()[:20],
-                byte_length=len(content_bytes),
-            )
+            current = self._validate_url(url)
+            for _ in range(_MAX_REDIRECTS + 1):
+                response = httpx.get(
+                    current,
+                    headers={"User-Agent": self._user_agent},
+                    timeout=self._request_timeout,
+                    follow_redirects=False,
+                    trust_env=False,
+                )
+                if response.status_code in _REDIRECT_STATUSES:
+                    location = response.headers.get("location")
+                    if not location:
+                        break
+                    current = self._validate_url(urljoin(current, location))
+                    continue
+                content = response.text
+                content_bytes = content.encode("utf-8", errors="replace")
+                return FetchedPage(
+                    url=current,
+                    status_code=response.status_code,
+                    content=content,
+                    fetched_at=datetime.now(timezone.utc).isoformat(),
+                    content_hash=hashlib.sha256(content_bytes).hexdigest(),
+                    byte_length=len(content_bytes),
+                )
+            raise URLSafetyError(f"redirect limit ({_MAX_REDIRECTS}) exceeded or redirect lacked Location")
+        except URLSafetyError as exc:
+            self._record_blocked_url(url, str(exc))
+            return None
         except Exception as exc:
             logger.warning("Failed to fetch %s: %s", url, exc)
             return None
 
     def _detect_follow_ups(self, page: FetchedPage, step: CrawlStep) -> list[CrawlStep]:
         """Ask LLM to identify pagination/detail links in a fetched page."""
+        candidates = self._safe_links_from_html(page.content, page.url)
+        if not candidates:
+            return []
         snippet = _html_to_text_snippet(page.content, max_chars=8000)
         user_msg = (
             f"Page URL: {page.url}\n"
             f"Original purpose: {step.purpose}\n"
+            f"Candidate URLs (choose exact URLs only):\n{json.dumps(candidates, ensure_ascii=False)}\n"
             f"Page content (text):\n{snippet}"
         )
         try:
@@ -497,11 +733,16 @@ class MiningPipeline:
         except Exception:
             return []
 
+        candidate_urls = {candidate["url"] for candidate in candidates}
         visited = {s.url for s in self._crawl_plan}
         new_steps: list[CrawlStep] = []
         for item in items[:3]:
-            url = item.get("url", "")
-            if url and url not in visited:
+            url = str(item.get("url", ""))
+            if url not in candidate_urls:
+                if url:
+                    self._record_blocked_url(url, "follow-up URL was not an extracted safe candidate")
+                continue
+            if url not in visited:
                 self._step_counter += 1
                 new_steps.append(CrawlStep(
                     step_id=self._step_counter,
@@ -610,8 +851,32 @@ class MiningPipeline:
 
     # -- Phase 4: Anti-hallucination verification -----------------------------
 
+    def _field_evidence(self, record: ExtractedRecord, page_text: str) -> tuple[float, dict[str, bool]]:
+        """Bind every claimed structured field to the submitted page citation."""
+        citation_match = _citation_score(record.citation_snippet, page_text) >= max(0.9, self._min_citation_score)
+        snippet = record.citation_snippet
+        field_checks: dict[str, bool] = {
+            "citation_present": citation_match,
+            "entity_name": _value_in_text(record.entity_name, snippet),
+            "rating": False,
+            "rating_scale": _scale_in_text(record.rating_scale, snippet),
+        }
+        # The rating may occur within a longer citation; compare every normalised
+        # representation rather than requiring the snippet to equal the number.
+        field_checks["rating"] = _rating_in_text(record.rating, snippet)
+        if record.contributor_id is not None:
+            field_checks["contributor_id"] = _value_in_text(record.contributor_id, snippet)
+        if record.created_at is not None:
+            date_value = str(record.created_at)
+            field_checks["created_at"] = _value_in_text(date_value, snippet) or _value_in_text(date_value.split("T", 1)[0], snippet)
+        if record.review_text is not None:
+            field_checks["review_text"] = _value_in_text(record.review_text, snippet)
+        passed = sum(field_checks.values())
+        confidence = passed / len(field_checks) if field_checks else 0.0
+        return confidence, field_checks
+
     def verify_records(self) -> list[ExtractedRecord]:
-        """Verify each record's citation_snippet against its source page."""
+        """Accept only records whose citation binds every claimed data field."""
         page_map: dict[str, str] = {}
         for page in self._fetched_pages:
             text = _html_to_text_snippet(page.content, max_chars=200000)
@@ -621,14 +886,19 @@ class MiningPipeline:
         discarded = 0
         for record in self._records:
             page_text = page_map.get(record.content_hash, "")
-            score = _citation_score(record.citation_snippet, page_text)
+            score, evidence_fields = self._field_evidence(record, page_text)
             record.confidence = score
-            if score >= self._min_citation_score:
+            record.evidence_fields = evidence_fields
+            record.evidence_status = "field_bound" if score == 1.0 else "field_mismatch"
+            # min_citation_score remains configurable for diagnostics, but a
+            # verified record must have an exact/normalised citation and all
+            # mandatory and claimed fields bound to that citation.
+            if score == 1.0 and evidence_fields.get("citation_present", False):
                 self._verified_records.append(record)
             else:
                 discarded += 1
                 logger.debug(
-                    "Discarded record (score=%.2f): %s — %s",
+                    "Discarded record (field confidence=%.2f): %s — %s",
                     score, record.entity_name, record.citation_snippet[:50],
                 )
         logger.info(
@@ -652,11 +922,27 @@ class MiningPipeline:
                 self._task.domain,
                 prefix="entity",
             )
+            evidence_fingerprint = hashlib.sha256("\x1f".join([
+                rec.platform,
+                entity_id,
+                rec.contributor_id or "",
+                str(rec.rating),
+                rec.rating_scale,
+                rec.created_at or "",
+                rec.citation_snippet,
+                rec.source_url,
+                rec.content_hash,
+            ]).encode("utf-8")).hexdigest()
             record_id = stable_id(
                 rec.platform,
                 entity_id,
                 rec.contributor_id or "",
-                rec.citation_snippet[:40],
+                str(rec.rating),
+                rec.rating_scale,
+                rec.created_at or "",
+                rec.citation_snippet,
+                rec.source_url,
+                rec.content_hash,
                 prefix="mined_record",
             )
             contributor_id = (
@@ -674,16 +960,24 @@ class MiningPipeline:
                 "review_text": rec.review_text,
                 "created_at": rec.created_at,
                 "source": f"llm_mined:{rec.platform}",
-                "verification_level": "llm_mined_web_citation",
+                "verification_level": "llm_mined_web_citation_field_bound",
                 "ai_disclosure": "unknown",
                 "is_synthetic": False,
                 "source_url": rec.source_url,
                 "content_hash": rec.content_hash,
                 "citation_snippet": rec.citation_snippet,
                 "citation_confidence": rec.confidence,
+                "citation_evidence_status": rec.evidence_status,
+                "citation_field_evidence": json.dumps(rec.evidence_fields, ensure_ascii=False, sort_keys=True),
+                "evidence_fingerprint": evidence_fingerprint,
             })
 
         df = pd.DataFrame(rows)
+        before = len(df)
+        df = df.drop_duplicates(subset=["evidence_fingerprint"], keep="first").copy()
+        self._deduplicated_records = before - len(df)
+        if df["record_id"].duplicated().any():
+            raise RuntimeError("Mined record_id collision after evidence-fingerprint de-duplication")
         df = enrich_cross_source_fields(df)
         return df
 
@@ -719,15 +1013,18 @@ def enrich_cross_source_fields(df: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
 
-    # Entity reference score: mean of source-level means
-    entity_ref = source_means.groupby("entity_id")["rating"].mean()
+    source_counts = source_means.groupby("entity_id")["source"].nunique()
+
+    # A cross-source reference is meaningful only when at least two distinct
+    # sources supplied a rating for this entity.
+    entity_ref = source_means.groupby("entity_id")["rating"].mean().where(source_counts >= 2)
     entity_ref.name = "entity_reference_score"
 
     # Cross-source gap: max pairwise difference between source means
     def _max_gap(ratings: pd.Series) -> float:
         vals = ratings.values
         if len(vals) < 2:
-            return 0.0
+            return np.nan
         return float(np.max(vals) - np.min(vals))
 
     entity_gap = source_means.groupby("entity_id")["rating"].apply(_max_gap)
@@ -762,6 +1059,8 @@ def run_mining(
     llm_cfg = config["llm"]
     crawl_cfg = config.get("crawl", {})
     verify_cfg = config.get("verification", {})
+    if "platform_domains" not in crawl_cfg:
+        raise ValueError("crawl.platform_domains is required for safe LLM mining")
 
     provider = LLMProvider(
         api_type=llm_cfg["api_type"],
@@ -791,6 +1090,7 @@ def run_mining(
         user_agent=crawl_cfg.get("user_agent", "TrustData-Miner/0.1 (academic-research)"),
         request_timeout=float(crawl_cfg.get("request_timeout", 30.0)),
         min_citation_score=float(verify_cfg.get("min_citation_score", 0.5)),
+        platform_domains=crawl_cfg.get("platform_domains"),
     )
 
     pipeline.generate_strategy()
@@ -826,6 +1126,7 @@ def run_mining(
         "pages_fetched": len(pipeline._fetched_pages),
         "records_extracted": len(pipeline._records),
         "records_verified": len(pipeline._verified_records),
+        "records_deduplicated": pipeline._deduplicated_records,
         "output_path": str(output_path),
     }
     summary_path = output_path.with_name(f"{output_path.stem}.mining_summary.json")
