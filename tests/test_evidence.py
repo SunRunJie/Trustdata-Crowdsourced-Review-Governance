@@ -11,6 +11,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 LATEST = ROOT / "outputs" / "runs" / "latest"
 EVIDENCE = ROOT / "competition" / "evidence"
+RUNTIME_MANIFEST = EVIDENCE / "runtime" / "run_manifest.json"
 
 
 def _sha256(path: Path) -> str:
@@ -58,6 +59,10 @@ def test_manifest_output_digests() -> None:
     assert manifest["run_status"] == "success"
     for relative_path, expected in manifest["outputs"].items():
         assert _sha256(ROOT / relative_path) == expected
+
+
+def test_evidence_runtime_manifest_matches_latest_run() -> None:
+    assert _sha256(RUNTIME_MANIFEST) == _sha256(LATEST / "run_manifest.json")
 
 
 def test_evidence_mirror_matches_latest_results() -> None:

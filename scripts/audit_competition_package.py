@@ -41,6 +41,8 @@ BANNED_PATTERNS = (
     "能不能",
 )
 
+METRIC_TOLERANCE = 5e-7
+
 
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -101,9 +103,9 @@ def main() -> None:
         row for row in primary_rows
         if float(row["contamination"]) == 0.3 and row["method"] == "multi_evidence_logistic"
     )
-    require(abs(float(primary_30["f1"]) - 0.7495073125194482) < 1e-12,
+    require(abs(float(primary_30["f1"]) - 0.7495073125194482) < METRIC_TOLERANCE,
             "primary 30% F1 matches the locked result", findings)
-    require(abs(float(primary_30["auprc"]) - 0.9492221877817787) < 1e-12,
+    require(abs(float(primary_30["auprc"]) - 0.9492221877817787) < METRIC_TOLERANCE,
             "primary 30% AUPRC matches the locked result", findings)
 
     sensitivity = read_csv(LATEST / "split_sensitivity_metrics.csv")

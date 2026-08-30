@@ -6,6 +6,7 @@ import hashlib
 import importlib.metadata
 import json
 import platform
+import shutil
 import sys
 import time
 from datetime import datetime, timezone
@@ -66,6 +67,31 @@ def _write_dashboard_script(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     serialized = json.dumps(_json_safe(payload), ensure_ascii=False, separators=(",", ":"))
     path.write_text(f"window.TRUSTDATA_DASHBOARD = {serialized};\n", encoding="utf-8")
+
+
+def _sync_evidence_mirror(root: Path, output: Path) -> int:
+    """Copy completed run artifacts to the versioned competition evidence mirror."""
+    evidence = root / "competition" / "evidence"
+    destinations = {
+        "results": evidence / "results",
+        "figures": evidence / "figures",
+        "runtime": evidence / "runtime",
+    }
+    for destination in destinations.values():
+        destination.mkdir(parents=True, exist_ok=True)
+
+    sources = [
+        *(path for path in output.glob("*.csv") if path.is_file()),
+        *(path for path in output.glob("*.json") if path.name != "run_manifest.json" and path.is_file()),
+        *(path for path in (output / "figures").glob("*") if path.is_file()),
+    ]
+    copied = 0
+    for source in sources:
+        destination_dir = destinations["figures"] if source.parent.name == "figures" else destinations["results"]
+        shutil.copyfile(source, destination_dir / source.name)
+        copied += 1
+    shutil.copyfile(output / "run_manifest.json", destinations["runtime"] / "run_manifest.json")
+    return copied + 1
 
 
 def _build_training_frame(
@@ -453,4 +479,6 @@ def run_pipeline(root: Path, config_path: Path) -> dict[str, Any]:
     }
     _write_json(output / "run_manifest.json", manifest)
     print(f"[OK] manifest={output / 'run_manifest.json'}")
+    copied = _sync_evidence_mirror(root, output)
+    print(f"[OK] evidence mirror artifacts={copied}")
     return dashboard
