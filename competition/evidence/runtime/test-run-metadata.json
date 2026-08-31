@@ -1,10 +1,11 @@
 {
   "schema_version": "1.0",
-  "report_id": "TD-FTR-20260831-02",
+  "report_id": "TD-FTR-20260831-03",
   "source": {
     "branch": "master",
     "commit": "9faf4e8f82a61c0fb4dabcd5c03870921a6508dd",
-    "repository": "SunRunJie/Trustdata-Crowdsourced-Review-Governance"
+    "repository": "SunRunJie/Trustdata-Crowdsourced-Review-Governance",
+    "ci_validation_commit": "1dbcb1c92016d6f51be4a9ad7e0815f8b8651232"
   },
   "execution": {
     "timestamp": "2026-08-31T17:13:52.084027+08:00",
@@ -56,18 +57,34 @@
     },
     "workflow": {
       "path": ".github/workflows/ci.yml",
-      "sha256": "03809696ACC45A01E83448129299B65251AACD3286E103634D3E3C57FF1CDC4C",
+      "sha256": "2FD0548F3F8E4D27C75922848282A3F66C28FBF1E94CA5EFE08389110AB65C16",
       "local_yaml_validation": "passed",
-      "remote_github_checks": "pending_user_push",
+      "remote_github_checks": "passed",
       "planned_checks": [
         "Tests (ubuntu-latest, Python 3.12.13)",
-        "Tests (windows-latest, Python 3.12.13)",
+        "Tests (windows-latest, Python 3.12)",
         "CI gate"
+      ],
+      "successful_run": {
+        "run_id": 33383173670,
+        "url": "https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33383173670",
+        "head_sha": "1dbcb1c92016d6f51be4a9ad7e0815f8b8651232",
+        "conclusion": "success",
+        "completed_at": "2026-08-31T10:39:00Z",
+        "checks": [
+          {"name": "Tests (ubuntu-latest, Python 3.12.13)", "job_id": 99459837050, "conclusion": "success"},
+          {"name": "Tests (windows-latest, Python 3.12)", "job_id": 99459836677, "conclusion": "success"},
+          {"name": "CI gate", "job_id": 99460411082, "conclusion": "success"}
+        ]
+      },
+      "prior_diagnostic_runs": [
+        {"run_id": 33378802164, "head_sha": "515f346b6c61b802bc13b258ba67515cf415cd3f", "conclusion": "failure", "finding": "Windows runner could not provision exact Python 3.12.13"},
+        {"run_id": 33381987630, "head_sha": "5ae70ef7627ad55059fbd8f7a6d6d4000b96f20d", "conclusion": "failure", "finding": "floating Python 3.12 passed Windows but failed the Ubuntu test suite"}
       ]
     }
   },
   "limitations": [
-    "Remote GitHub-hosted checks cannot run until these local commits are pushed.",
+    "Local JUnit evidence is bound to source commit 9faf4e8f82a61c0fb4dabcd5c03870921a6508dd; remote cross-platform CI evidence is bound to validation commit 1dbcb1c92016d6f51be4a9ad7e0815f8b8651232",
     "No macOS, browser E2E, load, penetration, privacy-impact, or live external API test was executed.",
     "The current evidence level remains E2: controlled internal validation."
   ]

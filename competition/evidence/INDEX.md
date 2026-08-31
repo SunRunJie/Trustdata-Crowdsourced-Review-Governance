@@ -15,7 +15,7 @@
 | E09 | 排序结果 | `results/ranking_metrics.csv` | Spearman、Kendall、Top-100、MRE、NDCG |
 | E10 | 稳健性/消融/公平性 | `results/split_sensitivity_metrics.csv`、`results/split_sensitivity_summary.csv`、`results/ablation_metrics.csv`、`results/fairness_metrics.csv` | 五个贡献者分组种子、P/B/C/X/T 消融、账号年龄清洁 FPR |
 | E11 | 图表 | `figures/` | 风险检测、排序、消融、等级分布 |
-| E12 | 测试记录 | `TEST_REPORT.md`、`runtime/pytest-junit.xml`、`runtime/test-case-inventory.csv`、`runtime/test-run-metadata.json` | 64/64 本地自动化测试通过；逐例状态、提交、环境、哈希、CI 设计和限制可追溯 |
+| E12 | 测试记录 | `TEST_REPORT.md`、`runtime/pytest-junit.xml`、`runtime/test-case-inventory.csv`、`runtime/test-run-metadata.json` | 64/64 本地自动化测试通过；GitHub Ubuntu、Windows 与 CI gate 运行 33383173670 全部通过；逐例状态、提交、环境、哈希、诊断历史和限制可追溯 |
 | E13 | 产品原型 | `product/`、`app/data/dashboard.json` | 六工作面；数据由运行管线生成 |
 | E14 | 主张映射 | `CLAIM_EVIDENCE.csv` | 每项主张的证据、等级和禁用表述 |
 | E15 | 数字母表 | `NUMBERS_MASTER.csv` | 申报和路演数字的唯一引用表 |

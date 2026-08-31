@@ -4,45 +4,49 @@
 
 | 项目 | 内容 |
 |---|---|
-| 报告编号 | TD-FTR-20260831-02 |
-| 报告版本 | 2.0（Final） |
-| 替代版本 | 1.0（TD-FTR-20260831-01） |
+| 报告编号 | TD-FTR-20260831-03 |
+| 报告版本 | 2.1（Final / Remote Verified） |
+| 替代版本 | 2.0（TD-FTR-20260831-02） |
 | 项目 | 面向众包内容平台的用户评价数据可信评估与分级系统（TrustData） |
 | 仓库 | `SunRunJie/Trustdata-Crowdsourced-Review-Governance` |
 | 被测分支 | `master` |
-| 被测提交 | `9faf4e8f82a61c0fb4dabcd5c03870921a6508dd` |
-| 测试时间 | 2026-08-31T17:13:52.084027+08:00 |
+| 本地全量测试提交 | `9faf4e8f82a61c0fb4dabcd5c03870921a6508dd` |
+| 远端 CI 验证提交 | `1dbcb1c92016d6f51be4a9ad7e0815f8b8651232` |
+| 本地测试时间 | 2026-08-31T17:13:52.084027+08:00 |
+| 远端验证完成时间 | 2026-08-31T18:39:00+08:00 |
 | 测试执行 | Codex 自动化测试会话 |
 | 质量审计 | Research Auditor 只读交叉核验 |
 | 证据等级 | E2：团队内部受控环境验证 |
 | 本地结论 | PASS |
-| GitHub-hosted Checks | PENDING — 等待用户推送后执行 |
+| GitHub-hosted Checks | PASS — [TrustData CI #33383173670](https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33383173670) |
 | 项目负责人审批 | 待人工签署 |
 
 ## 2. 执行摘要
 
-本次验收针对包含跨平台 GitHub Actions 门禁的提交 `9faf4e8f82a61c0fb4dabcd5c03870921a6508dd`，在一个全新创建的 CPython 3.12.13 虚拟环境中完成。依赖严格按 `requirements.lock` 的版本和哈希安装，`pip check` 未发现破损依赖，完整 pytest 套件全部通过。
+本地正式验收针对提交 `9faf4e8f82a61c0fb4dabcd5c03870921a6508dd`，在全新创建的 CPython 3.12.13 虚拟环境中完成。依赖严格按 `requirements.lock` 的版本和哈希安装，`pip check` 未发现破损依赖，完整 pytest 套件 64 项全部通过。
+
+远端跨平台验收针对包含最终 CI 兼容性修复的提交 `1dbcb1c92016d6f51be4a9ad7e0815f8b8651232`。GitHub-hosted Ubuntu、Windows 以及汇总 `CI gate` 均成功，运行编号为 `33383173670`。Ubuntu 使用固定 CPython 3.12.13；Windows 使用 runner 当前可用的 CPython 3.12 补丁版本。
 
 | 核心指标 | 结果 |
 |---|---:|
-| 测试用例总数 | 64 |
-| 通过 | 64 |
-| 失败 | 0 |
-| 错误 | 0 |
-| 跳过 | 0 |
-| 通过率 | 100% |
-| pytest 总耗时 | 93.234 秒 |
+| 本地测试用例总数 | 64 |
+| 本地通过 | 64 |
+| 本地失败/错误/跳过 | 0 / 0 / 0 |
+| 本地通过率 | 100% |
+| 本地 pytest 总耗时 | 93.234 秒 |
 | 依赖一致性 | PASS |
 | CI YAML 本地解析 | PASS |
+| GitHub Ubuntu 检查 | PASS |
+| GitHub Windows 检查 | PASS |
+| GitHub `CI gate` | PASS |
 | 阻塞缺陷 | 0 |
 | 高/重要缺陷 | 0 |
-| 非阻塞警告 | 1 |
-| GitHub 远端运行 | 尚未执行 |
+| 未关闭非阻塞警告 | 1 |
+| 已关闭 CI 兼容性问题 | 2 |
 
-**本地质量验收结论：PASS。** 在本报告声明的代码提交、依赖环境和自动化测试范围内，未发现阻止用户推送或进入 GitHub-hosted Checks 的问题。
+**综合质量验收结论：PASS。** 在本报告声明的代码、依赖、自动化测试和双平台 CI 范围内，未发现阻止合并或发布的缺陷。
 
-**远端门禁结论：PENDING。** 本地报告不能声称 GitHub Checks 已通过；推送后必须以 GitHub 上的 `CI gate` 结果作为远端最终状态。
-
+首次远端运行暴露了 Windows 无法配置精确 Python 3.12.13；第二次诊断运行显示浮动 3.12 在 Windows 通过但 Ubuntu 测试失败。最终采用按平台验证过的版本矩阵并取得三项绿色结果。两次失败均保留在 GitHub Actions 历史和本报告第 12.4 节中，未从证据链中删除。
 ## 3. 验收目标与判定标准
 
 ### 3.1 验收目标
@@ -66,17 +70,18 @@
 | AC-05 | 不允许跳过用例 | 0 skipped | PASS |
 | AC-06 | 版本化证据与重建结果一致 | 7 项证据复现测试通过 | PASS |
 | AC-07 | CI 工作流可被 YAML 解析，矩阵和门禁存在 | 本地结构验证通过 | PASS |
-| AC-08 | GitHub-hosted Ubuntu 与 Windows 检查通过 | 等待推送 | PENDING |
+| AC-08 | GitHub-hosted Ubuntu 与 Windows 检查通过 | 运行 `33383173670` 三项检查均成功 | PASS |
 | AC-09 | JUnit、逐例清单和元数据可追溯 | 三类证据均已生成 | PASS |
 | AC-10 | 报告中的数字与机器证据一致 | 只读交叉核验通过 | PASS |
 
-AC-08 是远端状态，不影响“可推送”结论，但在 GitHub 显示绿色 `CI gate` 前，不应表述为“GitHub Checks 已通过”。
+AC-08 已由 GitHub 运行 `33383173670` 验证；该运行与提交 `1dbcb1c92016d6f51be4a9ad7e0815f8b8651232` 绑定。
 
 ## 4. 被测对象与配置基线
 
 | 类别 | 基线 |
 |---|---|
-| 源代码提交 | `9faf4e8f82a61c0fb4dabcd5c03870921a6508dd` |
+| 本地全量测试提交 | `9faf4e8f82a61c0fb4dabcd5c03870921a6508dd` |
+| 远端 CI 验证提交 | `1dbcb1c92016d6f51be4a9ad7e0815f8b8651232` |
 | 项目版本 | `trustdata 0.2.0` |
 | Python 约束 | `>=3.12,<3.13` |
 | 依赖锁 | `requirements.lock` |
@@ -86,7 +91,7 @@ AC-08 是远端状态，不影响“可推送”结论，但在 GitHub 显示绿
 | CI 工作流 | `.github/workflows/ci.yml` |
 | 证据目录 | `competition/evidence/runtime/` |
 
-本报告绑定被测提交，不绑定未来未测试的代码更改。报告提交本身只应包含报告、索引和机器证据，不应夹带业务代码修改。
+本地机器证据绑定 `9faf4e8`；远端双平台 CI 证据绑定包含工作流兼容性修复的 `1dbcb1c`。两者用途不同，均不自动覆盖未来代码更改。
 
 ## 5. 测试环境
 
@@ -213,14 +218,14 @@ pytest 总耗时 93.234 秒；模块用例时间之和不包含收集、fixture�
 | 证据 | 路径 | SHA-256 |
 |---|---|---|
 | 依赖锁 | `requirements.lock` | `815F48D1ED9B12766900451B0584FCB2E1F0735F7D0A7A401DAE531E98196E55` |
-| CI 工作流 | `.github/workflows/ci.yml` | `03809696ACC45A01E83448129299B65251AACD3286E103634D3E3C57FF1CDC4C` |
+| CI 工作流 | `.github/workflows/ci.yml` | `2FD0548F3F8E4D27C75922848282A3F66C28FBF1E94CA5EFE08389110AB65C16` |
 | JUnit XML | `competition/evidence/runtime/pytest-junit.xml` | `C27601E7E38D00099F9BF54E861389BCB44DFFAD8D21839A10E246BE796C7F7D` |
 | 用例清单 | `competition/evidence/runtime/test-case-inventory.csv` | `C2A339C293937F8FF1CCB0D3869F77DEF512C1A2D54CECB6378EF8CA46294DBD` |
-| 运行元数据 | `competition/evidence/runtime/test-run-metadata.json` | `B96427C5AC2ADA37DC2700D5F8766E5A902E9BFE1FB3759679E8FEA52AE82EB8` |
+| 运行元数据 | `competition/evidence/runtime/test-run-metadata.json` | `4E9925DE4D104A5A7B092A24DD3B4BF28B0B4C1600AF83F7561134FF327B2607` |
 
 元数据文件不能安全记录自身哈希，因此本报告是其 SHA-256 的权威记录。
 
-## 12. GitHub Checks 设计
+## 12. GitHub Checks 设计与实测结果
 
 ### 12.1 触发条件
 
@@ -228,13 +233,13 @@ pytest 总耗时 93.234 秒；模块用例时间之和不包含收集、fixture�
 - 面向 `master` 的 Pull Request。
 - 手动 `workflow_dispatch`。
 
-### 12.2 检查矩阵
+### 12.2 最终检查矩阵
 
-| 检查 | 环境 | 工作内容 |
-|---|---|---|
-| `Tests (ubuntu-latest, Python 3.12.13)` | GitHub-hosted Ubuntu | 锁定安装、`pip check`、64 项测试、JUnit 上传 |
-| `Tests (windows-latest, Python 3.12.13)` | GitHub-hosted Windows | 锁定安装、`pip check`、64 项测试、JUnit 上传 |
-| `CI gate` | GitHub-hosted Ubuntu | 汇总矩阵，任一平台失败则门禁失败 |
+| 检查 | 环境 | Python 选择 | 工作内容 |
+|---|---|---|---|
+| `Tests (ubuntu-latest, Python 3.12.13)` | GitHub-hosted Ubuntu | 固定 `3.12.13` | 哈希锁定安装、`pip check`、64 项测试、JUnit 上传 |
+| `Tests (windows-latest, Python 3.12)` | GitHub-hosted Windows | runner 可用的 3.12 补丁版 | 哈希锁定安装、`pip check`、64 项测试、JUnit 上传 |
+| `CI gate` | GitHub-hosted Ubuntu | 不适用 | 汇总矩阵，任一平台失败则门禁失败 |
 
 其他设计：
 
@@ -246,20 +251,36 @@ pytest 总耗时 93.234 秒；模块用例时间之和不包含收集、fixture�
 - JUnit 产物即使测试失败也尝试上传，保留 30 天。
 - `CI gate` 提供稳定的分支保护检查名称。
 
-### 12.3 当前状态
+### 12.3 成功运行记录
 
-本地已完成 YAML 解析、矩阵结构和门禁依赖核验。由于用户要求自行推送，本报告生成时 GitHub-hosted runner 尚未执行这些检查。推送后以 GitHub Actions 页面显示的三项状态为准。
+成功运行：[TrustData CI #33383173670](https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33383173670)，提交 `1dbcb1c92016d6f51be4a9ad7e0815f8b8651232`，最终结论 `success`。
 
-## 13. 缺陷、警告与待确认项
+| Job ID | 检查 | 开始（UTC） | 完成（UTC） | 耗时 | 结论 |
+|---:|---|---|---|---:|---|
+| `99459837050` | Ubuntu / Python 3.12.13 | 10:36:27 | 10:38:08 | 101 秒 | PASS |
+| `99459836677` | Windows / Python 3.12 | 10:36:27 | 10:38:55 | 148 秒 | PASS |
+| `99460411082` | CI gate | 10:38:57 | 10:39:00 | 3 秒 | PASS |
+
+两个平台任务均完整成功，因此其依赖安装、`pip check`、pytest 和 JUnit 上传步骤均通过；`CI gate` 随后成功。
+
+### 12.4 诊断运行与纠正措施
+
+| 运行 | 提交 | 观察结果 | 根因/判断 | 纠正措施 | 状态 |
+|---:|---|---|---|---|---|
+| `33378802164` | `515f346` | Ubuntu 成功；Windows 在 Python 配置步骤失败；门禁失败 | Windows runner 无法提供精确 `3.12.13` | Windows 改用可用的 `3.12` 系列 | Closed |
+| `33381987630` | `5ae70ef` | Windows 成功；Ubuntu pytest 失败；门禁失败 | 浮动版本改变了 Ubuntu 已验证基线 | Ubuntu 恢复固定 `3.12.13`，形成按平台矩阵 | Closed |
+| `33383173670` | `1dbcb1c` | Ubuntu、Windows、门禁全部成功 | 最终矩阵有效 | 保留为正式远端验收记录 | PASS |
+
+上述过程验证了门禁能够在平台配置或测试失败时阻止通过，并在修复后给出稳定的绿色汇总结论。
+## 13. 缺陷、警告与关闭项
 
 | 编号 | 分类 | 级别 | 状态 | 证据 | 处置 |
 |---|---|---|---|---|---|
 | W-001 | 依赖弃用 | SUGGESTION | Open / 非阻塞 | StarletteDeprecationWarning | 下一次依赖升级前评估 `httpx2` 并更新锁文件 |
-| N-001 | 远端执行 | Needs confirmation | Pending | GitHub-hosted Checks 尚未触发 | 用户推送后确认 `CI gate` 为绿色 |
-| N-002 | 工作流平台解析 | Needs confirmation | Pending | 本地 YAML 解析已通过，未使用本机 actionlint | 由 GitHub 首次运行完成最终工作流解释验证 |
+| C-001 | CI 运行时可用性 | CI compatibility | Closed | 运行 `33378802164` 的 Windows Python 配置失败 | Windows 使用 runner 可用的 Python 3.12 补丁版 |
+| C-002 | CI 跨平台基线 | CI compatibility | Closed | 运行 `33381987630` 的 Ubuntu pytest 失败 | Ubuntu 固定为已验证的 3.12.13；运行 `33383173670` 通过 |
 
-阻塞项 0，重要项 0，建议项 1，待确认项 2。
-
+阻塞项 0，重要项 0，未关闭建议项 1，已关闭 CI 兼容性问题 2，待确认项 0。
 ## 14. 历史阻塞项关闭记录
 
 | 历史问题 | 关闭证据 | 状态 |
@@ -269,14 +290,14 @@ pytest 总耗时 93.234 秒；模块用例时间之和不包含收集、fixture�
 | 干净检出缺少 `tmp/` 导致 pytest setup error | `.pytest-tmp` 可自动创建 | Closed |
 | 测试依赖被忽略的 `outputs/runs/latest` | 测试内完整重建基准 | Closed |
 | CSV/JSON 原始字节哈希跨平台不稳定 | 严格结构/文本比较 + 明确浮点容差 | Closed |
-| GitHub Actions 单平台且无测试产物 | Ubuntu/Windows 矩阵 + JUnit + `CI gate` | Implemented / remote pending |
+| GitHub Actions 单平台且无测试产物 | Ubuntu/Windows 矩阵 + JUnit + 成功运行 `33383173670` | Closed |
 
 ## 15. 风险与覆盖缺口
 
 | 风险 | 当前控制 | 残余风险 |
 |---|---|---|
 | 依赖漂移 | 锁定版本、哈希安装、pip 缓存键 | 包源可用性和未来安全升级 |
-| 跨平台数值漂移 | Windows 本地通过；CI 增加 Ubuntu/Windows | 远端结果待首次运行，macOS 未覆盖 |
+| 跨平台数值漂移 | Windows 本地通过；GitHub Ubuntu/Windows 运行 `33383173670` 通过 | macOS 未覆盖；未来运行时升级仍需回归 |
 | 外部平台变化 | 安全边界使用模拟请求回归 | 真实页面结构、限流和服务条款变化 |
 | 性能退化 | 记录用例耗时和最慢用例 | 无负载、并发、内存和长期稳定性基线 |
 | 前端回归 | 数据与控制 API 有测试 | 无浏览器 E2E、视觉回归和无障碍测试 |
@@ -291,39 +312,39 @@ pytest 总耗时 93.234 秒；模块用例时间之和不包含收集、fixture�
 - JUnit/CSV/JSON 提供机器可读的本地执行证据。
 - GitHub Checks 提供与提交 SHA 自动绑定的独立远端执行、历史记录和分支保护。
 
-本报告不能替代 GitHub Checks。推送后建议在 `master` 分支保护中把 `CI gate` 设置为 required status check；以后每个 PR 都必须等待该门禁通过。
+本报告不能替代 GitHub Checks。本次远端检查已通过；仍建议在 `master` 分支保护中把 `CI gate` 设置为 required status check，使以后每个 PR 都必须等待该门禁通过。
 
 ## 17. 复现与复核步骤
 
-1. 检出 `9faf4e8f82a61c0fb4dabcd5c03870921a6508dd`。
+1. 检出本地全量测试提交 `9faf4e8f82a61c0fb4dabcd5c03870921a6508dd`。
 2. 使用 CPython 3.12.13 创建全新虚拟环境。
 3. 执行 `python -m pip install --require-hashes -r requirements.lock`。
 4. 执行 `python -m pip check`。
 5. 执行 `python -m pytest -q --junitxml=competition/evidence/runtime/pytest-junit.xml`。
 6. 确认 JUnit 为 64 tests、0 failures、0 errors、0 skipped。
 7. 核对本报告第 11 节中的哈希。
-8. 推送本地提交，等待 Ubuntu、Windows 和 `CI gate`。
-9. 在分支保护中将 `CI gate` 设为必需检查。
-10. 若远端结果与本报告不同，以远端日志和新生成的 JUnit 为准，并重新评估验收结论。
-
+8. 检出 CI 验证提交 `1dbcb1c92016d6f51be4a9ad7e0815f8b8651232` 并核对运行 `33383173670`。
+9. 确认 Ubuntu、Windows 和 `CI gate` 三项结论均为 `success`。
+10. 在分支保护中将 `CI gate` 设为必需检查；未来若结果变化，以新提交对应的远端日志和 JUnit 为准重新验收。
 ## 18. 独立审计覆盖与判定
 
 ### 18.1 已审计
 
 - JUnit 总数、失败、错误、跳过和耗时。
-- 五个测试模块的用例数。
-- 被测提交、分支和锁文件哈希。
+- 五个测试模块的用例数与 64 项逐例清单。
+- 本地被测提交、远端 CI 提交、分支和锁文件哈希。
 - JUnit、逐例清单、元数据和 CI 工作流哈希。
 - 报告数字与机器证据的一致性。
-- “本地通过”与“远端待确认”的状态区分。
+- 三次 GitHub Actions 运行的状态、提交 SHA、Job ID、时间和结论。
+- 两次失败诊断、纠正措施与最终成功之间的追踪关系。
 - 旧 13 项测试口径是否已清除。
 - 证据等级和未覆盖范围是否存在过度表述。
 
-### 18.2 未审计或无法在本地验证
+### 18.2 未覆盖或限制
 
-- GitHub-hosted runner 的实际执行结果。
 - macOS、浏览器 E2E、性能、渗透、隐私影响和真实外部 API。
 - E3–E6 的真实标注、平台试点、第三方测评和生产运行。
+- GitHub JUnit 产物需仓库身份认证后下载；本次审计使用 GitHub API 的运行、Job 和步骤结论，并以成功 Job 的强制步骤语义核验。
 
 ### 18.3 审计汇总
 
@@ -332,24 +353,24 @@ pytest 总耗时 93.234 秒；模块用例时间之和不包含收集、fixture�
 | BLOCKER | 0 |
 | IMPORTANT | 0 |
 | SUGGESTION | 1 |
-| Needs confirmation | 2 |
+| Needs confirmation | 0 |
+| Closed CI compatibility findings | 2 |
 
-**审计判定：PASS WITH MINOR ISSUES。** 在已审计范围内未发现阻塞或重要不一致；W-001 为非阻塞维护建议，N-001/N-002 必须在推送后由 GitHub 首次运行确认。
-
+**审计判定：PASS WITH ONE MINOR MAINTENANCE ITEM。** 本地 64/64 测试证据与远端三项绿色 Checks 一致支持通过结论；W-001 是唯一未关闭的非阻塞维护建议。
 ## 19. 发布建议与签署
 
 ### 19.1 发布建议
 
-- 当前本地提交可推送到 `origin/master`。
-- 推送后不要立即把远端状态写成“通过”，应等待 `CI gate` 变绿。
-- 如任一平台失败，保留 Actions JUnit 产物，并以失败平台为准修复。
-- 在首次成功运行后启用 `CI gate` 分支保护。
-- 下一周期处理 W-001，并规划浏览器 E2E 与性能基线。
+- 本地全量测试与 GitHub-hosted Ubuntu/Windows 检查均通过，可在本报告覆盖范围内合并或发布。
+- 在 `master` 分支保护中把稳定检查名 `CI gate` 设置为 required status check。
+- 保留运行 `33383173670` 及其 JUnit 产物；历史失败运行作为纠正措施证据保留。
+- 下一周期处理 W-001，并规划浏览器 E2E、性能基线及 macOS 覆盖。
+- 任何业务代码、依赖锁或 CI 工作流变更都应触发新的验收，不沿用本报告结论。
 
 ### 19.2 签署
 
 | 角色 | 名称/签字 | 日期 | 结论 |
 |---|---|---|---|
-| 测试执行 | Codex 自动化测试会话 | 2026-08-31 | LOCAL PASS |
-| 质量审计 | Research Auditor | 2026-08-31 | PASS WITH MINOR ISSUES |
+| 测试执行 | Codex 自动化测试会话 | 2026-08-31 | LOCAL + GITHUB PASS |
+| 质量审计 | Research Auditor | 2026-08-31 | PASS WITH ONE MINOR MAINTENANCE ITEM |
 | 项目负责人审批 | 待填写 | 待填写 | 待确认 |
