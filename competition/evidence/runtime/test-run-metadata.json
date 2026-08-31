@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "report_id": "TD-FTR-20260831-02",
+  "source": {
+    "branch": "master",
+    "commit": "9faf4e8f82a61c0fb4dabcd5c03870921a6508dd",
+    "repository": "SunRunJie/Trustdata-Crowdsourced-Review-Governance"
+  },
+  "execution": {
+    "timestamp": "2026-08-31T17:13:52.084027+08:00",
+    "timezone": "Asia/Shanghai",
+    "status": "passed",
+    "environment": "fresh isolated virtual environment",
+    "install_command": "python -m pip install --require-hashes -r requirements.lock",
+    "dependency_check": "passed",
+    "test_command": "python -m pytest -q --junitxml=competition/evidence/runtime/pytest-junit.xml"
+  },
+  "runtime": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python_implementation": "CPython",
+    "python_version": "3.12.13",
+    "pip": "25.0.1",
+    "pytest": "9.1.1",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.0",
+    "scikit_learn": "1.9.0",
+    "fastapi": "0.141.1",
+    "starlette": "1.6.0",
+    "httpx": "0.28.1"
+  },
+  "results": {
+    "tests": 64,
+    "passed": 64,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 93.234,
+    "warning_count": 1,
+    "warnings": [
+      "StarletteDeprecationWarning: httpx-backed TestClient is deprecated; evaluate httpx2 before the next dependency upgrade"
+    ]
+  },
+  "evidence": {
+    "requirements_lock": {
+      "path": "requirements.lock",
+      "sha256": "815F48D1ED9B12766900451B0584FCB2E1F0735F7D0A7A401DAE531E98196E55"
+    },
+    "junit": {
+      "path": "competition/evidence/runtime/pytest-junit.xml",
+      "sha256": "C27601E7E38D00099F9BF54E861389BCB44DFFAD8D21839A10E246BE796C7F7D"
+    },
+    "test_case_inventory": {
+      "path": "competition/evidence/runtime/test-case-inventory.csv",
+      "sha256": "C2A339C293937F8FF1CCB0D3869F77DEF512C1A2D54CECB6378EF8CA46294DBD"
+    },
+    "workflow": {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "03809696ACC45A01E83448129299B65251AACD3286E103634D3E3C57FF1CDC4C",
+      "local_yaml_validation": "passed",
+      "remote_github_checks": "pending_user_push",
+      "planned_checks": [
+        "Tests (ubuntu-latest, Python 3.12.13)",
+        "Tests (windows-latest, Python 3.12.13)",
+        "CI gate"
+      ]
+    }
+  },
+  "limitations": [
+    "Remote GitHub-hosted checks cannot run until these local commits are pushed.",
+    "No macOS, browser E2E, load, penetration, privacy-impact, or live external API test was executed.",
+    "The current evidence level remains E2: controlled internal validation."
+  ]
+}
