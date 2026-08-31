@@ -15,7 +15,7 @@
 | E09 | 排序结果 | `results/ranking_metrics.csv` | Spearman、Kendall、Top-100、MRE、NDCG |
 | E10 | 稳健性/消融/公平性 | `results/split_sensitivity_metrics.csv`、`results/split_sensitivity_summary.csv`、`results/ablation_metrics.csv`、`results/fairness_metrics.csv` | 五个贡献者分组种子、P/B/C/X/T 消融、账号年龄清洁 FPR |
 | E11 | 图表 | `figures/` | 风险检测、排序、消融、等级分布 |
-| E12 | 测试记录 | `TEST_REPORT.md` | 13/13 自动化测试通过；测试范围和空缺 |
+| E12 | 测试记录 | `TEST_REPORT.md`、`runtime/pytest-junit.xml` | 64/64 自动化测试通过；提交、环境、范围和限制可追溯 |
 | E13 | 产品原型 | `product/`、`app/data/dashboard.json` | 六工作面；数据由运行管线生成 |
 | E14 | 主张映射 | `CLAIM_EVIDENCE.csv` | 每项主张的证据、等级和禁用表述 |
 | E15 | 数字母表 | `NUMBERS_MASTER.csv` | 申报和路演数字的唯一引用表 |
@@ -39,7 +39,7 @@
 
 1. 检查 `run_manifest.json` 的状态、种子和输入哈希。
 2. 对照 `NUMBERS_MASTER.csv` 与原始结果 CSV。
-3. 运行 13 项自动化测试。
+3. 运行 64 项自动化测试，并核对 JUnit XML 与被测提交 SHA。
 4. 运行完整管线并比较输出结构；浮点数允许因底层库差异出现末位差异。
 5. 打开本地产品，确认页面数据来自 `dashboard.json`。
 
