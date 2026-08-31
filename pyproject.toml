@@ -31,5 +31,5 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --basetemp=tmp/pytest"
+addopts = "-q --basetemp=.pytest-tmp"
 pythonpath = ["src"]

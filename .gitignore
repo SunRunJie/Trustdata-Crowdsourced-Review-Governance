@@ -4,6 +4,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
+.pytest-tmp/
 htmlcov/
 data/interim/
 data/processed/*.csv

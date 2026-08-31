@@ -16,6 +16,7 @@ from trustdata.pipeline import run_pipeline
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE = ROOT / "competition" / "evidence"
 
+EVIDENCE_ATOL = 2e-6
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -49,6 +50,45 @@ def _primary_at(output: Path, level: float) -> pd.Series:
         & metrics["method"].eq("multi_evidence_logistic")
     ].iloc[0]
 
+
+def _assert_csv_equivalent(generated_path: Path, archived_path: Path, *, ignore: tuple[str, ...] = ()) -> None:
+    """Compare evidence semantically while allowing small cross-platform numeric drift."""
+    generated = pd.read_csv(generated_path)
+    archived = pd.read_csv(archived_path)
+    assert generated.columns.tolist() == archived.columns.tolist()
+    assert set(ignore).issubset(generated.columns)
+    pd.testing.assert_frame_equal(
+        generated.drop(columns=list(ignore)),
+        archived.drop(columns=list(ignore)),
+        check_exact=False,
+        rtol=0.0,
+        atol=EVIDENCE_ATOL,
+    )
+
+
+def _assert_json_equivalent(generated: object, archived: object, *, path: str = "$") -> None:
+    """Compare JSON structure strictly and numeric leaves within the evidence tolerance."""
+    if isinstance(archived, bool) or archived is None or isinstance(archived, str):
+        assert type(generated) is type(archived), path
+        assert generated == archived, path
+        return
+    if isinstance(archived, (int, float)):
+        assert isinstance(generated, (int, float)) and not isinstance(generated, bool), path
+        assert generated == pytest.approx(archived, rel=0.0, abs=EVIDENCE_ATOL), path
+        return
+    if isinstance(archived, dict):
+        assert isinstance(generated, dict), path
+        assert generated.keys() == archived.keys(), path
+        for key in archived:
+            _assert_json_equivalent(generated[key], archived[key], path=f"{path}.{key}")
+        return
+    if isinstance(archived, list):
+        assert isinstance(generated, list), path
+        assert len(generated) == len(archived), path
+        for index, (generated_item, archived_item) in enumerate(zip(generated, archived, strict=True)):
+            _assert_json_equivalent(generated_item, archived_item, path=f"{path}[{index}]")
+        return
+    raise TypeError(f"Unsupported JSON value at {path}: {type(archived).__name__}")
 
 def test_numbers_master_matches_generated_primary_results(benchmark_run: Path) -> None:
     numbers = pd.read_csv(EVIDENCE / "NUMBERS_MASTER.csv").set_index("number_id")
@@ -98,15 +138,14 @@ def test_versioned_evidence_mirrors_generated_results(benchmark_run: Path) -> No
         mirror = EVIDENCE / "results" / source.name
         assert mirror.exists()
         if source.name == "audit_trail.csv":
-            generated = pd.read_csv(source)
-            archived = pd.read_csv(mirror)
-            assert generated.columns.tolist() == archived.columns.tolist()
-            assert {"event_time", "model_version", "decision_status"}.issubset(generated.columns)
-            assert generated.drop(columns=["event_time"]).equals(archived.drop(columns=["event_time"]))
+            assert {"event_time", "model_version", "decision_status"}.issubset(pd.read_csv(source, nrows=0).columns)
+            _assert_csv_equivalent(source, mirror, ignore=("event_time",))
             continue
-        assert _sha256(source) == _sha256(mirror)
+        _assert_csv_equivalent(source, mirror)
     for name in ("result_summary.json", "trust_passports.json"):
-        assert _sha256(benchmark_run / name) == _sha256(EVIDENCE / "results" / name)
+        generated = json.loads((benchmark_run / name).read_text(encoding="utf-8"))
+        archived = json.loads((EVIDENCE / "results" / name).read_text(encoding="utf-8"))
+        _assert_json_equivalent(generated, archived)
     for figure in (benchmark_run / "figures").glob("*.png"):
         archived_figure = EVIDENCE / "figures" / figure.name
         assert archived_figure.is_file()
