@@ -207,7 +207,7 @@ task:
 
 `.github/workflows/ci.yml` 会在推送到 `master`、面向 `master` 的 Pull Request 以及手动触发时运行：
 
-- Ubuntu 与 Windows 分别使用 CPython 3.12.13；
+- Ubuntu 与 Windows 分别使用 runner 当前可用的最新 CPython 3.12 补丁版本，并在日志中输出实际版本；
 - 按 `requirements.lock` 的哈希安装依赖，并执行 `pip check`；
 - 两个平台均运行完整 pytest 套件；
 - 无论成功或失败，均尝试上传保留 30 天的 JUnit XML；
