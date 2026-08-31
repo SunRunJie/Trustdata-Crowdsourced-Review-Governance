@@ -11,7 +11,7 @@ C009,30%污染下平均排名误差下降25.6%,E2,"outputs/runs/latest/ranking_m
 C010,1%污染下F1较低且排序加权恶化,E2,"outputs/runs/latest/classification_metrics.csv;outputs/runs/latest/ranking_metrics.csv",verified,"1%时F1为0.1910且平均排名误差上升","低污染仍保持稳定性能"
 C011,新账号仅作为弱特征,E1,"src/trustdata/features.py;tests/test_core.py",verified,"账户年龄小于等于30天只贡献弱风险项","系统对新账号零偏差"
 C012,六工作面产品可本地运行,E1,"product/index.html;product/app.js;product/styles.css;app/data/dashboard.json",verified,"交付可运行治理原型","已完成生产部署"
-C013,自动化测试64项全部通过,E1,"tests/;competition/evidence/TEST_REPORT.md;competition/evidence/runtime/pytest-junit.xml;competition/evidence/runtime/test-case-inventory.csv;competition/evidence/runtime/test-run-metadata.json",verified,"核心、环境、控制台安全回归、LLM采集与证据一致性测试64/64本地通过；GitHub-hosted Ubuntu、Windows和CI gate运行33383173670全部通过","通过全面第三方测试"
+C013,自动化测试64项全部通过,E1,"tests/;competition/evidence/TEST_REPORT.md;competition/evidence/runtime/pytest-junit.xml;competition/evidence/runtime/test-case-inventory.csv;competition/evidence/runtime/test-run-metadata.json",verified,"核心、环境、控制台安全回归、LLM采集与证据一致性测试64/64本地通过；GitHub-hosted Ubuntu、Windows和CI gate稳定性修复运行33395397064全部通过","通过全面第三方测试"
 C014,与ISO/IEC 5259和生成内容标识政策方向相容,E0,"docs/05_LITERATURE_POLICY_LANDSCAPE.md",supported,"设计参考用途适配数据质量与来源标识要求","获得ISO认证或监管认可"
 C015,具有差异化治理系统集成设计,E1,"docs/03_ALGORITHM_AND_METHODS.md;docs/05_LITERATURE_POLICY_LANDSCAPE.md",supported,"形成面向UGC数据使用风险的差异化系统设计","国内首创或国际领先"
 C016,五个贡献者分组种子下30%污染F1保持稳定区间,E2,"outputs/runs/latest/split_sensitivity_metrics.csv;outputs/runs/latest/split_sensitivity_summary.csv",verified,"30%污染F1中位数0.7526，范围0.7451至0.7622","多种真实平台条件下均稳定"

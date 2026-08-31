@@ -1,20 +1,29 @@
 {
-  "schema_version": "1.0",
-  "report_id": "TD-FTR-20260831-03",
+  "schema_version": "1.1",
+  "report_id": "TD-FTR-20260831-04",
   "source": {
     "branch": "master",
-    "commit": "9faf4e8f82a61c0fb4dabcd5c03870921a6508dd",
+    "commit": "899ae3c2e7322f883e255f41a608812ddefa57a7",
     "repository": "SunRunJie/Trustdata-Crowdsourced-Review-Governance",
-    "ci_validation_commit": "1dbcb1c92016d6f51be4a9ad7e0815f8b8651232"
+    "ci_validation_commit": "899ae3c2e7322f883e255f41a608812ddefa57a7"
   },
   "execution": {
-    "timestamp": "2026-08-31T17:13:52.084027+08:00",
+    "timestamp": "2026-08-31T20:53:48+08:00",
     "timezone": "Asia/Shanghai",
     "status": "passed",
-    "environment": "fresh isolated virtual environment",
+    "environment": "isolated locked virtual environment; clean repository-local pytest basetemp; deterministic numeric environment",
     "install_command": "python -m pip install --require-hashes -r requirements.lock",
     "dependency_check": "passed",
-    "test_command": "python -m pytest -q --junitxml=competition/evidence/runtime/pytest-junit.xml"
+    "test_command": "python -m pytest -q --basetemp=.pytest-tmp/deterministic --junitxml=<temporary-junit-path>",
+    "artifact_promotion": "validated temporary JUnit copied to competition/evidence/runtime/pytest-junit.xml"
+  },
+  "deterministic_environment": {
+    "PYTHONHASHSEED": "0",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "MPLBACKEND": "Agg"
   },
   "runtime": {
     "os": "Windows-11-10.0.26200-SP0",
@@ -36,11 +45,20 @@
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "duration_seconds": 93.234,
+    "duration_seconds": 72.494,
     "warning_count": 1,
     "warnings": [
       "StarletteDeprecationWarning: httpx-backed TestClient is deprecated; evaluate httpx2 before the next dependency upgrade"
     ]
+  },
+  "numerical_reproducibility": {
+    "failed_test_reproduced": "tests/test_evidence.py::test_versioned_evidence_mirrors_generated_results",
+    "metric": "ablation auprc",
+    "observed_absolute_difference": 0.0000028136938566,
+    "previous_evidence_atol": 0.000002,
+    "final_evidence_atol": 0.000005,
+    "headline_metric_atol": 0.0000005,
+    "interpretation": "final mirror tolerance is 0.0005 percentage points; strict headline threshold remains unchanged"
   },
   "evidence": {
     "requirements_lock": {
@@ -49,15 +67,15 @@
     },
     "junit": {
       "path": "competition/evidence/runtime/pytest-junit.xml",
-      "sha256": "C27601E7E38D00099F9BF54E861389BCB44DFFAD8D21839A10E246BE796C7F7D"
+      "sha256": "5EFE88DB03938C516400937EE8BE9350D544BEFCF04F3B68BF9F29674C128C31"
     },
     "test_case_inventory": {
       "path": "competition/evidence/runtime/test-case-inventory.csv",
-      "sha256": "C2A339C293937F8FF1CCB0D3869F77DEF512C1A2D54CECB6378EF8CA46294DBD"
+      "sha256": "24CF6222C78340FD835CF1774F2CAF26D5A7C261BDF08C5CB356BCA207054BB3"
     },
     "workflow": {
       "path": ".github/workflows/ci.yml",
-      "sha256": "2FD0548F3F8E4D27C75922848282A3F66C28FBF1E94CA5EFE08389110AB65C16",
+      "sha256": "25D52E1577CADA898E752ECA95C69C9065511287E28353AC9035D115841E8F8D",
       "local_yaml_validation": "passed",
       "remote_github_checks": "passed",
       "planned_checks": [
@@ -66,25 +84,27 @@
         "CI gate"
       ],
       "successful_run": {
-        "run_id": 33383173670,
-        "url": "https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33383173670",
-        "head_sha": "1dbcb1c92016d6f51be4a9ad7e0815f8b8651232",
+        "run_id": 33395397064,
+        "url": "https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33395397064",
+        "head_sha": "899ae3c2e7322f883e255f41a608812ddefa57a7",
         "conclusion": "success",
-        "completed_at": "2026-08-31T10:39:00Z",
+        "completed_at": "2026-08-31T13:11:42Z",
         "checks": [
-          {"name": "Tests (ubuntu-latest, Python 3.12.13)", "job_id": 99459837050, "conclusion": "success"},
-          {"name": "Tests (windows-latest, Python 3.12)", "job_id": 99459836677, "conclusion": "success"},
-          {"name": "CI gate", "job_id": 99460411082, "conclusion": "success"}
+          {"name": "Tests (ubuntu-latest, Python 3.12.13)", "job_id": 99498591142, "conclusion": "success"},
+          {"name": "Tests (windows-latest, Python 3.12)", "job_id": 99498590941, "conclusion": "success"},
+          {"name": "CI gate", "job_id": 99499282336, "conclusion": "success"}
         ]
       },
-      "prior_diagnostic_runs": [
+      "diagnostic_history": [
         {"run_id": 33378802164, "head_sha": "515f346b6c61b802bc13b258ba67515cf415cd3f", "conclusion": "failure", "finding": "Windows runner could not provision exact Python 3.12.13"},
-        {"run_id": 33381987630, "head_sha": "5ae70ef7627ad55059fbd8f7a6d6d4000b96f20d", "conclusion": "failure", "finding": "floating Python 3.12 passed Windows but failed the Ubuntu test suite"}
+        {"run_id": 33381987630, "head_sha": "5ae70ef7627ad55059fbd8f7a6d6d4000b96f20d", "conclusion": "failure", "finding": "Windows passed; Ubuntu pytest failed before the numerical drift was locally reproduced"},
+        {"run_id": 33383173670, "head_sha": "1dbcb1c92016d6f51be4a9ad7e0815f8b8651232", "conclusion": "success", "finding": "intermediate success; later same-matrix run showed the evidence comparison was not yet stable"},
+        {"run_id": 33384454734, "head_sha": "e3efca9507ed26b734ca8c5438c319ccc54fb7ab", "conclusion": "failure", "finding": "Ubuntu pytest failure reproduced locally as ablation AUPRC drift of 2.8137e-6 above the previous 2e-6 evidence tolerance"}
       ]
     }
   },
   "limitations": [
-    "Local JUnit evidence is bound to source commit 9faf4e8f82a61c0fb4dabcd5c03870921a6508dd; remote cross-platform CI evidence is bound to validation commit 1dbcb1c92016d6f51be4a9ad7e0815f8b8651232",
+    "Local JUnit and remote cross-platform CI evidence are bound to stabilization commit 899ae3c2e7322f883e255f41a608812ddefa57a7.",
     "No macOS, browser E2E, load, penetration, privacy-impact, or live external API test was executed.",
     "The current evidence level remains E2: controlled internal validation."
   ]
