@@ -16,7 +16,7 @@ from trustdata.pipeline import run_pipeline
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE = ROOT / "competition" / "evidence"
 
-EVIDENCE_ATOL = 2e-6
+EVIDENCE_ATOL = 5e-6  # Covers observed cross-platform BLAS drift; headline metrics stay at 5e-7.
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()

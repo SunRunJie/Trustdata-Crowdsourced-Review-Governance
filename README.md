@@ -209,6 +209,7 @@ task:
 
 - Ubuntu 固定使用 CPython 3.12.13；Windows 使用 runner 当前可用的 CPython 3.12 补丁版本，并在日志中输出实际版本；
 - 按 `requirements.lock` 的哈希安装依赖，并执行 `pip check`；
+- 固定 Python 哈希种子并将 BLAS/OMP 数值线程限制为 1，降低跨平台基准的非确定性；
 - 两个平台均运行完整 pytest 套件；
 - 无论成功或失败，均尝试上传保留 30 天的 JUnit XML；
 - `CI gate` 汇总矩阵结果，适合作为分支保护的必需检查。
