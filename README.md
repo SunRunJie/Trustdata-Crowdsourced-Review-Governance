@@ -23,6 +23,8 @@ TrustData 面向 UGC 平台的数据运营与治理团队，评估一条或一�
 
 控制台页面右上角的“打开产品看板”保留原静态展示入口。若端口 8000 已被占用，可使用 `--port 8080`；服务仅接受 `127.0.0.1`、`localhost` 或 `::1`。
 
+控制台不会接受跨站写请求：启动页面会建立仅本机可用的短期会话，配置保存、上传和任务启动均需同源 `Origin`、回环 `Host` 与请求 token。请始终从控制台地址打开页面；若页面闲置后提示 token 已过期，刷新页面即可继续。
+
 ### 2. 评估一批新数据
 
 ```powershell
@@ -47,6 +49,15 @@ TrustData 支持使用大模型 API 作为万能爬虫，从多个平台挖掘�
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
+
+`requirements.txt` 引用 Python 3.12 的带哈希锁文件；CI 使用更严格的安装方式：
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install --require-hashes -r requirements.lock
+.\.venv\Scripts\python.exe -m pip check
+```
+
+需要更新主项目依赖时，修改 `requirements.in`，使用 Python 3.12 下的 `uv pip compile requirements.in --python-version 3.12 --universal --generate-hashes --output-file requirements.lock` 重新生成锁文件，并运行完整测试。`prior_research/requirements-lock.txt` 是前置研究的独立环境，不应与主项目锁文件混用。
 
 #### 1. 配置 API Key
 
@@ -166,11 +177,11 @@ task:
 | 现象 | 处理方式 |
 | --- | --- |
 | `Environment variable 'LLM_API_KEY' is not set` | 确认 `.env` 位于仓库根目录、变量名与 `api_key_env` 一致，并重新运行命令。 |
-| 认证失败或 401 | 检查密钥是否有效、是否复制了占位符，以及 `api_type`、`base_url` 是否与服务商匹配。 |
+| 认证失败或 401 | 检查密钥有效性、占位符替换情况，以及 `api_type`、`base_url` 与服务商的匹配关系。 |
 | 未提取到记录 | 使用 `--verbose` 检查页面抓取状态、搜索提示与页面正文；被安全策略拦截、缺少两个来源或无法用引文证明实体/评分等字段的记录会被丢弃。 |
 | `Task platforms must be explicitly configured` | 在 `crawl.platform_domains` 为任务使用的平台增加正式主机名；不要用 `search_hints` 绕过白名单。 |
 | 全部 URL 返回 403/404 | 查看同目录的 `*.source_unavailable.json`，使用其中 URL 通过官方 API、数据导出或平台批准的数据请求自行获取数据；程序不会绕过访问控制。 |
-| 输出记录少于预期 | 降低范围而不是盲目提高抓取量；检查 `max_pages_total`、`max_pages_per_entity` 及 `min_citation_score`。 |
+| 输出记录少于预期 | 缩小范围，请勿盲目提高抓取量；检查 `max_pages_total`、`max_pages_per_entity` 及 `min_citation_score`。 |
 | 需要无网络测试 | 运行 `python -m pytest -q tests/test_llm_mining.py`；该测试使用模拟请求，不需要 API Key。 |
 
 **反幻觉与证据规则**：每条记录必须附带页面原文引文；系统先验证引文存在，再验证实体、原始评分与量表，以及所有非空的用户、日期和评论字段均由该引文证明。只有字段全部绑定的记录才会输出，并标记为 `verification_level="llm_mined_web_citation_field_bound"`、`citation_confidence=1.0`。单来源实体没有跨源参考分或跨源差距，其跨源覆盖度为零。
@@ -182,6 +193,12 @@ task:
 .\.venv\Scripts\python.exe scripts\run_trustdata.py
 .\.venv\Scripts\python.exe -m pytest -q
 .\.venv\Scripts\python.exe scripts\verify_run_manifest.py
+```
+
+`pytest` 会在已忽略的 `tmp/pytest/` 下自动生成一套完整受控基准并验证清单、证据镜像和产品指标，因此全新克隆无需预先存在 `outputs/runs/latest`。如需审计某个控制台运行，可显式指定其结果目录：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\audit_competition_package.py --run-dir outputs\ui-runs\<运行ID>\results
 ```
 
 解决方案定位、数据契约、交付与验收标准见 [`docs/solution/`](docs/solution/README.md)。

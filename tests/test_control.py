@@ -17,7 +17,19 @@ def make_client(tmp_path: Path) -> TestClient:
     (tmp_path / "product" / "control.html").write_text("<html>console</html>", encoding="utf-8")
     (tmp_path / "configs" / "trust.yaml").write_text((ROOT / "configs" / "trust.yaml").read_text(encoding="utf-8"), encoding="utf-8")
     (tmp_path / "configs" / "llm_mining.yaml").write_text((ROOT / "configs" / "llm_mining.yaml").read_text(encoding="utf-8"), encoding="utf-8")
-    return TestClient(create_app(tmp_path))
+    return TestClient(create_app(tmp_path), base_url="http://127.0.0.1:8765")
+
+
+def write_headers(client: TestClient, *, content_type: str | None = "application/json") -> dict[str, str]:
+    csrf = client.get("/api/csrf")
+    assert csrf.status_code == 200
+    headers = {
+        "Origin": str(client.base_url).rstrip("/"),
+        "X-CSRF-Token": csrf.json()["csrf_token"],
+    }
+    if content_type is not None:
+        headers["Content-Type"] = content_type
+    return headers
 
 
 def wait_for_job(client: TestClient, job_id: str) -> dict:
@@ -31,7 +43,11 @@ def wait_for_job(client: TestClient, job_id: str) -> dict:
 
 def test_config_masks_key_and_persists_only_to_dotenv(tmp_path: Path) -> None:
     client = make_client(tmp_path)
-    response = client.put("/api/config/llm", json={"config": {"llm": {"model": "local-model"}}, "api_key": "super-secret-key"})
+    response = client.put(
+        "/api/config/llm",
+        json={"config": {"llm": {"model": "local-model"}}, "api_key": "super-secret-key"},
+        headers=write_headers(client),
+    )
     assert response.status_code == 200
     payload = response.json()
     assert payload["api_key_configured"] is True
@@ -45,6 +61,7 @@ def test_console_rejects_url_shaped_platform_allowlist_entries(tmp_path: Path) -
     response = client.put(
         "/api/config/llm",
         json={"config": {"crawl": {"platform_domains": {"imdb": ["https://attacker.example/path"]}}}},
+        headers=write_headers(client),
     )
     assert response.status_code == 400
     assert "hostname" in response.json()["detail"]
@@ -53,10 +70,18 @@ def test_console_rejects_url_shaped_platform_allowlist_entries(tmp_path: Path) -
 def test_upload_preflight_and_assessment_job_are_isolated(tmp_path: Path) -> None:
     client = make_client(tmp_path)
     content = b"record_id,entity_id,rating\nr1,e1,4.5\nr2,e1,3.5\n"
-    upload = client.post("/api/uploads", files={"file": ("reviews.csv", content, "text/csv")})
+    upload = client.post(
+        "/api/uploads",
+        files={"file": ("reviews.csv", content, "text/csv")},
+        headers=write_headers(client, content_type=None),
+    )
     assert upload.status_code == 200
     assert upload.json()["preview"]["canonical_missing"] == []
-    started = client.post("/api/jobs", json={"kind": "assess", "params": {"upload_id": upload.json()["upload_id"], "scenario": "ranking_integrity"}})
+    started = client.post(
+        "/api/jobs",
+        json={"kind": "assess", "params": {"upload_id": upload.json()["upload_id"], "scenario": "ranking_integrity"}},
+        headers=write_headers(client),
+    )
     assert started.status_code == 200
     job = wait_for_job(client, started.json()["id"])
     assert job["state"] == "succeeded"
@@ -68,5 +93,39 @@ def test_upload_preflight_and_assessment_job_are_isolated(tmp_path: Path) -> Non
 
 def test_job_allowlist_and_artifact_path_protection(tmp_path: Path) -> None:
     client = make_client(tmp_path)
-    assert client.post("/api/jobs", json={"kind": "arbitrary_shell", "params": {}}).status_code == 400
+    assert client.post("/api/jobs", json={"kind": "arbitrary_shell", "params": {}}, headers=write_headers(client)).status_code == 400
     assert client.get("/api/jobs/not-a-job/artifacts/../../.env").status_code in {404, 400}
+
+
+def test_write_requests_require_same_origin_csrf_and_correct_media_type(tmp_path: Path) -> None:
+    client = make_client(tmp_path)
+    payload = b'{"kind":"assess","params":{}}'
+    rejected = client.post(
+        "/api/jobs",
+        content=payload,
+        headers={"Origin": "https://evil.example", "Content-Type": "text/plain"},
+    )
+    assert rejected.status_code == 403
+    assert client.get("/api/jobs").json() == []
+
+    token_headers = write_headers(client)
+    no_origin = client.post("/api/jobs", content=payload, headers={key: value for key, value in token_headers.items() if key != "Origin"})
+    assert no_origin.status_code == 403
+    wrong_type = client.post(
+        "/api/jobs",
+        content=payload,
+        headers={**token_headers, "Content-Type": "text/plain"},
+    )
+    assert wrong_type.status_code == 415
+    wrong_host = client.post(
+        "/api/jobs",
+        content=payload,
+        headers={**token_headers, "Host": "evil.example", "Origin": "http://evil.example"},
+    )
+    assert wrong_host.status_code == 403
+    bad_token = client.post(
+        "/api/jobs",
+        content=payload,
+        headers={**token_headers, "X-CSRF-Token": "wrong"},
+    )
+    assert bad_token.status_code == 403

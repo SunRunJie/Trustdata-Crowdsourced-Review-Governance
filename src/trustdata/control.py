@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -17,13 +18,14 @@ import threading
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+from hmac import compare_digest
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
 import yaml
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .assessment import REQUIRED_FIELDS, assess_records, prepare_canonical_records
@@ -53,6 +55,10 @@ _CONFIG_KEYS = {
     "output": {"include_source_url", "include_citation_snippet", "include_content_hash"},
 }
 _ENV_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+_CONSOLE_SESSION_COOKIE = "trustdata_console_session"
+_CSRF_HEADER = "x-csrf-token"
+_SESSION_TTL_SECONDS = 2 * 60 * 60
+_LOCAL_HOSTS = frozenset({"127.0.0.1", "localhost", "::1"})
 
 
 def _utc_now() -> str:
@@ -76,6 +82,93 @@ def _masked(value: str) -> str:
     if len(value) <= 6:
         return "*" * len(value)
     return f"{value[:3]}{'*' * max(4, len(value) - 7)}{value[-4:]}"
+
+
+class LocalRequestGuard:
+    """Require same-origin, session-bound writes for the local console."""
+
+    def __init__(self) -> None:
+        self._sessions: dict[str, tuple[str, float]] = {}
+        self._lock = threading.Lock()
+
+    @staticmethod
+    def _host(request: Request) -> str:
+        host = request.headers.get("host", "")
+        if not host or "," in host or "@" in host or any(char.isspace() for char in host):
+            raise HTTPException(403, "控制台只接受本机 Host")
+        try:
+            from urllib.parse import urlsplit
+
+            parsed = urlsplit(f"//{host}")
+            port = parsed.port
+        except ValueError as exc:
+            raise HTTPException(403, "控制台 Host 格式无效") from exc
+        if (
+            parsed.netloc != host
+            or parsed.username
+            or parsed.password
+            or parsed.hostname not in _LOCAL_HOSTS
+        ):
+            raise HTTPException(403, "控制台只接受本机 Host")
+        if port is not None and not 1 <= port <= 65535:
+            raise HTTPException(403, "控制台 Host 端口无效")
+        return host
+
+    @staticmethod
+    def _cleanup(sessions: dict[str, tuple[str, float]], now: float) -> None:
+        for session_id, (_, expires_at) in list(sessions.items()):
+            if expires_at <= now:
+                del sessions[session_id]
+
+    def _session(self, request: Request) -> tuple[str, str]:
+        import time
+
+        now = time.time()
+        requested = request.cookies.get(_CONSOLE_SESSION_COOKIE, "")
+        with self._lock:
+            self._cleanup(self._sessions, now)
+            existing = self._sessions.get(requested)
+            if existing is not None:
+                token, _ = existing
+                self._sessions[requested] = (token, now + _SESSION_TTL_SECONDS)
+                return requested, token
+            session_id = secrets.token_urlsafe(32)
+            token = secrets.token_urlsafe(32)
+            self._sessions[session_id] = (token, now + _SESSION_TTL_SECONDS)
+            return session_id, token
+
+    def csrf_response(self, request: Request) -> JSONResponse:
+        self._host(request)
+        session_id, token = self._session(request)
+        response = JSONResponse({"csrf_token": token, "expires_in": _SESSION_TTL_SECONDS})
+        response.set_cookie(
+            _CONSOLE_SESSION_COOKIE,
+            session_id,
+            httponly=True,
+            samesite="strict",
+            secure=False,
+            max_age=_SESSION_TTL_SECONDS,
+            path="/",
+        )
+        return response
+
+    def require_write(self, request: Request, media_type: str) -> None:
+        host = self._host(request)
+        expected_origin = f"{request.url.scheme}://{host}"
+        if request.url.scheme != "http" or request.headers.get("origin") != expected_origin:
+            raise HTTPException(403, "写操作必须来自同源本机控制台")
+        received_media_type = request.headers.get("content-type", "").split(";", 1)[0].lower()
+        if received_media_type != media_type:
+            raise HTTPException(415, f"写操作必须使用 {media_type}")
+        session_id = request.cookies.get(_CONSOLE_SESSION_COOKIE, "")
+        supplied = request.headers.get(_CSRF_HEADER, "")
+        import time
+
+        with self._lock:
+            self._cleanup(self._sessions, time.time())
+            entry = self._sessions.get(session_id)
+        if entry is None or not supplied or not compare_digest(entry[0], supplied):
+            raise HTTPException(403, "CSRF token 无效或已过期；请刷新页面后重试")
 
 
 class LocalJobs:
@@ -316,7 +409,15 @@ class LocalJobs:
                 raise ValueError("目标运行尚无 results/run_manifest.json")
             self._run_subprocess(job, [sys.executable, str(self.root / "scripts" / "verify_run_manifest.py"), "--manifest", str(manifest)])
         elif kind == "audit_package":
-            self._run_subprocess(job, [sys.executable, str(self.root / "scripts" / "audit_competition_package.py")])
+            run_id = str(params.get("run_id", ""))
+            source_workspace = self.runs_root / run_id
+            run_dir = source_workspace / "results"
+            if source_workspace.parent != self.runs_root or not (run_dir / "run_manifest.json").is_file():
+                raise ValueError("请选择一个已完成的控制台受控基准运行")
+            self._run_subprocess(
+                job,
+                [sys.executable, str(self.root / "scripts" / "audit_competition_package.py"), "--run-dir", str(run_dir)],
+            )
         elif kind == "publish_dashboard":
             if not bool(params.get("confirmed", False)):
                 raise ValueError("发布正式演示产物需要明确确认")
@@ -372,13 +473,30 @@ def create_app(root: Path) -> FastAPI:
     """Create the local control-console application for *root*."""
     root = root.resolve()
     jobs = LocalJobs(root)
+    request_guard = LocalRequestGuard()
     app = FastAPI(title="TrustData Local Console", docs_url=None, redoc_url=None)
     product = root / "product"
     app.mount("/product", StaticFiles(directory=product), name="product")
 
     @app.get("/", response_class=HTMLResponse)
-    def home() -> str:
-        return (product / "control.html").read_text(encoding="utf-8")
+    def home(request: Request) -> HTMLResponse:
+        request_guard._host(request)
+        session_id, _ = request_guard._session(request)
+        response = HTMLResponse((product / "control.html").read_text(encoding="utf-8"))
+        response.set_cookie(
+            _CONSOLE_SESSION_COOKIE,
+            session_id,
+            httponly=True,
+            samesite="strict",
+            secure=False,
+            max_age=_SESSION_TTL_SECONDS,
+            path="/",
+        )
+        return response
+
+    @app.get("/api/csrf")
+    def csrf(request: Request) -> JSONResponse:
+        return request_guard.csrf_response(request)
 
     @app.get("/api/status")
     def status() -> dict[str, Any]:
@@ -402,6 +520,7 @@ def create_app(root: Path) -> FastAPI:
 
     @app.put("/api/config/llm")
     async def put_llm_config(request: Request) -> dict[str, Any]:
+        request_guard.require_write(request, "application/json")
         payload = await request.json()
         if not isinstance(payload, dict):
             raise HTTPException(400, "配置必须是 JSON 对象")
@@ -433,11 +552,13 @@ def create_app(root: Path) -> FastAPI:
         return get_llm_config()
 
     @app.post("/api/uploads")
-    def upload(file: UploadFile = File(...)) -> dict[str, Any]:
+    def upload(request: Request, file: UploadFile = File(...)) -> dict[str, Any]:
+        request_guard.require_write(request, "multipart/form-data")
         return jobs.upload(file)
 
     @app.post("/api/jobs")
     async def start_job(request: Request) -> dict[str, Any]:
+        request_guard.require_write(request, "application/json")
         payload = await request.json()
         if not isinstance(payload, dict):
             raise HTTPException(400, "任务必须是 JSON 对象")

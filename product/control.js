@@ -1,7 +1,19 @@
-const state = { config: null, upload: null, jobs: [], selected: null, poller: null };
+const state = { config: null, upload: null, jobs: [], selected: null, poller: null, csrfToken: null };
 const $ = (selector) => document.querySelector(selector);
+const csrf = async () => {
+  const response = await fetch("/api/csrf", { credentials: "same-origin" });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok || !body.csrf_token) throw new Error(body.detail || "无法初始化本机控制台会话；请刷新页面后重试。");
+  state.csrfToken = body.csrf_token;
+};
 const api = async (url, options = {}) => {
-  const response = await fetch(url, options);
+  const method = (options.method || "GET").toUpperCase();
+  const headers = new Headers(options.headers || {});
+  if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
+    if (!state.csrfToken) await csrf();
+    headers.set("X-CSRF-Token", state.csrfToken);
+  }
+  const response = await fetch(url, { ...options, headers, credentials: "same-origin" });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(body.detail || `请求失败：${response.status}`);
   return body;
@@ -60,6 +72,7 @@ $("#upload-form").addEventListener("submit", async (event) => {
 $("#assessment-form").addEventListener("submit", async (event) => { event.preventDefault(); if (!state.upload) return showNotice("请先上传数据文件。", true); await startJob("assess", {upload_id: state.upload.upload_id, scenario: formValue(event.currentTarget,"scenario")}); });
 $("#main-tasks").addEventListener("click", event => { const button = event.target.closest("button[data-job]"); if (button) startJob(button.dataset.job); });
 $("#verify-form").addEventListener("submit", event => { event.preventDefault(); startJob("verify_manifest", {run_id: formValue(event.currentTarget, "run_id")}); });
+$("#audit-form").addEventListener("submit", event => { event.preventDefault(); startJob("audit_package", {run_id: formValue(event.currentTarget, "run_id")}); });
 $("#publish-form").addEventListener("submit", event => { event.preventDefault(); const f = event.currentTarget; if (!f.elements.confirmed.checked) return showNotice("发布前必须明确确认覆盖正式产物。", true); startJob("publish_dashboard", {run_id: formValue(f, "run_id"), confirmed: true}); });
 document.querySelectorAll("[data-job='research_install']").forEach(button => button.addEventListener("click", () => startJob("research_install")));
 $("#research-form").addEventListener("submit", event => { event.preventDefault(); const f = event.currentTarget; if (f.elements.collect.checked && !f.elements.collection_confirmed.checked) return showNotice("实时采集前必须勾选合规确认。", true); startJob("prior_research", {mode: formValue(f,"mode"), collect: f.elements.collect.checked, collection_confirmed: f.elements.collection_confirmed.checked}); });
@@ -75,4 +88,4 @@ async function refreshSelected() {
   try { const job = await api(`/api/jobs/${state.selected}`); const index = state.jobs.findIndex(item => item.id === job.id); if (index >= 0) state.jobs[index] = job; else state.jobs.unshift(job); $("#job-title").textContent = `${job.kind} · ${job.state}`; $("#job-log").textContent = job.events.map(event => `[${event.at}] ${event.message}`).join("\n") || "任务已创建，等待日志…"; $("#job-log").scrollTop = $("#job-log").scrollHeight; $("#artifact-list").innerHTML = job.artifacts.map(a => `<a target="_blank" rel="noopener" href="/api/jobs/${job.id}/artifacts/${a.path}">${a.path} (${Math.ceil(a.bytes / 1024)} KB)</a>`).join(""); renderJobs(); if (["succeeded","failed"].includes(job.state)) { clearInterval(state.poller); state.poller = null; } } catch (e) { showNotice(e.message, true); }
 }
 
-(async () => { try { await Promise.all([refreshStatus(), loadConfig(), loadJobs()]); } catch (e) { $("#server-status").textContent = "服务检查失败"; showNotice(e.message, true); } })();
+(async () => { try { await csrf(); await Promise.all([refreshStatus(), loadConfig(), loadJobs()]); } catch (e) { $("#server-status").textContent = "服务检查失败"; showNotice(e.message, true); } })();

@@ -1,0 +1,15 @@
+# Direct dependencies for the Python 3.12 TrustData application and tests.
+# Compile this file with uv; install requirements.lock for reproducible builds.
+numpy==2.5.2
+pandas==3.0.5
+scipy==1.18.0
+scikit-learn==1.9.0
+matplotlib==3.11.1
+PyYAML==6.0.3
+pyarrow==23.0.1
+httpx==0.28.1
+fastapi==0.141.1
+starlette==1.6.0
+uvicorn==0.52.4
+python-multipart==0.0.32
+pytest==9.1.1
