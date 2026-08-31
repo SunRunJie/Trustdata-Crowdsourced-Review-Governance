@@ -17,15 +17,18 @@ from typing import Dict, List
 # ================================================================
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
+# The control console sets this for isolated runs.  The normal command line
+# keeps the historical project-local paths unchanged.
+RUN_ROOT = Path(os.environ.get("TRUSTDATA_RESEARCH_WORKSPACE", PROJECT_ROOT)).resolve()
+DATA_DIR = RUN_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 EXTERNAL_DIR = DATA_DIR / "external"
 SRC_DIR = PROJECT_ROOT / "src"
 NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
-FIGURES_DIR = PROJECT_ROOT / "figures"
+FIGURES_DIR = RUN_ROOT / "figures"
 ANALYSIS_FIGURES_DIR = FIGURES_DIR / "analysis"
-REPORT_DIR = PROJECT_ROOT / "docs"
+REPORT_DIR = RUN_ROOT / "docs"
 
 # Create all directories automatically
 for d in [RAW_DIR, PROCESSED_DIR, EXTERNAL_DIR, FIGURES_DIR,

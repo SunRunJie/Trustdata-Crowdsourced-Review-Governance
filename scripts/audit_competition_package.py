@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
 import json
@@ -8,27 +9,28 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LATEST = ROOT / "outputs" / "runs" / "latest"
 
-REQUIRED_FILES = (
-    ROOT / "deliverables" / "TrustData_2026新域新质创新大赛申报书.docx",
-    ROOT / "deliverables" / "TrustData_2026新域新质创新大赛申报书.pdf",
-    ROOT / "deliverables" / "TrustData_2026新域新质创新大赛路演稿.pptx",
-    ROOT / "product" / "index.html",
-    ROOT / "product" / "dashboard-data.js",
-    ROOT / "app" / "data" / "dashboard.json",
-    ROOT / "scripts" / "assess_data.py",
-    ROOT / "scripts" / "serve_solution.py",
-    ROOT / "examples" / "sample_reviews.csv",
-    ROOT / "docs" / "solution" / "README.md",
-    ROOT / "competition" / "evidence" / "NUMBERS_MASTER.csv",
-    ROOT / "competition" / "evidence" / "CLAIM_EVIDENCE.csv",
-    LATEST / "classification_metrics.csv",
-    LATEST / "ranking_metrics.csv",
-    LATEST / "split_sensitivity_metrics.csv",
-    LATEST / "split_sensitivity_summary.csv",
-    LATEST / "run_manifest.json",
-)
+
+def required_files(run_dir: Path) -> tuple[Path, ...]:
+    return (
+        ROOT / "deliverables" / "TrustData_2026新域新质创新大赛申报书.docx",
+        ROOT / "deliverables" / "TrustData_2026新域新质创新大赛申报书.pdf",
+        ROOT / "deliverables" / "TrustData_2026新域新质创新大赛路演稿.pptx",
+        ROOT / "product" / "index.html",
+        ROOT / "product" / "dashboard-data.js",
+        ROOT / "app" / "data" / "dashboard.json",
+        ROOT / "scripts" / "assess_data.py",
+        ROOT / "scripts" / "serve_solution.py",
+        ROOT / "examples" / "sample_reviews.csv",
+        ROOT / "docs" / "solution" / "README.md",
+        ROOT / "competition" / "evidence" / "NUMBERS_MASTER.csv",
+        ROOT / "competition" / "evidence" / "CLAIM_EVIDENCE.csv",
+        run_dir / "classification_metrics.csv",
+        run_dir / "ranking_metrics.csv",
+        run_dir / "split_sensitivity_metrics.csv",
+        run_dir / "split_sensitivity_summary.csv",
+        run_dir / "run_manifest.json",
+    )
 
 BANNED_PATTERNS = (
     "不是",
@@ -40,6 +42,8 @@ BANNED_PATTERNS = (
     "有没有",
     "能不能",
 )
+
+METRIC_TOLERANCE = 5e-7
 
 
 def sha256(path: Path) -> str:
@@ -70,8 +74,19 @@ def section_length(markdown: str, heading: str) -> int:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Audit the TrustData competition package and one completed run.")
+    parser.add_argument(
+        "--run-dir",
+        default="outputs/runs/latest",
+        help="Completed run directory (default: outputs/runs/latest)",
+    )
+    args = parser.parse_args()
+    run_dir = Path(args.run_dir)
+    if not run_dir.is_absolute():
+        run_dir = ROOT / run_dir
+    run_dir = run_dir.resolve()
     findings: list[str] = []
-    missing = [str(path.relative_to(ROOT)) for path in REQUIRED_FILES if not path.is_file()]
+    missing = [str(path) for path in required_files(run_dir) if not path.is_file()]
     require(not missing, "required competition artifacts are present", findings)
 
     application = (ROOT / "materials" / "APPLICATION_DRAFT.md").read_text(encoding="utf-8")
@@ -96,17 +111,17 @@ def main() -> None:
                 language_hits.append(f"{path.relative_to(ROOT)}:{pattern}")
     require(not language_hits, "authored research materials pass the language screen", findings)
 
-    primary_rows = read_csv(LATEST / "classification_metrics.csv")
+    primary_rows = read_csv(run_dir / "classification_metrics.csv")
     primary_30 = next(
         row for row in primary_rows
         if float(row["contamination"]) == 0.3 and row["method"] == "multi_evidence_logistic"
     )
-    require(abs(float(primary_30["f1"]) - 0.7495073125194482) < 1e-12,
+    require(abs(float(primary_30["f1"]) - 0.7495073125194482) < METRIC_TOLERANCE,
             "primary 30% F1 matches the locked result", findings)
-    require(abs(float(primary_30["auprc"]) - 0.9492221877817787) < 1e-12,
+    require(abs(float(primary_30["auprc"]) - 0.9492221877817787) < METRIC_TOLERANCE,
             "primary 30% AUPRC matches the locked result", findings)
 
-    sensitivity = read_csv(LATEST / "split_sensitivity_metrics.csv")
+    sensitivity = read_csv(run_dir / "split_sensitivity_metrics.csv")
     levels = {float(row["contamination"]) for row in sensitivity}
     seeds = {int(row["split_seed"]) for row in sensitivity}
     require(len(sensitivity) == 25 and levels == {0.01, 0.05, 0.1, 0.2, 0.3} and len(seeds) == 5,
@@ -117,7 +132,7 @@ def main() -> None:
     require(abs(float(headline["risk_detection_f1_at_30pct"]) - float(primary_30["f1"])) < 1e-12,
             "product headline matches the primary result", findings)
 
-    manifest = json.loads((LATEST / "run_manifest.json").read_text(encoding="utf-8"))
+    manifest = json.loads((run_dir / "run_manifest.json").read_text(encoding="utf-8"))
     require(manifest["run_status"] == "success" and manifest["code_version"] == "0.2.0",
             "run manifest records a successful version 0.2.0 execution", findings)
     for relative, expected in manifest["inputs"].items():

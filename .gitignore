@@ -1,8 +1,10 @@
 .venv/
+.env
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
+.pytest-tmp/
 htmlcov/
 data/interim/
 data/processed/*.csv
@@ -11,8 +13,16 @@ data/processed/*.jsonl
 outputs/runs/
 outputs/cache/
 outputs/examples/
+outputs/ui-runs/
+data/mined/
 logs/
 tmp/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
 prior_research/.git/
 
 # Keep directory structure and small, auditable manifests/results.
