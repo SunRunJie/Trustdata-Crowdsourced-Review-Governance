@@ -195,13 +195,25 @@ task:
 .\.venv\Scripts\python.exe scripts\verify_run_manifest.py
 ```
 
-`pytest` 会在已忽略的 `tmp/pytest/` 下自动生成一套完整受控基准并验证清单、证据镜像和产品指标，因此全新克隆无需预先存在 `outputs/runs/latest`。如需审计某个控制台运行，可显式指定其结果目录：
+`pytest` 会在已忽略的 `.pytest-tmp/` 下自动生成一套完整受控基准并验证清单、证据镜像和产品指标，因此全新克隆无需预先存在 `outputs/runs/latest`。如需审计某个控制台运行，可显式指定其结果目录：
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\audit_competition_package.py --run-dir outputs\ui-runs\<运行ID>\results
 ```
 
 解决方案定位、数据契约、交付与验收标准见 [`docs/solution/`](docs/solution/README.md)。
+
+### 4. GitHub Checks
+
+`.github/workflows/ci.yml` 会在推送到 `master`、面向 `master` 的 Pull Request 以及手动触发时运行：
+
+- Ubuntu 与 Windows 分别使用 CPython 3.12.13；
+- 按 `requirements.lock` 的哈希安装依赖，并执行 `pip check`；
+- 两个平台均运行完整 pytest 套件；
+- 无论成功或失败，均尝试上传保留 30 天的 JUnit XML；
+- `CI gate` 汇总矩阵结果，适合作为分支保护的必需检查。
+
+每次运行的产物名称包含操作系统和提交 SHA，可在对应 GitHub Actions 运行页下载。首次推送本工作流后，应在仓库分支保护规则中把 `CI gate` 设为 required status check。
 
 ## 当前状态
 
