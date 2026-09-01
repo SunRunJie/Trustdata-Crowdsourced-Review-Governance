@@ -12,7 +12,8 @@
 | 本地验收时间 | 2026-09-01T20:45:23+08:00 |
 | 验收范围 | DOCX、PDF、PPTX、源文案、数值一致性及完整回归 |
 | 本地技术验收 | **PASS** |
-| 合并判定 | **PASS — 可以合并** |
+| GitHub-hosted Checks | **PASS — [TrustData CI #33511108745](https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33511108745)** |
+| 合并判定 | **PASS — 已合并** |
 
 本次增量验收覆盖 PR #2 的三份展示材料，以及维护者在合并前完成的指标、图表、表格、讲者备注和模板主题修复。正式主指标统一为：30% 污染 F1 0.7492478、AUPRC 0.9489835、FPR 0.0017301；五次贡献者分组复算的 F1 中位数 0.7515026，范围 0.7442975–0.7643808；排序平均名次误差由 20.3960 降至 15.2335，降幅 25.31%。
 
@@ -31,7 +32,7 @@
 | 指标一致性 | DOCX、PDF、PPTX 及源文案包含新指标；活动材料未残留旧指标 | PASS |
 | 主题恢复复验 | 恢复原模板主题后 12 张渲染图与恢复前逐字节一致 | PASS |
 
-PR #2 没有可复用的预合并 GitHub Check Runs。本地结论不冒充远端检查；合并推送后由 master 工作流重新执行 Ubuntu、Windows、macOS 与 CI gate，远端结果应在合并后单独核对。
+PR #2 没有可复用的预合并 GitHub Check Runs。本地结论未被用来冒充远端检查。合并提交 fb2cb17e711b4f1d13436c86d5784fe4f9539283 推送后，GitHub Actions 运行 #33511108745 独立执行 Ubuntu、Windows、macOS 与 CI gate；四项均以 success 完成，远端技术验收为 PASS。
 
 本节是当前 PR #2 的增量验收结论。后续第 1–12 节保留 PR #3 的跨平台可复现性基线、远端检查证据和完整方法说明，二者共同构成本次合并的质量证据链。
 
