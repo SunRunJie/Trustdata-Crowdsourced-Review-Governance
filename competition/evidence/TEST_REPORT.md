@@ -4,362 +4,278 @@
 
 | 项目 | 内容 |
 |---|---|
-| 报告编号 | TD-FTR-20260831-04 |
-| 报告版本 | 2.2（Final / Stabilized / Remote Verified） |
-| 替代版本 | 2.1（TD-FTR-20260831-03） |
+| 报告编号 | TD-FTR-20260901-05 |
+| 报告版本 | 3.1（PR #3 / Cross-platform Reproducibility / Remote Verified） |
+| 替代版本 | 2.2（TD-FTR-20260831-04） |
 | 项目 | 面向众包内容平台的用户评价数据可信评估与分级系统（TrustData） |
 | 仓库 | `SunRunJie/Trustdata-Crowdsourced-Review-Governance` |
-| 被测分支 | `master` |
-| 本地全量测试提交 | `899ae3c2e7322f883e255f41a608812ddefa57a7` |
-| 远端 CI 验证提交 | `899ae3c2e7322f883e255f41a608812ddefa57a7` |
-| 本地测试时间 | 2026-08-31T20:53:48+08:00 |
-| 远端验证完成时间 | 2026-08-31T21:11:42+08:00 |
+| 被测对象 | Pull Request #3：`fix: make TrustData benchmark reproducible across Windows, macOS, and Linux` |
+| PR 提交 | `5ff5d11b465e703fcc11fb9f1515144c8b6d9b85` |
+| 基线提交 | `8ff6184c567edffd8f8595659d247fbb18ea7451`（`master`） |
+| 本地测试时间 | 2026-09-01T12:57:23.592731+08:00 |
+| 报告生成时间 | 2026-09-01T14:05:08+08:00 |
 | 测试执行 | Codex 自动化测试会话 |
-| 质量审计 | Research Auditor 只读交叉核验 |
+| 独立审计 | Research Auditor 只读交叉核验 |
 | 证据等级 | E2：团队内部受控环境验证 |
-| 本地结论 | PASS |
-| GitHub-hosted Checks | PASS — [TrustData CI #33395397064](https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33395397064) |
+| 本地技术验收 | **PASS** |
+| GitHub-hosted Checks | **PASS — [TrustData CI #33467946308](https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33467946308)** |
+| 合并门禁 | **PASS — 可以合并** |
 | 项目负责人审批 | 待人工签署 |
 
-## 2. 执行摘要
+## 2. 执行摘要与合并结论
 
-最终验收针对稳定性修复提交 `899ae3c2e7322f883e255f41a608812ddefa57a7`。本地在隔离的 CPython 3.12.13 锁定环境中，以与 CI 相同的确定性变量执行完整套件，64 项全部通过；GitHub-hosted Ubuntu、Windows 和汇总 `CI gate` 随后全部成功。
+PR #3 针对基准数据、贡献者分组、Top-K 排序、CSV 换行符及运行清单路径加入显式确定性规则，并把 CI 测试矩阵扩展到 Ubuntu、Windows 和 macOS。代码可由 GitHub 自动合并，未检测到分支冲突。
 
-在最终通过前，门禁捕获了一项真实的跨平台数值波动：证据镜像中的消融 AUPRC 绝对差异为约 `2.8137e-6`，略高于原 `2e-6` 容差。该失败已在本机复现。最终将通用证据镜像容差设为 `5e-6`（0.0005 个百分点），仍保留 headline 核心指标 `5e-7` 的严格门槛；同时固定哈希种子和 BLAS/OMP 线程数。算法、数据和结果文件均未修改，也未跳过测试。
+本地验收在隔离的 CPython 3.12.13 锁定环境中完成。正式全量测试 **67/67 通过**，失败、错误和跳过均为 0；竞赛材料审计 **27/27 通过**，运行清单 **18/18 个摘要通过**。第二次独立基准重建的 7 项证据测试全部通过，两次运行的 6 个核心文件 SHA-256 完全相同，支持“同平台连续运行字节级一致”的结论。
 
-| 核心指标 | 结果 |
+维护者批准外部贡献者工作流后，GitHub Actions 运行 `33467946308`（run number 9，attempt 2）在 PR 提交 `5ff5d11` 上完成。Ubuntu、Windows、macOS 与汇总 `CI gate` 四项检查全部成功；GitHub 随后返回 `mergeable=true`、`mergeable_state=clean`、`check_runs=4`。因此，本报告判定为：
+
+> **本地技术验收与远端跨平台门禁均通过，PR #3 可以合并。**
+
+本地 Windows 结果未被用来替代远端检查；Linux、macOS 与独立 Windows runner 均在同一候选提交上完成验证，形成了本地证据、三平台 CI 和汇总门禁三层证据链。
+
+## 3. 变更范围与审查结论
+
+### 3.1 变更规模
+
+| 指标 | 数量 |
 |---|---:|
-| 本地测试用例总数 | 64 |
-| 本地通过 | 64 |
-| 本地失败/错误/跳过 | 0 / 0 / 0 |
-| 本地通过率 | 100% |
-| 本地 pytest 总耗时 | 72.494 秒 |
-| 依赖一致性 | PASS |
-| CI YAML 本地解析 | PASS |
-| GitHub Ubuntu 检查 | PASS |
-| GitHub Windows 检查 | PASS |
-| GitHub `CI gate` | PASS |
-| 阻塞缺陷 | 0 |
-| 高/重要缺陷 | 0 |
-| 未关闭非阻塞警告 | 1 |
-| 已关闭 CI/数值兼容性问题 | 2 |
+| 提交 | 1 |
+| 变更文件 | 37 |
+| 新增行 | 7,447 |
+| 删除行 | 7,269 |
+| GitHub 冲突 | 0 |
 
-**综合质量验收结论：PASS。** 本地与远端证据均绑定同一提交；在本报告声明的代码、依赖、数值容差、自动化测试和双平台 CI 范围内，未发现阻止合并或发布的缺陷。
-## 3. 验收目标与判定标准
+大部分行数变化来自重新排序或重新生成的数据、证据、图表和展示文件。核心源代码变更集中在基准构建、评价、读写、标准化与流水线模块。
 
-### 3.1 验收目标
+### 3.2 关键技术变化
 
-1. 验证核心可信评估、数据读写、配置加载和评分分级功能。
-2. 验证本地控制台的任务白名单、路径隔离和写请求保护。
-3. 验证 LLM 数据采集的证据绑定、去重、跨源补全及网络边界。
-4. 在干净环境中重建完整受控基准并核对版本化证据。
-5. 验证依赖锁可安装且不存在已解析依赖冲突。
-6. 建立 Ubuntu/Windows 双平台 GitHub Checks 和稳定的汇总门禁。
-7. 形成能够追踪到提交、环境、用例和哈希的机器可读证据链。
+| 领域 | 实现变化 | 审查结论 |
+|---|---|---|
+| 数据选择 | 稳定排序并加入显式并列决胜键 | 合理，消除输入顺序漂移 |
+| 贡献者分组 | 分组前按 `record_id` 规范化 | 合理，减少平台/输入顺序影响 |
+| Top-K 指标 | 分数降序、实体 ID 升序 | 合理，并列结果可重复 |
+| CSV 输出 | UTF-8、LF、稳定行顺序 | 合理，Windows/macOS/Linux 文件一致性增强 |
+| 运行清单 | 路径统一为 `/` | 合理，修复 Windows 反斜杠差异 |
+| CI | 新增 `macos-latest` 矩阵项 | 配置结构通过本地解析；远端尚未执行 |
+| 证据与材料 | 重新生成数字、图表、看板和说明 | 本地重建与版本化证据一致 |
 
-### 3.2 通过标准
+### 3.3 代码审查结果
 
-| 门槛编号 | 判定标准 | 实际结果 | 状态 |
+- 未发现阻塞级算法、数据泄漏、安全或分组隔离缺陷。
+- 新增测试覆盖输入乱序、Top-K 并列和 CSV LF 三类关键回归点。
+- `git diff --check` 通过，未发现空白错误或冲突标记。
+- `requirements.lock` 未破损，`pip check` 返回 `No broken requirements found`。
+- CI YAML 可解析，矩阵包含 Ubuntu、Windows、macOS，且存在汇总 `CI gate`。
+
+## 4. 验收目标与判定标准
+
+| 编号 | 判定标准 | 实际结果 | 状态 |
 |---|---|---|---|
-| AC-01 | 全新 CPython 3.12.13 环境可创建 | 已创建独立虚拟环境 | PASS |
-| AC-02 | `requirements.lock` 带哈希安装成功 | 安装成功，无哈希错误 | PASS |
-| AC-03 | `python -m pip check` 无破损依赖 | `No broken requirements found` | PASS |
-| AC-04 | pytest 失败数与错误数均为 0 | 0 failures / 0 errors | PASS |
-| AC-05 | 不允许跳过用例 | 0 skipped | PASS |
-| AC-06 | 版本化证据与重建结果一致 | 7 项证据复现测试通过 | PASS |
-| AC-07 | CI 工作流可被 YAML 解析，矩阵和门禁存在 | 本地结构验证通过 | PASS |
-| AC-08 | GitHub-hosted Ubuntu 与 Windows 检查通过 | 运行 `33395397064` 三项检查均成功 | PASS |
-| AC-09 | JUnit、逐例清单和元数据可追溯 | 三类证据均已生成 | PASS |
-| AC-10 | 报告中的数字与机器证据一致 | 只读交叉核验通过 | PASS |
+| AC-01 | PR 与 `master` 无冲突 | GitHub `mergeable=true` | PASS |
+| AC-02 | 锁定依赖无破损 | `pip check` 通过 | PASS |
+| AC-03 | 全量 pytest 无失败、错误、跳过 | 67 / 0 / 0 / 0 | PASS |
+| AC-04 | 证据重建与版本化结果一致 | 7 项证据测试通过 | PASS |
+| AC-05 | 竞赛材料审计通过 | 27 项检查通过 | PASS |
+| AC-06 | 运行清单摘要全部匹配 | 18 个摘要通过 | PASS |
+| AC-07 | 连续两次核心产物字节一致 | 6/6 SHA-256 一致 | PASS |
+| AC-08 | CI 工作流包含三平台矩阵和 gate | 本地结构验证通过 | PASS |
+| AC-09 | GitHub 三平台测试均成功 | Ubuntu、Windows、macOS 全部成功 | PASS |
+| AC-10 | GitHub `CI gate` 成功 | Job `99755567005` 成功 | PASS |
+| AC-11 | JUnit、逐例清单、元数据与报告一致 | 已更新为 67 项并绑定 PR 提交 | PASS |
 
-AC-08 已由 GitHub 运行 `33395397064` 验证；该运行与稳定性修复提交 `899ae3c2e7322f883e255f41a608812ddefa57a7` 绑定。
+AC-01 至 AC-11 全部满足，整体合并门禁为 PASS。
 
-## 4. 被测对象与配置基线
+## 5. 测试基线与环境
 
 | 类别 | 基线 |
 |---|---|
-| 本地全量测试提交 | `899ae3c2e7322f883e255f41a608812ddefa57a7` |
-| 远端 CI 验证提交 | `899ae3c2e7322f883e255f41a608812ddefa57a7` |
 | 项目版本 | `trustdata 0.2.0` |
 | Python 约束 | `>=3.12,<3.13` |
-| 依赖锁 | `requirements.lock` |
-| pytest 配置 | `pyproject.toml` |
-| 测试目录 | `tests/` |
-| 随机种子 | `20260828`（运行契约） |
-| CI 工作流 | `.github/workflows/ci.yml` |
-| 证据目录 | `competition/evidence/runtime/` |
-
-本地 JUnit、逐例清单与远端双平台 CI 均绑定稳定性修复提交 `899ae3c`；本报告不自动覆盖未来代码、依赖或工作流更改。
-
-## 5. 测试环境
-
-| 组件 | 版本/状态 |
-|---|---|
+| Python 实现 | CPython 3.12.13 |
 | 操作系统 | Windows 11 10.0.26200 SP0 |
-| Python 实现 | CPython |
-| Python | 3.12.13 |
-| pip | 25.0.1 |
 | pytest | 9.1.1 |
-| NumPy | 2.5.2 |
-| pandas | 3.0.5 |
-| SciPy | 1.18.0 |
+| NumPy / pandas / SciPy | 2.5.2 / 3.0.5 / 1.18.0 |
 | scikit-learn | 1.9.0 |
-| FastAPI | 0.141.1 |
-| Starlette | 1.6.0 |
-| HTTPX | 0.28.1 |
-| 环境隔离 | 隔离锁定虚拟环境；本轮使用独立仓库内 pytest basetemp |
-| 网络依赖 | 安装阶段需要包源；测试阶段不调用真实外部 API |
+| FastAPI / Starlette / HTTPX | 0.141.1 / 1.6.0 / 0.28.1 |
+| 依赖锁 | `requirements.lock`，带哈希安装 |
+| 测试配置 | `pyproject.toml`，仓库内 `.pytest-tmp` |
+| 测试阶段网络 | 不调用真实外部 API |
 
-## 6. 执行过程
+确定性环境变量：
 
-1. 确认工作区状态和被测提交 SHA。
-2. 创建全新 CPython 3.12.13 虚拟环境。
-3. 执行带哈希的锁文件安装。
-4. 执行 `python -m pip check`。
-5. 执行完整 pytest 并生成 JUnit XML。
-6. 从 JUnit 导出 64 项逐例清单。
-7. 生成包含环境、提交、哈希和 CI 状态的运行元数据。
-8. 对 JUnit、清单、元数据、依赖锁和 CI 工作流进行交叉核验。
-9. 通过 GitHub API 核对远端运行、三个 Job、提交 SHA 和最终结论。
+```text
+PYTHONHASHSEED=0
+OMP_NUM_THREADS=1
+OPENBLAS_NUM_THREADS=1
+MKL_NUM_THREADS=1
+NUMEXPR_NUM_THREADS=1
+MPLBACKEND=Agg
+```
 
-正式执行命令：
+## 6. 正式执行结果
+
+### 6.1 全量自动化测试
+
+```text
+67 passed, 1 warning in 86.75s
+```
+
+报告与机器证据写入候选树后又执行了一次最终回归，结果为 `67 passed, 1 warning in 84.18s`；随后 27 项材料审计和 18 项运行清单摘要再次全部通过。
+
+| 测试域 | 用例数 | JUnit 用时（秒） | 覆盖重点 |
+|---|---:|---:|---|
+| `tests/test_control` | 5 | 0.500 | 配置脱敏、来源白名单、任务隔离、路径与写请求保护 |
+| `tests/test_core` | 11 | 0.530 | 特征、评分、阈值、分组、排序、读写与跨平台确定性 |
+| `tests/test_env` | 2 | 0.020 | 环境文件加载与覆盖规则 |
+| `tests/test_evidence` | 7 | 81.420 | 全基准重建、指标、看板、敏感性、清单和证据镜像 |
+| `tests/test_llm_mining` | 42 | 0.150 | 引用绑定、解析、抓取边界、重定向与身份去重 |
+| **合计** | **67** | **82.620** | **全部通过** |
+
+JUnit 累计用时与 pytest 墙钟时间口径不同；前者是逐例 `testcase` 时长之和，后者还包括会话初始化、fixture 和收尾。
+
+### 6.2 材料与清单审计
+
+| 检查 | 结果 |
+|---|---|
+| 必备竞赛文件存在性 | PASS |
+| 申报文本长度与语言规范 | PASS |
+| 30% 污染 F1 / AUPRC 与数字主表一致 | PASS |
+| 5 个污染档位 × 5 个分组种子 | PASS |
+| 看板 headline 与主结果一致 | PASS |
+| 运行状态与版本 | PASS |
+| 输入及输出哈希 | 18/18 PASS |
+| 总体材料审计 | 27/27 PASS |
+
+### 6.3 连续运行可复现性
+
+第二次独立执行 `tests/test_evidence.py`：
+
+```text
+7 passed in 83.04s
+```
+
+两次运行的最小规范比较集：
+
+| 文件 | SHA-256 | 一致 |
+|---|---|---|
+| `observed_entities.csv` | `a8e4836daf32783040379772d151fb909a2672c3d5f9cb89a34c22c89c607caf` | 是 |
+| `observed_reviews.csv` | `adffcb4008e4bc42165390594e03bdf63b17dbd609635f604fbc02060c837f70` | 是 |
+| `classification_metrics.csv` | `75277e14f8a5befc950128bf330bb210b10ee84f9e2ca119a61ea844587fffde` | 是 |
+| `ranking_metrics.csv` | `3bd35f1f6396b152454243c344a0396d4749cd7edd9a35df16bf515f36e55c39` | 是 |
+| `split_sensitivity_metrics.csv` | `b435bfe27fa0d3fecaf76a1d5ef8723446c3cd5657e650de0060ff6c5279982a` | 是 |
+| `split_sensitivity_summary.csv` | `c97d4103ae077bf019e7a2573c1b25b94d5a7cf63f2ef411ca36547a8d23f96a` | 是 |
+
+`run_manifest.json` 和 `audit_trail.csv` 含时间、环境及审计事件，不应作为跨运行字节相等的对象。
+
+## 7. 数值影响分析
+
+确定性排序改变了受控基准的具体样本顺序，因此版本化指标发生小幅变化。主数字、结果 CSV、看板、材料和图表已同步更新，并由证据测试交叉核对。
+
+| 指标 | 基线 | PR #3 | 变化 |
+|---|---:|---:|---:|
+| 30% 污染 F1 | 0.749507 | 0.749248 | -0.000259 |
+| 30% 污染 AUPRC | 0.949222 | 0.948984 | -0.000238 |
+| 30% 原始平均排名误差 | 20.4565 | 20.3960 | -0.0605 |
+| 30% 加权平均排名误差 | 15.2275 | 15.2335 | +0.0060 |
+| 排名误差降幅 | 25.56% | 25.31% | -0.25 个百分点 |
+
+变化幅度较小，且证据链内部一致；它反映确定性样本选择的变化，不是执行随机漂移。已知边界仍然存在：1% 低污染条件下 F1 较弱，加权排名在 1% 条件下仍有退化，材料中应继续如实披露。
+
+## 8. GitHub Checks 与合并门禁
+
+### 8.1 计划中的远端任务
+
+| 任务 | 目标 |
+|---|---|
+| `Tests (ubuntu-latest, Python 3.12.13)` | Linux 锁定版本验证 |
+| `Tests (windows-latest, Python 3.12)` | Windows runner 可用补丁版验证 |
+| `Tests (macos-latest, Python 3.12)` | macOS 跨平台验证 |
+| `CI gate` | 要求整个矩阵成功 |
+
+### 8.2 当前远端状态
+
+| 字段 | 值 |
+|---|---|
+| PR 状态 | open |
+| Draft | false |
+| `mergeable` | true |
+| `mergeable_state` | clean |
+| PR head | `5ff5d11b465e703fcc11fb9f1515144c8b6d9b85` |
+| Check Runs | 4 |
+| Actions 运行 | [33467946308](https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33467946308)，attempt 2 |
+| 远端结论 | PASS |
+
+| Check | Job ID | 完成时间（UTC） | 结论 |
+|---|---:|---|---|
+| macOS / Python 3.12 | `99754869975` | 2026-09-01T06:03:18Z | success |
+| Ubuntu / Python 3.12.13 | `99754870158` | 2026-09-01T06:03:18Z | success |
+| Windows / Python 3.12 | `99754870196` | 2026-09-01T06:05:02Z | success |
+| `CI gate` | `99755567005` | 2026-09-01T06:05:07Z | success |
+
+此前针对提交 `899ae3c` 的成功运行只证明旧提交的 Ubuntu/Windows 状态，不能替代 PR #3 的三平台检查。测试报告能够补充 GitHub Checks，但不能替代由独立 runner 在目标提交上执行的 Checks。
+
+## 9. 缺陷、警告与风险登记
+
+| ID | 级别 | 状态 | 说明 | 处置 |
+|---|---|---|---|---|
+| F-001 | Blocker | Closed | 外部贡献者工作流最初处于 `action_required` | 维护者已批准；三平台与 gate 全部成功 |
+| W-001 | Minor | Open | FastAPI/Starlette TestClient 出现弃用警告 | 当前不影响结果；下次依赖升级评估 `httpx2` |
+| L-001 | Limitation | Accepted | 未执行浏览器 E2E、负载、渗透、隐私影响和真实外部 API 测试 | 不属于本次确定性修复范围；发布前按风险补充 |
+| L-002 | Limitation | Accepted | 外部绝对输出目录不属于当前 manifest 的仓库相对路径契约 | 使用项目默认仓库内运行目录；如要开放 API 再单独设计 |
+
+审计期间两次非正式试运行因审计者覆盖了项目自带的 `--basetemp=.pytest-tmp` 约定而出现临时目录/相对路径设置错误；两次均未计入正式结果。恢复仓库标准配置后，67 项正式测试全部通过。该过程记录用于区分测试工具配置错误与产品缺陷。
+
+## 10. 证据目录与完整性
+
+| 证据 | 路径 | SHA-256 |
+|---|---|---|
+| 最终报告 | `competition/evidence/TEST_REPORT.md` | 提交时由 Git 追踪 |
+| JUnit | `competition/evidence/runtime/pytest-junit.xml` | `21d29b3ba36fb156136afcfdc9c4ecb800d318de0ff4e35320c593b937246809` |
+| 逐例清单 | `competition/evidence/runtime/test-case-inventory.csv` | `6e4c5b860ca358d59af273e01ac1488fd89e5b327e656b563d7e130aef200062` |
+| 运行元数据 | `competition/evidence/runtime/test-run-metadata.json` | 提交时由 Git 追踪 |
+| 版本化运行清单 | `competition/evidence/runtime/run_manifest.json` | 由 18 项摘要验证覆盖 |
+| 依赖锁 | `requirements.lock` | `815f48d1ed9b12766900451b0584fcb2e1f0735f7d0a7a401dae531e98196e55` |
+| CI 工作流 | `.github/workflows/ci.yml` | `c0a53d9099a1e594469b645b91c09d2961ed1259d89d85a56c862f320000e208` |
+
+## 11. 可复现命令
+
+在仓库根目录、CPython 3.12 环境中执行：
 
 ```powershell
 python -m pip install --require-hashes -r requirements.lock
 python -m pip check
-python -m pytest -q --basetemp=.pytest-tmp/deterministic --junitxml=<temporary-junit-path>
+python -m pytest --junitxml=test-results/pytest-local.xml
+python scripts/prepare_observed_data.py
+python scripts/run_trustdata.py
+python scripts/verify_run_manifest.py
+python scripts/audit_competition_package.py
 ```
 
-## 7. 测试结果明细
+完整流水线会生成 `outputs/runs/latest`，因此清单验证与材料审计应在流水线成功后执行。
 
-### 7.1 模块统计
+## 12. 最终判定与签署
 
-| 测试模块 | 用例数 | 用例执行时间 | 结果 |
-|---|---:|---:|---|
-| `tests/test_control.py` | 5 | 0.610 秒 | PASS |
-| `tests/test_core.py` | 8 | 0.410 秒 | PASS |
-| `tests/test_env.py` | 2 | 0.010 秒 | PASS |
-| `tests/test_evidence.py` | 7 | 67.130 秒 | PASS |
-| `tests/test_llm_mining.py` | 42 | 0.150 秒 | PASS |
-| **合计** | **64** | **68.310 秒（用例体）** | **PASS** |
+### 12.1 当前判定
 
-pytest 总耗时 72.494 秒；模块用例时间之和不包含收集、fixture、进程启动和报告生成等框架开销。
+- 本地功能、证据一致性与同平台连续运行可复现性：**PASS**。
+- GitHub 跨平台执行：**PASS**。
+- 当前合并判定：**PASS / 可以合并**。
 
-### 7.2 最慢用例
+### 12.2 合并条件完成情况
 
-| 排名 | 用例 | 时间 |
-|---:|---|---:|
-| 1 | `test_numbers_master_matches_generated_primary_results` | 66.093 秒 |
-| 2 | `test_manifest_cli_verifies_generated_run` | 0.822 秒 |
-| 3 | `test_upload_preflight_and_assessment_job_are_isolated` | 0.337 秒 |
-| 4 | `test_versioned_evidence_mirrors_generated_results` | 0.173 秒 |
-| 5 | `test_config_masks_key_and_persists_only_to_dotenv` | 0.156 秒 |
+1. PR 候选提交已触发并完成 GitHub Actions。
+2. Ubuntu、Windows、macOS 三个平台的 67 项测试全部通过。
+3. `CI gate` 成功。
+4. 运行链接、head SHA、完成时间和任务结论已写入本报告及 `test-run-metadata.json`。
+5. 本次新增变更仅为测试报告和机器证据；若功能代码再次变化，需重新执行完整验收。
 
-完整 64 项用例、类名、状态和耗时见 `test-case-inventory.csv`。
+### 12.3 签署栏
 
-## 8. 需求—测试追踪矩阵
-
-| 需求编号 | 质量目标 | 测试证据 | 用例数 | 结论 |
-|---|---|---|---:|---|
-| TR-FUNC-01 | 特征、评分、等级与阈值逻辑正确 | `tests/test_core.py` | 8 | Verified |
-| TR-ENV-01 | 环境变量读取与覆盖规则稳定 | `tests/test_env.py` | 2 | Verified |
-| TR-CTRL-01 | 控制台配置与任务执行隔离 | `tests/test_control.py` | 5 | Verified |
-| TR-CTRL-02 | Host/Origin/CSRF/媒体类型保护 | `test_write_requests_require_same_origin_csrf_and_correct_media_type` | 1 | Verified |
-| TR-LLM-01 | 任务解析、JSON 提取和评分归一化 | `tests/test_llm_mining.py` | 18 | Verified |
-| TR-LLM-02 | HTML 提取、引用评分、字段证据绑定和身份稳定性 | `TestHtmlToTextSnippet`、`TestCitationScore`、`TestFieldBoundEvidenceAndIdentity` | 13 | Verified |
-| TR-LLM-03 | 采集管线编排、空结果与来源不可用报告 | `TestMiningPipeline` | 3 | Verified |
-| TR-NET-01 | 域名白名单、重定向和后续链接安全 | `TestSafeCrawling` | 5 | Verified |
-| TR-XSR-01 | 单来源与跨来源补全规则正确 | `TestEnrichCrossSource` | 3 | Verified |
-| TR-EVID-01 | 主指标、看板和敏感性覆盖一致 | `tests/test_evidence.py` | 3 | Verified |
-| TR-EVID-02 | 清单、证据镜像和运行契约可复现 | `tests/test_evidence.py` | 4 | Verified |
-
-上述子类用例数用于覆盖说明；机器清单是逐例数量的权威来源。
-
-## 9. 安全与边界回归
-
-### 9.1 已验证
-
-- 控制台写请求要求本机 Host、同源 Origin、有效 CSRF token 和正确媒体类型。
-- 任意任务类型不会绕过任务白名单。
-- 产物访问拒绝路径穿越。
-- API 密钥在响应中脱敏，只写入预期环境文件。
-- 平台域名必须显式配置为主机名，不接受 URL 形态绕过。
-- 抓取请求验证允许域名，并对重定向后的目标重新校验。
-- 非 HTML 后续链接不会被当作页面候选。
-- 相对分页链接会被规范解析。
-- 实体、评分、量表、用户、日期和评论字段需要各自证据绑定。
-- 伪造评分即使存在引文也会被拒绝。
-- 完整证据参与稳定记录身份生成，精确重复证据会被去重。
-- 单来源实体不会伪造跨源指标。
-
-### 9.2 未验证
-
-- 专业渗透测试。
-- 浏览器沙箱逃逸或操作系统权限提升。
-- 真实第三方平台的访问控制与服务条款兼容性。
-- 生产级密钥管理、集中审计和多用户授权模型。
-- 隐私影响评估与个人信息合规审查。
-
-本节是回归测试覆盖说明，不等同于安全认证。
-
-## 10. 证据复现与数值判定
-
-- 完整基准在 pytest 临时目录中重新生成，不依赖被忽略的 `outputs/runs/latest`。
-- 列名、行序、索引、数据类型、文本、布尔值及 JSON 键/列表结构严格一致。
-- CSV 与 JSON 普通数值叶允许绝对误差不超过 `5e-6`，用于容纳已实测的跨平台底层数值库末位漂移；该阈值等于 0.0005 个百分点。
-- 30% 污染档位的 F1、AUPRC 和 FPR 保留更严格的 `5e-7` 绝对误差断言。
-- 运行清单的成功状态、代码版本、随机种子和输出摘要由自动化测试核对。
-- JUnit、逐例清单和运行元数据分别保存，任何一层变化都会改变对应 SHA-256。
-
-## 11. 机器证据与哈希
-
-| 证据 | 路径 | SHA-256 |
-|---|---|---|
-| 依赖锁 | `requirements.lock` | `815F48D1ED9B12766900451B0584FCB2E1F0735F7D0A7A401DAE531E98196E55` |
-| CI 工作流 | `.github/workflows/ci.yml` | `25D52E1577CADA898E752ECA95C69C9065511287E28353AC9035D115841E8F8D` |
-| JUnit XML | `competition/evidence/runtime/pytest-junit.xml` | `5EFE88DB03938C516400937EE8BE9350D544BEFCF04F3B68BF9F29674C128C31` |
-| 用例清单 | `competition/evidence/runtime/test-case-inventory.csv` | `24CF6222C78340FD835CF1774F2CAF26D5A7C261BDF08C5CB356BCA207054BB3` |
-| 运行元数据 | `competition/evidence/runtime/test-run-metadata.json` | `EFDCB365DF3E10E7428B99D2C0044A73DAC55E52EB5697669D941F4E39301730` |
-
-元数据文件不能安全记录自身哈希，因此本报告是其 SHA-256 的权威记录。
-
-## 12. GitHub Checks 设计与实测结果
-
-### 12.1 触发与可复现性控制
-
-- 推送到 `master`、面向 `master` 的 Pull Request及手动 `workflow_dispatch` 均触发。
-- 权限最小化为 `contents: read`；checkout 不持久化凭据。
-- pip 缓存以 `requirements.lock` 为键；依赖按哈希安装并执行 `pip check`。
-- 固定 `PYTHONHASHSEED=0`，将 OMP/OpenBLAS/MKL/NumExpr 线程数设为 1，并使用无界面的 Matplotlib 后端。
-- 矩阵不快速失败；JUnit 始终尝试上传并保留 30 天。
-- `CI gate` 汇总矩阵，提供稳定的分支保护检查名。
-
-### 12.2 最终检查矩阵
-
-| 检查 | 环境 | Python 选择 | 工作内容 |
+| 角色 | 姓名/标识 | 结论 | 日期 |
 |---|---|---|---|
-| `Tests (ubuntu-latest, Python 3.12.13)` | GitHub-hosted Ubuntu | 固定 `3.12.13` | 哈希锁定安装、`pip check`、64 项测试、JUnit 上传 |
-| `Tests (windows-latest, Python 3.12)` | GitHub-hosted Windows | runner 可用的 3.12 补丁版 | 哈希锁定安装、`pip check`、64 项测试、JUnit 上传 |
-| `CI gate` | GitHub-hosted Ubuntu | 不适用 | 汇总矩阵，任一平台失败则门禁失败 |
+| 测试执行 | Codex 自动化测试会话 | 本地 PASS | 2026-09-01 |
+| 独立质量审计 | Research Auditor | 本地与远端 PASS | 2026-09-01 |
+| 项目负责人 |  |  |  |
 
-### 12.3 最终成功运行
-
-成功运行：[TrustData CI #33395397064](https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33395397064)，提交 `899ae3c2e7322f883e255f41a608812ddefa57a7`，最终结论 `success`。
-
-| Job ID | 检查 | 开始（UTC） | 完成（UTC） | 耗时 | 结论 |
-|---:|---|---|---|---:|---|
-| `99498591142` | Ubuntu / Python 3.12.13 | 13:09:21 | 13:10:49 | 88 秒 | PASS |
-| `99498590941` | Windows / Python 3.12 | 13:09:21 | 13:11:37 | 136 秒 | PASS |
-| `99499282336` | CI gate | 13:11:39 | 13:11:42 | 3 秒 | PASS |
-
-### 12.4 诊断历史与纠正措施
-
-| 运行 | 提交 | 观察结果 | 纠正/解释 | 状态 |
-|---:|---|---|---|---|
-| `33378802164` | `515f346` | Windows 无法配置精确 Python 3.12.13 | Windows 改用 runner 可用的 3.12 补丁版 | Closed |
-| `33381987630` | `5ae70ef` | Windows 通过；Ubuntu pytest 失败 | 当时尚未获得失败用例；继续交叉运行 | Superseded |
-| `33383173670` | `1dbcb1c` | 三项成功 | 后续相同矩阵出现失败，证明单次绿色尚不足以判定稳定 | Intermediate only |
-| `33384454734` | `e3efca9` | Ubuntu pytest 失败 | 本地复现为消融 AUPRC 漂移 `2.8137e-6` 超过旧容差 `2e-6` | Closed |
-| `33395397064` | `899ae3c` | Ubuntu、Windows、门禁全部成功 | 固定数值环境；镜像容差调整为 `5e-6`，核心指标仍为 `5e-7` | PASS |
-
-上述历史被完整保留，证明门禁能够阻断环境配置失败和数值证据不一致；最终修复依据具体失败数据，而不是通过重跑掩盖波动。
-## 13. 缺陷、警告与关闭项
-
-| 编号 | 分类 | 级别 | 状态 | 证据 | 处置 |
-|---|---|---|---|---|---|
-| W-001 | 依赖弃用 | SUGGESTION | Open / 非阻塞 | StarletteDeprecationWarning | 下一次依赖升级前评估 `httpx2` 并更新锁文件 |
-| C-001 | CI 运行时可用性 | CI compatibility | Closed | 运行 `33378802164` 的 Windows Python 配置失败 | Windows 使用 runner 可用的 Python 3.12 补丁版 |
-| C-002 | 跨平台数值复现 | Evidence compatibility | Closed | AUPRC 实测漂移约 `2.8137e-6`，旧阈值为 `2e-6` | 固定数值线程/哈希种子；镜像容差 `5e-6`；核心指标继续 `5e-7` |
-
-阻塞项 0，重要项 0，未关闭建议项 1，已关闭兼容性问题 2，待确认项 0。
-## 14. 历史阻塞项关闭记录
-
-| 历史问题 | 关闭证据 | 状态 |
-|---|---|---|
-| 控制台跨站写请求可创建任务 | Host/Origin/CSRF/媒体类型回归测试 | Closed |
-| 宽泛依赖范围导致测试客户端不稳定 | Python 3.12 锁文件、哈希安装、`pip check` | Closed |
-| 干净检出缺少 `tmp/` 导致 pytest setup error | `.pytest-tmp` 可自动创建 | Closed |
-| 测试依赖被忽略的 `outputs/runs/latest` | 测试内完整重建基准 | Closed |
-| CSV/JSON 原始字节哈希跨平台不稳定 | 严格结构/文本比较 + 明确浮点容差 | Closed |
-| GitHub Actions 单平台且无测试产物 | Ubuntu/Windows 矩阵 + JUnit + 稳定性修复运行 `33395397064` | Closed |
-
-## 15. 风险与覆盖缺口
-
-| 风险 | 当前控制 | 残余风险 |
-|---|---|---|
-| 依赖漂移 | 锁定版本、哈希安装、pip 缓存键 | 包源可用性和未来安全升级 |
-| 跨平台数值漂移 | 实测漂移量、确定性线程设置、`5e-6` 镜像容差及双平台运行 `33395397064` | macOS 未覆盖；未来数值库升级仍需回归 |
-| 外部平台变化 | 安全边界使用模拟请求回归 | 真实页面结构、限流和服务条款变化 |
-| 性能退化 | 记录用例耗时和最慢用例 | 无负载、并发、内存和长期稳定性基线 |
-| 前端回归 | 数据与控制 API 有测试 | 无浏览器 E2E、视觉回归和无障碍测试 |
-| 安全风险 | SSRF/CSRF/路径/白名单回归 | 无第三方渗透测试和隐私影响评估 |
-| 研究外部效度 | E2 受控基准与证据链 | 无 E3 真实离线标注、E4 影子试点或 E5 第三方测评 |
-
-## 16. 报告与 GitHub Checks 的关系
-
-本报告和 GitHub Checks 是互补证据：
-
-- 本报告提供测试设计、环境、范围、限制、哈希和人工可读结论。
-- JUnit/CSV/JSON 提供机器可读的本地执行证据。
-- GitHub Checks 提供与提交 SHA 自动绑定的独立远端执行、历史记录和分支保护。
-
-本报告不能替代 GitHub Checks。本次远端检查已通过；仍建议在 `master` 分支保护中把 `CI gate` 设置为 required status check，使以后每个 PR 都必须等待该门禁通过。
-
-## 17. 复现与复核步骤
-
-1. 检出稳定性修复提交 `899ae3c2e7322f883e255f41a608812ddefa57a7`。
-2. 使用 CPython 3.12.13 和 `requirements.lock` 创建隔离环境，执行带哈希安装及 `pip check`。
-3. 设置 `PYTHONHASHSEED=0`、`OMP_NUM_THREADS=1`、`OPENBLAS_NUM_THREADS=1`、`MKL_NUM_THREADS=1`、`NUMEXPR_NUM_THREADS=1`、`MPLBACKEND=Agg`。
-4. 在仓库内受忽略的独立 basetemp 中执行完整 pytest，并生成 JUnit。
-5. 确认 JUnit 为 64 tests、0 failures、0 errors、0 skipped。
-6. 确认普通证据镜像比较使用 `5e-6` 绝对容差，核心 headline 指标仍使用 `5e-7`。
-7. 核对本报告第 11 节中的哈希。
-8. 核对 GitHub 运行 `33395397064` 与提交 SHA 一致。
-9. 确认 Ubuntu、Windows 和 `CI gate` 三项结论均为 `success`。
-10. 将 `CI gate` 设为分支保护必需检查；未来依赖、数值环境或业务代码变化均重新验收。
-## 18. 独立审计覆盖与判定
-
-### 18.1 已审计
-
-- 最终 JUnit 的 64 项总数、失败、错误、跳过和耗时。
-- 64 项逐例清单与 JUnit 的一一对应关系。
-- 本地与远端提交 SHA、分支、锁文件、工作流及证据哈希。
-- GitHub 运行 `33395397064` 的三个 Job ID、时间和结论。
-- 失败用例、本地复现数值、旧/新容差与核心指标阈值之间的关系。
-- 四次诊断/中间运行与最终成功运行的历史完整性。
-- 报告是否存在待推送、待确认或单次绿色即宣称稳定的过度表述。
-
-### 18.2 未覆盖或限制
-
-- macOS、浏览器 E2E、性能、渗透、隐私影响和真实外部 API。
-- E3–E6 的真实标注、平台试点、第三方测评和生产运行。
-- GitHub JUnit 下载需要仓库身份认证；远端结论通过 GitHub API 的运行、Job 和步骤状态核验，本地保存完整 JUnit。
-
-### 18.3 审计汇总
-
-| 类型 | 数量 |
-|---|---:|
-| BLOCKER | 0 |
-| IMPORTANT | 0 |
-| SUGGESTION | 1 |
-| Needs confirmation | 0 |
-| Closed compatibility findings | 2 |
-
-**审计判定：PASS WITH ONE MINOR MAINTENANCE ITEM。** 最终本地 64/64 与远端三项绿色 Checks 均绑定 `899ae3c`；数值容差调整有失败数据支持且未放宽 headline 核心指标。W-001 是唯一未关闭的非阻塞建议。
-## 19. 发布建议与签署
-
-### 19.1 发布建议
-
-- 稳定性修复提交 `899ae3c` 的本地 64/64 与 GitHub Ubuntu/Windows/门禁均通过，可在本报告覆盖范围内合并或发布。
-- 在 `master` 分支保护中把 `CI gate` 设置为 required status check。
-- 保留成功运行 `33395397064` 及历史失败运行，作为问题发现与纠正措施证据。
-- 下一周期处理 W-001，并规划浏览器 E2E、性能基线及 macOS 覆盖。
-- 任何业务代码、依赖锁、容差或 CI 工作流变更都应触发新的验收。
-
-### 19.2 签署
-
-| 角色 | 名称/签字 | 日期 | 结论 |
-|---|---|---|---|
-| 测试执行 | Codex 自动化测试会话 | 2026-08-31 | LOCAL + GITHUB PASS |
-| 质量审计 | Research Auditor | 2026-08-31 | PASS WITH ONE MINOR MAINTENANCE ITEM |
-| 项目负责人审批 | 待填写 | 待填写 | 待确认 |
+本报告覆盖 PR head `5ff5d11b465e703fcc11fb9f1515144c8b6d9b85` 及随报告一并提交的非执行性测试证据更新。任何后续功能代码、依赖或工作流变化都会使当前验收范围失效。
