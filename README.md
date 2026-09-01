@@ -207,10 +207,10 @@ task:
 
 `.github/workflows/ci.yml` 会在推送到 `master`、面向 `master` 的 Pull Request 以及手动触发时运行：
 
-- Ubuntu 固定使用 CPython 3.12.13；Windows 使用 runner 当前可用的 CPython 3.12 补丁版本，并在日志中输出实际版本；
+- Ubuntu 固定使用 CPython 3.12.13；Windows 与 macOS 使用 runner 当前可用的 CPython 3.12 补丁版本，并在日志中输出实际版本；
 - 按 `requirements.lock` 的哈希安装依赖，并执行 `pip check`；
 - 固定 Python 哈希种子并将 BLAS/OMP 数值线程限制为 1，降低跨平台基准的非确定性；
-- 两个平台均运行完整 pytest 套件；
+- 三个平台均运行完整 pytest 套件；
 - 无论成功或失败，均尝试上传保留 30 天的 JUnit XML；
 - `CI gate` 汇总矩阵结果，适合作为分支保护的必需检查。
 
@@ -218,7 +218,7 @@ task:
 
 ## 当前状态
 
-项目已完成数据、算法、产品、内部证明与申报材料闭环。前置研究位于 `prior_research/`，其中的真实归档、合成数据、受控实验和情景模型分别归档；前置结果作为研究基础使用。当前版本加入五个贡献者分组种子敏感性评测、64 项自动化测试和跨交付物证据校验。提交前工作集中于填写团队信息、核对赛事系统字段与准备真实平台试点。
+项目已完成数据、算法、产品、内部证明与申报材料闭环。前置研究位于 `prior_research/`，其中的真实归档、合成数据、受控实验和情景模型分别归档；前置结果作为研究基础使用。当前版本加入五个贡献者分组种子敏感性评测、67 项自动化测试、Windows/macOS/Linux 确定性回归和跨交付物证据校验。提交前工作集中于填写团队信息、核对赛事系统字段与准备真实平台试点。
 
 ## 核心闭环
 
@@ -241,3 +241,7 @@ python scripts/audit_competition_package.py
 python scripts/verify_run_manifest.py
 pytest -q
 ```
+
+Windows、macOS 和 Linux 的环境创建、确定性约束及跨平台结果比较方法见
+[跨平台复现说明](docs/CROSS_PLATFORM_REPRODUCIBILITY.md)。核心确定性测试会在三个系统的
+GitHub Actions 环境中自动运行。

@@ -11,6 +11,30 @@ import pandas as pd
 SUPPORTED_SUFFIXES = {".csv", ".json", ".jsonl", ".parquet"}
 
 
+def write_csv(
+    frame: pd.DataFrame,
+    path: str | Path,
+    *,
+    encoding: str = "utf-8",
+    sort_by: list[str] | tuple[str, ...] | None = None,
+) -> Path:
+    """Write a CSV with deterministic row order and LF line endings.
+
+    Python's default text newline handling uses CRLF on Windows.  Explicit LF
+    output keeps byte digests portable across Windows, macOS, and Linux.
+    """
+    destination = Path(path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    output = frame
+    if sort_by:
+        missing = [column for column in sort_by if column not in frame.columns]
+        if missing:
+            raise ValueError(f"CSV sort columns are missing: {missing}")
+        output = frame.sort_values(list(sort_by), kind="mergesort").reset_index(drop=True)
+    output.to_csv(destination, index=False, encoding=encoding, lineterminator="\n")
+    return destination
+
+
 def read_table(path: str | Path) -> pd.DataFrame:
     source = Path(path)
     suffix = source.suffix.lower()
@@ -38,7 +62,7 @@ def write_table(frame: pd.DataFrame, path: str | Path) -> Path:
     destination.parent.mkdir(parents=True, exist_ok=True)
     suffix = destination.suffix.lower()
     if suffix == ".csv":
-        frame.to_csv(destination, index=False, encoding="utf-8-sig")
+        write_csv(frame, destination, encoding="utf-8-sig")
     elif suffix == ".jsonl":
         frame.to_json(destination, orient="records", lines=True, force_ascii=False)
     elif suffix == ".json":
@@ -56,4 +80,3 @@ def write_table(frame: pd.DataFrame, path: str | Path) -> Path:
     else:
         raise ValueError(f"Unsupported output format: {suffix}")
     return destination
-

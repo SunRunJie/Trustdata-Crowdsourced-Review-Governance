@@ -116,10 +116,15 @@ def main() -> None:
         row for row in primary_rows
         if float(row["contamination"]) == 0.3 and row["method"] == "multi_evidence_logistic"
     )
-    require(abs(float(primary_30["f1"]) - 0.7495073125194482) < METRIC_TOLERANCE,
-            "primary 30% F1 matches the locked result", findings)
-    require(abs(float(primary_30["auprc"]) - 0.9492221877817787) < METRIC_TOLERANCE,
-            "primary 30% AUPRC matches the locked result", findings)
+    numbers = {
+        row["number_id"]: float(row["value"])
+        for row in read_csv(ROOT / "competition" / "evidence" / "NUMBERS_MASTER.csv")
+        if row["number_id"] in {"N021", "N022"}
+    }
+    require(abs(float(primary_30["f1"]) - numbers["N021"]) < METRIC_TOLERANCE,
+            "primary 30% F1 matches NUMBERS_MASTER", findings)
+    require(abs(float(primary_30["auprc"]) - numbers["N022"]) < METRIC_TOLERANCE,
+            "primary 30% AUPRC matches NUMBERS_MASTER", findings)
 
     sensitivity = read_csv(run_dir / "split_sensitivity_metrics.csv")
     levels = {float(row["contamination"]) for row in sensitivity}

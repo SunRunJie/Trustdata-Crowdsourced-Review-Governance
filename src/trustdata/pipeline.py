@@ -32,6 +32,7 @@ from .evaluation import (
     ranking_metrics,
 )
 from .features import extract_features
+from .io import write_csv
 from .scoring import TierThresholds, score_records
 
 
@@ -101,15 +102,22 @@ def _build_training_frame(
 ) -> pd.DataFrame:
     parts: list[pd.DataFrame] = []
     for level in levels:
-        scored = level_frames[level]
+        scored = level_frames[level].sort_values("record_id", kind="mergesort")
         clean = scored.loc[scored["ground_truth_risk"].eq(0)].sample(
             n=min(20_000, int(scored["ground_truth_risk"].eq(0).sum())),
             random_state=int(random_seed + round(level * 1000)),
         )
-        parts.append(
-            pd.concat([clean, scored.loc[scored["ground_truth_risk"].eq(1)]], ignore_index=True)
+        part = pd.concat(
+            [clean, scored.loc[scored["ground_truth_risk"].eq(1)]], ignore_index=True
         )
-    return pd.concat(parts, ignore_index=True)
+        part["_training_level"] = level
+        parts.append(part)
+    return (
+        pd.concat(parts, ignore_index=True)
+        .sort_values(["_training_level", "record_id"], kind="mergesort")
+        .drop(columns="_training_level")
+        .reset_index(drop=True)
+    )
 
 
 def _split_sensitivity_study(
@@ -293,9 +301,9 @@ def run_pipeline(
         random_seed=int(config["random_seed"]),
     )
     clean, attacks, catalog = generate_benchmark(entities, reviews, spec)
-    clean.to_csv(processed / "benchmark_clean_control.csv", index=False, encoding="utf-8-sig")
-    attacks.to_csv(processed / "benchmark_controlled_injections.csv", index=False, encoding="utf-8-sig")
-    catalog.to_csv(processed / "benchmark_entity_catalog.csv", index=False, encoding="utf-8-sig")
+    write_csv(clean, processed / "benchmark_clean_control.csv", encoding="utf-8-sig", sort_by=["record_id"])
+    write_csv(attacks, processed / "benchmark_controlled_injections.csv", encoding="utf-8-sig", sort_by=["record_id"])
+    write_csv(catalog, processed / "benchmark_entity_catalog.csv", encoding="utf-8-sig", sort_by=["entity_id", "record_id"])
     print(f"[OK] benchmark clean={len(clean):,} injected={len(attacks):,}")
 
     levels = [float(value) for value in benchmark_config["contamination_levels"]]
@@ -366,13 +374,13 @@ def run_pipeline(
         sensitivity_seeds,
         maximum_false_positive_rate,
     )
-    classification.to_csv(output / "classification_metrics.csv", index=False)
-    ranking.to_csv(output / "ranking_metrics.csv", index=False)
-    ablation.to_csv(output / "ablation_metrics.csv", index=False)
-    fairness.to_csv(output / "fairness_metrics.csv", index=False)
-    split_sensitivity.to_csv(output / "split_sensitivity_metrics.csv", index=False)
-    split_sensitivity_summary.to_csv(output / "split_sensitivity_summary.csv", index=False)
-    headline.to_csv(output / "headline_metrics.csv", index=False)
+    write_csv(classification, output / "classification_metrics.csv", sort_by=["contamination", "method"])
+    write_csv(ranking, output / "ranking_metrics.csv", sort_by=["contamination"])
+    write_csv(ablation, output / "ablation_metrics.csv", sort_by=["ablation"])
+    write_csv(fairness, output / "fairness_metrics.csv", sort_by=["account_age_group"])
+    write_csv(split_sensitivity, output / "split_sensitivity_metrics.csv", sort_by=["split_seed", "contamination"])
+    write_csv(split_sensitivity_summary, output / "split_sensitivity_summary.csv", sort_by=["contamination"])
+    write_csv(headline, output / "headline_metrics.csv", sort_by=["contamination", "method"])
 
     selected_columns = [
         "record_id", "entity_id", "contributor_id", "rating", "created_at", "attack_type",
@@ -381,11 +389,15 @@ def run_pipeline(
         "risk_probability_model", "model_flag",
     ]
     sample = (
-        max_scored.sort_values("risk_probability_model", ascending=False)
+        max_scored.sort_values(
+            ["risk_probability_model", "record_id"],
+            ascending=[False, True],
+            kind="mergesort",
+        )
         .head(5000)[selected_columns]
         .copy()
     )
-    sample.to_csv(output / "scored_records_sample.csv", index=False, encoding="utf-8-sig")
+    write_csv(sample, output / "scored_records_sample.csv", encoding="utf-8-sig")
     passports = sample.head(100).to_dict(orient="records")
     _write_json(output / "trust_passports.json", passports)
 
@@ -394,7 +406,7 @@ def run_pipeline(
     audit["decision_status"] = "pending_human_review"
     audit["event_time"] = started_at
     audit["model_version"] = config["version"]
-    audit.to_csv(output / "audit_trail.csv", index=False, encoding="utf-8-sig")
+    write_csv(audit, output / "audit_trail.csv", encoding="utf-8-sig")
 
     figures = _plot_results(output, headline, ablation, max_scored)
     proposed = classification.loc[classification["method"] == "multi_evidence_logistic"].copy()
@@ -470,9 +482,9 @@ def run_pipeline(
         "random_seed": config["random_seed"],
         "evidence_class": dashboard["evidence_class"],
         "inputs": {
-            str(entity_path.relative_to(root)): _sha256(entity_path),
-            str(review_path.relative_to(root)): _sha256(review_path),
-            str(config_path.relative_to(root)): _sha256(config_path),
+            entity_path.relative_to(root).as_posix(): _sha256(entity_path),
+            review_path.relative_to(root).as_posix(): _sha256(review_path),
+            config_path.relative_to(root).as_posix(): _sha256(config_path),
         },
         "environment": {
             "python": sys.version,
@@ -482,8 +494,8 @@ def run_pipeline(
                 for package in ["numpy", "pandas", "scipy", "scikit-learn", "matplotlib", "PyYAML"]
             },
         },
-        "outputs": {str(path.relative_to(root)): _sha256(path) for path in outputs},
-        "figures": [str(path.relative_to(root)) for path in figures],
+        "outputs": {path.relative_to(root).as_posix(): _sha256(path) for path in outputs},
+        "figures": [path.relative_to(root).as_posix() for path in figures],
     }
     _write_json(output / "run_manifest.json", manifest)
     print(f"[OK] manifest={output / 'run_manifest.json'}")

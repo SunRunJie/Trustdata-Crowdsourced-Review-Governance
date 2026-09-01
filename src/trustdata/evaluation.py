@@ -68,8 +68,9 @@ def balanced_group_split_map(
     random_state: int = 20260828,
 ) -> dict[str, str]:
     """Build one stable, class-balanced, contributor-disjoint split map."""
-    groups = frame["contributor_id"].fillna(frame["record_id"]).astype(str)
-    truth = frame["ground_truth_risk"].astype(int)
+    ordered = frame.sort_values("record_id", kind="mergesort").reset_index(drop=True)
+    groups = ordered["contributor_id"].fillna(ordered["record_id"]).astype(str)
+    truth = ordered["ground_truth_risk"].astype(int)
     splitter = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=random_state)
     assignment = np.full(len(frame), "", dtype=object)
     fold_names = ["test", "validation", "train", "train", "train"]
@@ -78,7 +79,17 @@ def balanced_group_split_map(
         assignment[test_index] = fold_names[fold]
     if (assignment == "").any():
         raise RuntimeError("Incomplete evaluation split assignment")
-    return dict(zip(frame["record_id"].astype(str), assignment, strict=True))
+    return dict(zip(ordered["record_id"].astype(str), assignment, strict=True))
+
+
+def _top_entity_ids(frame: pd.DataFrame, score: str, count: int) -> set[object]:
+    """Select top entities deterministically when scores are tied."""
+    ordered = frame[[score]].copy()
+    ordered["_entity_key"] = ordered.index.map(str)
+    ordered = ordered.sort_values(
+        [score, "_entity_key"], ascending=[False, True], kind="mergesort"
+    )
+    return set(ordered.head(count).index)
 
 
 def expected_calibration_error(y_true: np.ndarray, probability: np.ndarray, bins: int = 10) -> float:
@@ -233,9 +244,9 @@ def ranking_metrics(
     raw_order = joined["raw"].rank(ascending=False, method="average")
     weighted_order = joined["weighted"].rank(ascending=False, method="average")
     top_k = min(100, len(joined))
-    clean_top = set(joined.nlargest(top_k, "clean").index)
-    raw_top = set(joined.nlargest(top_k, "raw").index)
-    weighted_top = set(joined.nlargest(top_k, "weighted").index)
+    clean_top = _top_entity_ids(joined, "clean", top_k)
+    raw_top = _top_entity_ids(joined, "raw", top_k)
+    weighted_top = _top_entity_ids(joined, "weighted", top_k)
     relevance = joined["clean"].to_numpy()[None, :]
     return {
         "entities": int(len(joined)),
