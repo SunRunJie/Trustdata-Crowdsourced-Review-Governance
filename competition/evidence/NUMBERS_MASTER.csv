@@ -11,25 +11,25 @@ N009,normalized_review_duplicates,965,records,normalized exact text duplicates,E
 N010,clean_benchmark_records,100000,records,controlled benchmark,E2,configs/trust.yaml,behavior and timestamps synthetic
 N011,maximum_injection_pool,30000,records,controlled benchmark,E2,configs/trust.yaml,five attack mechanisms
 N012,validation_threshold,0.90,probability score,all contamination levels,E2,outputs/runs/latest/classification_metrics.csv,selected on validation data
-N013,f1_1pct,0.190981,ratio,1 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,known weak case
-N014,auprc_1pct,0.352125,ratio,1 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N015,f1_5pct,0.631268,ratio,5 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N016,auprc_5pct,0.715710,ratio,5 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N017,f1_10pct,0.741889,ratio,10 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N018,auprc_10pct,0.852263,ratio,10 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N019,f1_20pct,0.751832,ratio,20 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N020,auprc_20pct,0.925288,ratio,20 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N021,f1_30pct,0.749507,ratio,30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N022,auprc_30pct,0.949222,ratio,30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N013,f1_1pct,0.190476,ratio,1 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,known weak case
+N014,auprc_1pct,0.353304,ratio,1 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N015,f1_5pct,0.630218,ratio,5 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N016,auprc_5pct,0.714257,ratio,5 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N017,f1_10pct,0.741399,ratio,10 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N018,auprc_10pct,0.851604,ratio,10 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N019,f1_20pct,0.751680,ratio,20 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N020,auprc_20pct,0.924887,ratio,20 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N021,f1_30pct,0.749248,ratio,30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
+N022,auprc_30pct,0.948984,ratio,30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
 N023,fpr_30pct,0.001730,ratio,clean test records at 30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,equals 0.173 percent
 N024,simple_rule_f1_30pct,0.444128,ratio,30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,
-N025,raw_mean_rank_error_30pct,20.4565,ranks,2000 entities,E2,outputs/runs/latest/ranking_metrics.csv,
-N026,weighted_mean_rank_error_30pct,15.2275,ranks,2000 entities,E2,outputs/runs/latest/ranking_metrics.csv,25.56 percent reduction
-N027,raw_mean_rank_error_1pct,3.0210,ranks,2000 entities,E2,outputs/runs/latest/ranking_metrics.csv,
-N028,weighted_mean_rank_error_1pct,38.7625,ranks,2000 entities,E2,outputs/runs/latest/ranking_metrics.csv,known regression
-N029,automated_tests_passed,13,tests,core and evidence test suites,E1,tests/,not third-party testing
+N025,raw_mean_rank_error_30pct,20.3960,ranks,2000 entities,E2,outputs/runs/latest/ranking_metrics.csv,
+N026,weighted_mean_rank_error_30pct,15.2335,ranks,2000 entities,E2,outputs/runs/latest/ranking_metrics.csv,25.31 percent reduction
+N027,raw_mean_rank_error_1pct,3.0325,ranks,2000 entities,E2,outputs/runs/latest/ranking_metrics.csv,
+N028,weighted_mean_rank_error_1pct,39.0970,ranks,2000 entities,E2,outputs/runs/latest/ranking_metrics.csv,known regression
+N029,automated_tests_passed,67,tests,core and evidence test suites,E1,tests/,not third-party testing
 N030,competition_system_deadline,2026-09-05,date,Nanjing University application,E1,https://jw.nju.edu.cn/d9/36/c26263a842038/page.htm,timezone assumed China Standard Time
 N031,split_sensitivity_runs,5,group partitions,all contamination levels,E2,outputs/runs/latest/split_sensitivity_metrics.csv,contributor-disjoint splits on one generated benchmark
-N032,f1_median_30pct_split_sensitivity,0.752588,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.745057 to 0.762178
-N033,auprc_median_30pct_split_sensitivity,0.948837,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.948059 to 0.949222
-N034,fpr_median_30pct_split_sensitivity,0.001854,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.001545 to 0.002163
+N032,f1_median_30pct_split_sensitivity,0.751503,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.744297 to 0.764381
+N033,auprc_median_30pct_split_sensitivity,0.948669,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.948358 to 0.948984
+N034,fpr_median_30pct_split_sensitivity,0.001730,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.001483 to 0.002224

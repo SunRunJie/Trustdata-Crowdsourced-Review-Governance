@@ -34,13 +34,21 @@ class BenchmarkSpec:
 def _choose_catalog(entities: pd.DataFrame, count: int) -> pd.DataFrame:
     catalog = (
         entities.loc[entities["cross_source_reference"].notna()]
-        .sort_values(["entity_id", "rating_count"], ascending=[True, False])
+        .sort_values(
+            ["entity_id", "rating_count", "record_id"],
+            ascending=[True, False, True],
+            kind="mergesort",
+        )
         .drop_duplicates("entity_id")
         .copy()
     )
     catalog["reference_score"] = catalog["cross_source_reference"].clip(0.5, 5)
     catalog["attention_weight"] = np.sqrt(catalog["rating_count"].fillna(1).clip(lower=1))
-    catalog = catalog.sort_values("attention_weight", ascending=False).head(count)
+    catalog = catalog.sort_values(
+        ["attention_weight", "entity_id", "record_id"],
+        ascending=[False, True, True],
+        kind="mergesort",
+    ).head(count)
     if len(catalog) < min(100, count):
         raise ValueError("Insufficient cross-source entities for the benchmark")
     return catalog.reset_index(drop=True)
@@ -78,7 +86,14 @@ def _base_rows(
 
     review_mask = rng.random(n) < spec.review_probability
     texts = np.full(n, None, dtype=object)
-    available = reviews["review_text"].dropna().astype(str).drop_duplicates().to_numpy()
+    available = (
+        reviews["review_text"]
+        .dropna()
+        .astype(str)
+        .drop_duplicates()
+        .sort_values(kind="mergesort")
+        .to_numpy()
+    )
     review_indices = np.flatnonzero(review_mask)
     if len(review_indices):
         sampled = rng.choice(available, size=len(review_indices), replace=len(review_indices) > len(available))
@@ -122,8 +137,23 @@ def _attack_rows(
     per_type = total // len(ATTACK_TYPES)
     counts = [per_type] * len(ATTACK_TYPES)
     counts[-1] += total - sum(counts)
-    targets = catalog.nlargest(min(100, len(catalog)), "attention_weight").reset_index(drop=True)
-    texts = reviews["review_text"].dropna().astype(str).drop_duplicates().to_numpy()
+    targets = (
+        catalog.sort_values(
+            ["attention_weight", "entity_id", "record_id"],
+            ascending=[False, True, True],
+            kind="mergesort",
+        )
+        .head(min(100, len(catalog)))
+        .reset_index(drop=True)
+    )
+    texts = (
+        reviews["review_text"]
+        .dropna()
+        .astype(str)
+        .drop_duplicates()
+        .sort_values(kind="mergesort")
+        .to_numpy()
+    )
     templates = rng.choice(texts, size=min(80, len(texts)), replace=False)
     parts: list[pd.DataFrame] = []
 
@@ -230,17 +260,26 @@ def generate_benchmark(
 def subset_for_level(clean: pd.DataFrame, attacks: pd.DataFrame, level: float) -> pd.DataFrame:
     desired = int(round(len(clean) * level))
     selected_parts: list[pd.DataFrame] = []
-    counts = attacks["attack_type"].value_counts()
+    counts = attacks.groupby("attack_type", sort=False).size().reindex(ATTACK_TYPES, fill_value=0)
     proportions = counts / counts.sum()
-    for attack_type, proportion in proportions.items():
+    for attack_type in ATTACK_TYPES:
+        proportion = proportions.loc[attack_type]
         take = int(round(desired * float(proportion)))
         selected_parts.append(
-            attacks.loc[attacks["attack_type"] == attack_type].nsmallest(take, "attack_order")
+            attacks.loc[attacks["attack_type"] == attack_type]
+            .sort_values(["attack_order", "record_id"], kind="mergesort")
+            .head(take)
         )
     selected = pd.concat(selected_parts, ignore_index=True)
     if len(selected) > desired:
         selected = selected.iloc[:desired].copy()
     elif len(selected) < desired:
         remaining = attacks.loc[~attacks["record_id"].isin(selected["record_id"])]
-        selected = pd.concat([selected, remaining.nsmallest(desired - len(selected), "attack_order")])
+        remainder = (
+            remaining.sort_values(
+                ["attack_order", "attack_type", "record_id"], kind="mergesort"
+            )
+            .head(desired - len(selected))
+        )
+        selected = pd.concat([selected, remainder], ignore_index=True)
     return pd.concat([clean, selected], ignore_index=True)

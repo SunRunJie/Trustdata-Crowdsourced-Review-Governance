@@ -129,7 +129,7 @@ def load_observed_entities(prior_root: Path) -> pd.DataFrame:
     else:
         entities["cross_source_gap"] = np.nan
         entities["cross_source_reference"] = np.nan
-    return entities
+    return entities.sort_values("record_id", kind="mergesort").reset_index(drop=True)
 
 
 def load_observed_reviews(prior_root: Path) -> pd.DataFrame:
@@ -185,5 +185,4 @@ def load_observed_reviews(prior_root: Path) -> pd.DataFrame:
     reviews["ai_disclosure"] = "unknown"
     reviews["is_synthetic"] = False
     reviews["provenance_status"] = "observed_published_text"
-    return reviews
-
+    return reviews.sort_values("record_id", kind="mergesort").reset_index(drop=True)

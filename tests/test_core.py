@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from trustdata.evaluation import balanced_group_split_map, choose_threshold
+from trustdata.benchmark import _choose_catalog
+from trustdata.evaluation import _top_entity_ids, balanced_group_split_map, choose_threshold
 from trustdata.features import extract_features
 from trustdata.io import read_table, write_table
 from trustdata.scoring import score_records
@@ -108,3 +109,33 @@ def test_group_split_is_complete_and_disjoint() -> None:
     assert assigned["split"].notna().all()
     assert set(assigned["split"]) == {"train", "validation", "test"}
     assert assigned.groupby("contributor_id")["split"].nunique().max() == 1
+    shuffled = frame.sample(frac=1, random_state=7).reset_index(drop=True)
+    assert balanced_group_split_map(shuffled, random_state=101) == split_map
+
+
+def test_catalog_selection_is_independent_of_input_order() -> None:
+    frame = pd.DataFrame(
+        {
+            "record_id": [f"r{index:03d}" for index in range(140)],
+            "entity_id": [f"e{index:03d}" for index in range(140)],
+            "rating_count": [(index % 7) + 1 for index in range(140)],
+            "cross_source_reference": [4.0] * 140,
+            "cross_source_gap": [0.1] * 140,
+        }
+    )
+    expected = _choose_catalog(frame, 100)["record_id"].tolist()
+    shuffled = frame.sample(frac=1, random_state=19).reset_index(drop=True)
+    assert _choose_catalog(shuffled, 100)["record_id"].tolist() == expected
+
+
+def test_top_entity_ties_use_entity_id_as_tiebreaker() -> None:
+    frame = pd.DataFrame({"score": [1.0] * 105}, index=[f"e{index:03d}" for index in range(104, -1, -1)])
+    assert _top_entity_ids(frame, "score", 100) == {f"e{index:03d}" for index in range(100)}
+
+
+def test_csv_writer_uses_lf_on_all_platforms(tmp_path) -> None:
+    path = tmp_path / "portable.csv"
+    write_table(sample_frame(), path)
+    payload = path.read_bytes()
+    assert b"\r\n" not in payload
+    assert payload.count(b"\n") == len(sample_frame()) + 1

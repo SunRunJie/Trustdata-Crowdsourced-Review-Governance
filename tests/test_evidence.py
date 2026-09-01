@@ -157,4 +157,4 @@ def test_versioned_runtime_manifest_declares_current_benchmark_contract() -> Non
     assert manifest["run_status"] == "success"
     assert manifest["code_version"] == "0.2.0"
     assert manifest["random_seed"] == 20260828
-    assert "outputs\\runs\\latest\\classification_metrics.csv" in manifest["outputs"]
+    assert "outputs/runs/latest/classification_metrics.csv" in manifest["outputs"]

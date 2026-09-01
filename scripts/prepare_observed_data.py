@@ -16,6 +16,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from trustdata.normalization import load_observed_entities, load_observed_reviews
+from trustdata.io import write_csv
 
 
 def parse_args() -> argparse.Namespace:
@@ -34,8 +35,8 @@ def prepare_observed_data(output: Path | None = None) -> dict:
 
     entity_path = output / "observed_entities.csv"
     review_path = output / "observed_reviews.csv"
-    entities.to_csv(entity_path, index=False, encoding="utf-8-sig")
-    reviews.to_csv(review_path, index=False, encoding="utf-8-sig")
+    write_csv(entities, entity_path, encoding="utf-8-sig", sort_by=["record_id"])
+    write_csv(reviews, review_path, encoding="utf-8-sig", sort_by=["record_id"])
 
     summary = {
         "entities_total": int(len(entities)),
