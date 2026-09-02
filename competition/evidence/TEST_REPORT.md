@@ -5,12 +5,13 @@
 | 项目 | 内容 |
 |---|---|
 | 增量报告编号 | TD-FTR-20260902-07 |
-| 增量报告版本 | 5.0（Headline Metric Provenance / Local Verified） |
+| 增量报告版本 | 5.1（Headline Metric Provenance / Remote Verified） |
 | 被测对象 | NUMBERS_MASTER.csv、声明映射、证据测试、竞赛材料审计与路演稿第 9 页 |
+| 已验收提交 | `cc0148ae9e17b1c88feedbebd4e9b74035bc1656` |
 | 本地验收时间 | 2026-09-02T13:43:15+08:00 |
 | 证据等级 | E2：团队内部受控环境验证 |
 | 本地技术验收 | **PASS** |
-| GitHub-hosted Checks | 待本次提交推送后执行 |
+| GitHub-hosted Checks | **PASS — [TrustData CI #33596300089](https://github.com/SunRunJie/Trustdata-Crowdsourced-Review-Governance/actions/runs/33596300089)** |
 
 本次修复解决了 Precision、Recall、AUROC、Spearman 和 Top-100 五个路演展示指标未在数字母表中逐项登记的问题。新增 N035—N039，并通过 C017 将主运行分类结果、加权排序结果和唯一数字表建立声明级映射。Spearman 展示值明确为**加权 Spearman**，避免其与同样四舍五入为 0.994 的原始 Spearman 混淆。
 
@@ -35,7 +36,7 @@
 | OOXML 完整性 | 68 个压缩条目全部可读；空结构占位符 0 | PASS |
 | PPTX 主题保持 | 3 个有效主题部件与编辑前 SHA-256 字节一致 | PASS |
 
-已知非阻塞事项：测试环境报告一条 Starlette TestClient 关于未来迁移至 httpx2 的弃用警告，不影响当前测试结果或指标计算。远端三平台门禁将在本次提交推送后独立执行；其结果不会由本地验收替代。
+已知非阻塞事项：测试环境报告一条 Starlette TestClient 关于未来迁移至 httpx2 的弃用警告，不影响当前测试结果或指标计算。远端 GitHub Actions 运行 #33596300089 已在提交 cc0148a 上独立完成；Ubuntu、Windows、macOS 与 CI gate 四项均为 success。本地验收未被用来替代远端门禁。
 
 
 ## 0. PR #2 交付物一致性增量验收
