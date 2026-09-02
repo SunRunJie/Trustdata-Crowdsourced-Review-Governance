@@ -1,16 +1,14 @@
 {
-  "entities_total": 42356,
+  "entities_total": 2000,
   "entities_by_platform": {
-    "AOTY_history": 32356,
-    "AOTY": 5000,
-    "RYM": 5000
+    "bundled_demo_seed": 2000
   },
-  "unique_entity_ids": 34584,
-  "cross_source_entities": 4102,
-  "reviews_total": 166259,
-  "review_exact_duplicates": 965,
-  "review_sources": 131,
+  "unique_entity_ids": 2000,
+  "cross_source_entities": 2000,
+  "reviews_total": 1000,
+  "review_exact_duplicates": 0,
+  "review_sources": 137,
   "review_text_missing": 0,
-  "observed_rows_total": 208615,
-  "evidence_boundary": "Observed archives support descriptive entity/content baselines; contributor-level longitudinal behavior belongs to the platform pilot dataset."
+  "observed_rows_total": 3000,
+  "evidence_boundary": "Bundled E2 synthetic seed for deterministic demonstration and CI only; external platform conclusions require independently sourced and documented data."
 }

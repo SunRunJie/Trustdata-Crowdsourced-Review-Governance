@@ -33,6 +33,7 @@ from .evaluation import (
 from .features import extract_features
 from .io import write_csv
 from .scoring import TierThresholds, score_records
+from .seed import ensure_demo_seed
 
 
 def _sha256(path: Path) -> str:
@@ -256,8 +257,13 @@ def run_pipeline(
     processed = processed_dir or root / "data" / "processed"
     entity_path = processed / "observed_entities.csv"
     review_path = processed / "observed_reviews.csv"
-    if not entity_path.exists() or not review_path.exists():
-        raise FileNotFoundError("Final processed data is missing from data/processed")
+    created_seed = ensure_demo_seed(
+        processed,
+        entity_count=int(config["benchmark"]["entities"]),
+        random_seed=int(config["random_seed"]),
+    )
+    if created_seed:
+        print(f"[OK] created deterministic E2 demo seed in {processed}")
 
     entities = pd.read_csv(entity_path, encoding="utf-8-sig")
     reviews = pd.read_csv(review_path, encoding="utf-8-sig")
@@ -387,7 +393,7 @@ def run_pipeline(
     proposed_max = proposed.loc[proposed["contamination"].idxmax()].to_dict()
     rank_max = ranking.loc[ranking["contamination"].idxmax()].to_dict()
     dashboard = {
-        "evidence_class": "E2_controlled_synthetic_benchmark_seeded_by_observed_distributions",
+        "evidence_class": "E2_controlled_synthetic_benchmark_with_bundled_seed",
         "observed_data": json.loads((processed / "observed_data_summary.json").read_text(encoding="utf-8")),
         "benchmark": {
             "clean_records": len(clean),
@@ -432,7 +438,7 @@ def run_pipeline(
         "split_sensitivity": split_sensitivity_summary.to_dict(orient="records"),
         "limitations": [
             "贡献者行为与时间戳来自受控合成基准；真实平台攻击模式需使用独立标注数据复核。",
-            "已发表乐评摘录用于建立文本多样性基线；平台用户内容需另行开展专门标注。",
+            "内置文本仅为可复现演示种子；平台用户内容与外部结论需使用独立来源数据复核。",
             "场景权重属于可解释的原型策略参数；真实平台试点阶段将依据标注与误报成本校准。",
         ],
     }

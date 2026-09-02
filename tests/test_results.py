@@ -25,12 +25,13 @@ def _sha256(path: Path) -> str:
 
 @pytest.fixture(scope="session")
 def benchmark_run(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    output = tmp_path_factory.mktemp("full-benchmark") / "results"
+    workspace = tmp_path_factory.mktemp("full-benchmark")
+    output = workspace / "results"
     run_pipeline(
         ROOT,
         ROOT / "configs" / "trust.yaml",
         output_dir=output,
-        processed_dir=ROOT / "data" / "processed",
+        processed_dir=workspace / "processed",
         publish=False,
     )
     return output
