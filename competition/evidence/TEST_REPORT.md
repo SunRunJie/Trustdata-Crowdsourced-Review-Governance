@@ -1,5 +1,43 @@
 # TrustData 最终测试与质量验收报告
 
+## 0.0 关键展示指标证据完整性修复验收
+
+| 项目 | 内容 |
+|---|---|
+| 增量报告编号 | TD-FTR-20260902-07 |
+| 增量报告版本 | 5.0（Headline Metric Provenance / Local Verified） |
+| 被测对象 | NUMBERS_MASTER.csv、声明映射、证据测试、竞赛材料审计与路演稿第 9 页 |
+| 本地验收时间 | 2026-09-02T13:43:15+08:00 |
+| 证据等级 | E2：团队内部受控环境验证 |
+| 本地技术验收 | **PASS** |
+| GitHub-hosted Checks | 待本次提交推送后执行 |
+
+本次修复解决了 Precision、Recall、AUROC、Spearman 和 Top-100 五个路演展示指标未在数字母表中逐项登记的问题。新增 N035—N039，并通过 C017 将主运行分类结果、加权排序结果和唯一数字表建立声明级映射。Spearman 展示值明确为**加权 Spearman**，避免其与同样四舍五入为 0.994 的原始 Spearman 混淆。
+
+| 编号 | 指标 | 运行产物精确值 | 对外展示 | 权威来源 |
+|---|---|---:|---:|---|
+| N035 | 30% Precision | 0.9923055784556197 | 0.992 | classification_metrics.csv |
+| N036 | 30% Recall | 0.6018333333333333 | 0.602 | classification_metrics.csv |
+| N037 | 30% AUROC | 0.9752989784148953 | 0.975 | classification_metrics.csv |
+| N038 | 30% 加权 Spearman | 0.9937081552269279 | 0.994 | ranking_metrics.csv |
+| N039 | 30% 加权 Top-100 overlap | 0.7000000000000000 | 0.70 | ranking_metrics.csv |
+
+| 验收项 | 结果 | 状态 |
+|---|---|---|
+| 锁定依赖一致性 | pip check：无破损依赖 | PASS |
+| 全量自动化测试 | 67 项全部执行至 100%；0 失败、0 错误、0 跳过；1 条第三方弃用警告 | PASS |
+| 数字母表自动匹配 | N021、N022、N023、N035—N039 均与本轮新生成产物在 5e-7 绝对容差内一致 | PASS |
+| 竞赛材料包审计 | 使用 .pytest-tmp/full-benchmark0/results 新生成结果执行，34/34 检查通过 | PASS |
+| 路演稿口径 | 第 9 页显式标为 Weighted Spearman 0.994 与 Weighted Top-100 0.70；讲者备注保留原始及加权精确值 | PASS |
+| PPTX 视觉检查 | 12 页逐页检查；无截断、遮挡、异常换行或图表错位 | PASS |
+| PPTX 越界检查 | 官方 slides_test.py 返回 Test passed. No overflow detected. | PASS |
+| PPTX 模板一致性 | 官方模板一致性检查 status=pass、issueCount=0 | PASS |
+| OOXML 完整性 | 68 个压缩条目全部可读；空结构占位符 0 | PASS |
+| PPTX 主题保持 | 3 个有效主题部件与编辑前 SHA-256 字节一致 | PASS |
+
+已知非阻塞事项：测试环境报告一条 Starlette TestClient 关于未来迁移至 httpx2 的弃用警告，不影响当前测试结果或指标计算。远端三平台门禁将在本次提交推送后独立执行；其结果不会由本地验收替代。
+
+
 ## 0. PR #2 交付物一致性增量验收
 
 | 项目 | 内容 |

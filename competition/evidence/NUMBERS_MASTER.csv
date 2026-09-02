@@ -33,3 +33,8 @@ N031,split_sensitivity_runs,5,group partitions,all contamination levels,E2,outpu
 N032,f1_median_30pct_split_sensitivity,0.751503,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.744297 to 0.764381
 N033,auprc_median_30pct_split_sensitivity,0.948669,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.948358 to 0.948984
 N034,fpr_median_30pct_split_sensitivity,0.001730,ratio,30 percent contamination,E2,outputs/runs/latest/split_sensitivity_summary.csv,range 0.001483 to 0.002224
+N035,precision_30pct,0.992306,ratio,30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,displayed as 0.992 or 0.9923 after rounding
+N036,recall_30pct,0.601833,ratio,30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,displayed as 0.602 or 0.6018 after rounding
+N037,auroc_30pct,0.975299,ratio,30 percent contamination,E2,outputs/runs/latest/classification_metrics.csv,displayed as 0.975 or 0.9753 after rounding
+N038,weighted_spearman_30pct,0.993708,ratio,30 percent contamination,E2,outputs/runs/latest/ranking_metrics.csv,weighted result displayed as 0.994 after rounding
+N039,weighted_top100_overlap_30pct,0.700000,ratio,30 percent contamination,E2,outputs/runs/latest/ranking_metrics.csv,weighted Top-100 overlap displayed as 0.70

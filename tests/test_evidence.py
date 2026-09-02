@@ -93,9 +93,17 @@ def _assert_json_equivalent(generated: object, archived: object, *, path: str = 
 def test_numbers_master_matches_generated_primary_results(benchmark_run: Path) -> None:
     numbers = pd.read_csv(EVIDENCE / "NUMBERS_MASTER.csv").set_index("number_id")
     primary = _primary_at(benchmark_run, 0.30)
+    ranking = pd.read_csv(benchmark_run / "ranking_metrics.csv").loc[
+        lambda frame: frame["contamination"].eq(0.30)
+    ].iloc[0]
     assert float(numbers.loc["N021", "value"]) == pytest.approx(primary["f1"], abs=5e-7)
     assert float(numbers.loc["N022", "value"]) == pytest.approx(primary["auprc"], abs=5e-7)
     assert float(numbers.loc["N023", "value"]) == pytest.approx(primary["fpr"], abs=5e-7)
+    assert float(numbers.loc["N035", "value"]) == pytest.approx(primary["precision"], abs=5e-7)
+    assert float(numbers.loc["N036", "value"]) == pytest.approx(primary["recall"], abs=5e-7)
+    assert float(numbers.loc["N037", "value"]) == pytest.approx(primary["auroc"], abs=5e-7)
+    assert float(numbers.loc["N038", "value"]) == pytest.approx(ranking["weighted_spearman"], abs=5e-7)
+    assert float(numbers.loc["N039", "value"]) == pytest.approx(ranking["weighted_topk_overlap"], abs=5e-7)
 
 
 def test_dashboard_headline_matches_generated_primary_results(benchmark_run: Path) -> None:

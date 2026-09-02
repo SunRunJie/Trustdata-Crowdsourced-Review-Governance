@@ -47,7 +47,7 @@ $env:PYTHONPATH='src'
 
 ## 证据规则
 
-1. 申报数字只从 `competition/evidence/NUMBERS_MASTER.csv` 引用。
+1. 申报和路演数字只从 `competition/evidence/NUMBERS_MASTER.csv` 引用；每个对外展示的关键指标必须有独立编号，并由自动化测试与原始运行产物逐项核对。
 2. 每个强主张必须在 `CLAIM_EVIDENCE.csv` 有证据路径和等级。
 3. E2 表述统一为“团队内部受控评测”；E3/E4 需要对应的外部测试或运行证据。
 4. 代码清单记录可核验的作者与第三方依赖；作者归属由团队确认。

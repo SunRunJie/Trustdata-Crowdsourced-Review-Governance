@@ -116,15 +116,33 @@ def main() -> None:
         row for row in primary_rows
         if float(row["contamination"]) == 0.3 and row["method"] == "multi_evidence_logistic"
     )
+    required_number_ids = {"N021", "N022", "N023", "N035", "N036", "N037", "N038", "N039"}
     numbers = {
         row["number_id"]: float(row["value"])
         for row in read_csv(ROOT / "competition" / "evidence" / "NUMBERS_MASTER.csv")
-        if row["number_id"] in {"N021", "N022"}
+        if row["number_id"] in required_number_ids
     }
+    require(numbers.keys() == required_number_ids,
+            "NUMBERS_MASTER contains every displayed 30% headline metric", findings)
     require(abs(float(primary_30["f1"]) - numbers["N021"]) < METRIC_TOLERANCE,
             "primary 30% F1 matches NUMBERS_MASTER", findings)
     require(abs(float(primary_30["auprc"]) - numbers["N022"]) < METRIC_TOLERANCE,
             "primary 30% AUPRC matches NUMBERS_MASTER", findings)
+    require(abs(float(primary_30["fpr"]) - numbers["N023"]) < METRIC_TOLERANCE,
+            "primary 30% FPR matches NUMBERS_MASTER", findings)
+    require(abs(float(primary_30["precision"]) - numbers["N035"]) < METRIC_TOLERANCE,
+            "primary 30% Precision matches NUMBERS_MASTER", findings)
+    require(abs(float(primary_30["recall"]) - numbers["N036"]) < METRIC_TOLERANCE,
+            "primary 30% Recall matches NUMBERS_MASTER", findings)
+    require(abs(float(primary_30["auroc"]) - numbers["N037"]) < METRIC_TOLERANCE,
+            "primary 30% AUROC matches NUMBERS_MASTER", findings)
+
+    ranking_rows = read_csv(run_dir / "ranking_metrics.csv")
+    ranking_30 = next(row for row in ranking_rows if float(row["contamination"]) == 0.3)
+    require(abs(float(ranking_30["weighted_spearman"]) - numbers["N038"]) < METRIC_TOLERANCE,
+            "weighted 30% Spearman matches NUMBERS_MASTER", findings)
+    require(abs(float(ranking_30["weighted_topk_overlap"]) - numbers["N039"]) < METRIC_TOLERANCE,
+            "weighted 30% Top-100 overlap matches NUMBERS_MASTER", findings)
 
     sensitivity = read_csv(run_dir / "split_sensitivity_metrics.csv")
     levels = {float(row["contamination"]) for row in sensitivity}

@@ -1,4 +1,4 @@
-{"kind":"deck","id":"pr/1wt6yt","name":"Deck"}
+{"kind":"deck","id":"pr/8clyg3","name":"Deck"}
 {"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"","type":"master"}
 {"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
 {"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"TrustData：面向众包内容平台的用户评价数据可信评估与分级系统","textShapes":7}
@@ -181,10 +181,10 @@
 {"kind":"textbox","id":"sh/0b65obm9","slide":9,"name":"矩形 2","text":"排序权衡：中高污染改善，低污染优先监测","textPreview":"排序权衡：中高污染改善，低污染优先监测","textChars":19,"textLines":1,"bbox":[68,92,1030,58]}
 {"kind":"shape","id":"sh/nex4jq5k","slide":9,"name":"直接连接符 3","bbox":[68,164,1144,0]}
 {"kind":"textbox","id":"sh/9gzml0nq","slide":9,"name":"矩形 5","text":"30% 污染时","textPreview":"30% 污染时","textChars":7,"textLines":1,"bbox":[842,236,250,32]}
-{"kind":"textbox","id":"sh/ofq5svm5","slide":9,"name":"矩形 6","text":"Spearman ρ  0.994\nTop-100 overlap  0.70\nMRE reduction  25.3%","textPreview":"Spearman ρ  0.994 | Top-100 overlap  0.70 | MRE reduction  25.3%","textChars":60,"textLines":3,"bbox":[842,286,315,115]}
+{"kind":"textbox","id":"sh/ofq5svm5","slide":9,"name":"矩形 6","text":"Weighted Spearman  0.994\nWeighted Top-100  0.70\nMRE reduction  25.3%","textPreview":"Weighted Spearman  0.994 | Weighted Top-100  0.70 | MRE reduction  25.3%","textChars":68,"textLines":3,"bbox":[842,286,315,115]}
 {"kind":"textbox","id":"sh/bih4na5w","slide":9,"name":"矩形 7","text":"20%–30% 降低平均排名误差；5%–30% 提高 Top-100 保留率。1% 场景进入监测与人工复核。","textPreview":"20%–30% 降低平均排名误差；5%–30% 提高 Top-100 保留率。1% 场景进入监测与人工复核。","textChars":54,"textLines":1,"bbox":[842,458,328,104]}
 {"kind":"image","id":"im/faho3ad0","slide":9,"name":"图片 12","bbox":[88,239.58,690,328.84]}
-{"kind":"notes","id":"nt/udsvah03","slide":9,"text":"平均排名误差与 Top-100 保留率分别报告。30% 污染下，原始平均排名误差为 20.3960，加权后为 15.2335，下降 25.31%；Spearman ρ 为 0.994，Top-100 overlap 为 0.70。加权排序在 20%—30% 污染下降低平均名次误差，在 5%—30% 污染下提高 Top-100 保留率；1% 污染下两项指标均下降，因此采用监测与人工复核策略。\n\n[Sources]\n- Internal evidence: competition/evidence/figures/ranking_robustness.png\n- Internal evidence: competition/evidence/results/ranking_metrics.csv\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md"}
+{"kind":"notes","id":"nt/udsvah03","slide":9,"text":"平均排名误差与 Top-100 保留率分别报告。30% 污染下，原始平均排名误差为 20.3960，加权后为 15.2335，下降 25.31%；原始 Spearman ρ 为 0.993732，加权 Spearman ρ 为 0.993708（路演展示为 0.994）；原始 Top-100 overlap 为 0.66，加权后为 0.70。加权排序在 20%—30% 污染下降低平均名次误差，在 5%—30% 污染下提高 Top-100 保留率；1% 污染下两项指标均下降，因此采用监测与人工复核策略。\n\n[Sources]\n- Internal evidence: competition/evidence/figures/ranking_robustness.png\n- Internal evidence: competition/evidence/results/ranking_metrics.csv\n- Internal evidence: docs/04_EVALUATION_AND_LIMITS.md"}
 {"kind":"slide","id":"sl/m90b6t0r","slide":10,"title":"TRUSTDATA / EVIDENCE REVIEW","textShapes":15}
 {"kind":"textbox","id":"sh/jypcrqd4","slide":10,"name":"矩形 25","text":"TRUSTDATA / EVIDENCE REVIEW","textPreview":"TRUSTDATA / EVIDENCE REVIEW","textChars":27,"textLines":1,"bbox":[68,42,260,24]}
 {"kind":"textbox","id":"sh/xc3mho32","slide":10,"name":"矩形 1","text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1150,40,62,28]}
