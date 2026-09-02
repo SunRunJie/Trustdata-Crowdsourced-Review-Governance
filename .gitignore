@@ -23,8 +23,6 @@ tmp/
 .ipynb_checkpoints/
 .DS_Store
 Thumbs.db
-prior_research/.git/
-
 # Keep directory structure and small, auditable manifests/results.
 !data/interim/.gitkeep
 !data/processed/.gitkeep

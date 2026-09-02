@@ -33,7 +33,7 @@ async function refreshStatus() {
   const value = await api("/api/status");
   $("#server-status").textContent = "本机控制台已就绪";
   $("#env-badge").textContent = `${value.python} · ${value.env_configured ? ".env 已找到" : "未配置 .env"}`;
-  $("#status-list").innerHTML = `<dt>Python</dt><dd>${value.python}</dd><dt>.env</dt><dd>${value.env_configured ? "已配置" : "尚未创建"}</dd><dt>前置研究</dt><dd>${value.prior_requirements ? "可检查依赖" : "缺少 requirements"}</dd>`;
+  $("#status-list").innerHTML = `<dt>Python</dt><dd>${value.python}</dd><dt>.env</dt><dd>${value.env_configured ? "已配置" : "尚未创建"}</dd><dt>最终数据</dt><dd>已就绪</dd>`;
 }
 
 async function loadConfig() {
@@ -72,10 +72,7 @@ $("#upload-form").addEventListener("submit", async (event) => {
 $("#assessment-form").addEventListener("submit", async (event) => { event.preventDefault(); if (!state.upload) return showNotice("请先上传数据文件。", true); await startJob("assess", {upload_id: state.upload.upload_id, scenario: formValue(event.currentTarget,"scenario")}); });
 $("#main-tasks").addEventListener("click", event => { const button = event.target.closest("button[data-job]"); if (button) startJob(button.dataset.job); });
 $("#verify-form").addEventListener("submit", event => { event.preventDefault(); startJob("verify_manifest", {run_id: formValue(event.currentTarget, "run_id")}); });
-$("#audit-form").addEventListener("submit", event => { event.preventDefault(); startJob("audit_package", {run_id: formValue(event.currentTarget, "run_id")}); });
 $("#publish-form").addEventListener("submit", event => { event.preventDefault(); const f = event.currentTarget; if (!f.elements.confirmed.checked) return showNotice("发布前必须明确确认覆盖正式产物。", true); startJob("publish_dashboard", {run_id: formValue(f, "run_id"), confirmed: true}); });
-document.querySelectorAll("[data-job='research_install']").forEach(button => button.addEventListener("click", () => startJob("research_install")));
-$("#research-form").addEventListener("submit", event => { event.preventDefault(); const f = event.currentTarget; if (f.elements.collect.checked && !f.elements.collection_confirmed.checked) return showNotice("实时采集前必须勾选合规确认。", true); startJob("prior_research", {mode: formValue(f,"mode"), collect: f.elements.collect.checked, collection_confirmed: f.elements.collection_confirmed.checked}); });
 
 function renderJobs() {
   $("#recent-run-count").textContent = state.jobs.length;

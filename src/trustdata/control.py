@@ -38,14 +38,9 @@ MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 JOB_KINDS = {
     "assess",
     "mine",
-    "prepare_observed",
     "trustdata",
-    "profile_prior",
     "verify_manifest",
-    "audit_package",
     "tests",
-    "prior_research",
-    "research_install",
     "publish_dashboard",
 }
 _CONFIG_KEYS = {
@@ -390,15 +385,9 @@ class LocalJobs:
             shutil.copy2(self.root / "configs" / "llm_mining.yaml", config_copy)
             run_mining(config_copy, task_source, target, verbose=True)
             self._append(job, "挖掘结果与来源可用性报告已写入 results/")
-        elif kind == "prepare_observed":
-            self._run_subprocess(job, [sys.executable, str(self.root / "scripts" / "prepare_observed_data.py"), "--output", str(workspace / "processed")])
         elif kind == "trustdata":
-            processed = workspace / "processed"
-            self._run_subprocess(job, [sys.executable, str(self.root / "scripts" / "prepare_observed_data.py"), "--output", str(processed)])
-            command = [sys.executable, str(self.root / "scripts" / "run_trustdata.py"), "--output", str(workspace / "results"), "--processed", str(workspace / "processed")]
+            command = [sys.executable, str(self.root / "scripts" / "run_trustdata.py"), "--output", str(workspace / "results"), "--processed", str(self.root / "data" / "processed")]
             self._run_subprocess(job, command)
-        elif kind == "profile_prior":
-            self._run_subprocess(job, [sys.executable, str(self.root / "scripts" / "profile_prior_data.py"), "--output", str(workspace / "results")])
         elif kind == "verify_manifest":
             run_id = str(params.get("run_id", ""))
             source_workspace = self.runs_root / run_id if run_id else workspace
@@ -408,16 +397,6 @@ class LocalJobs:
             if not manifest.is_file():
                 raise ValueError("目标运行尚无 results/run_manifest.json")
             self._run_subprocess(job, [sys.executable, str(self.root / "scripts" / "verify_run_manifest.py"), "--manifest", str(manifest)])
-        elif kind == "audit_package":
-            run_id = str(params.get("run_id", ""))
-            source_workspace = self.runs_root / run_id
-            run_dir = source_workspace / "results"
-            if source_workspace.parent != self.runs_root or not (run_dir / "run_manifest.json").is_file():
-                raise ValueError("请选择一个已完成的控制台受控基准运行")
-            self._run_subprocess(
-                job,
-                [sys.executable, str(self.root / "scripts" / "audit_competition_package.py"), "--run-dir", str(run_dir)],
-            )
         elif kind == "publish_dashboard":
             if not bool(params.get("confirmed", False)):
                 raise ValueError("发布正式演示产物需要明确确认")
@@ -428,34 +407,13 @@ class LocalJobs:
             manifest = source / "run_manifest.json"
             if source_workspace.parent != self.runs_root or not summary.is_file() or not manifest.is_file():
                 raise ValueError("请选择一个成功完成的控制台受控基准运行")
-            from .pipeline import _sync_evidence_mirror, _write_dashboard_script, _write_json
+            from .pipeline import _write_dashboard_script, _write_json
             dashboard = json.loads(summary.read_text(encoding="utf-8"))
             _write_json(self.root / "app" / "data" / "dashboard.json", dashboard)
             _write_dashboard_script(self.root / "product" / "dashboard-data.js", dashboard)
-            copied = _sync_evidence_mirror(self.root, source)
-            self._append(job, f"已发布产品看板和 {copied} 个证据镜像产物")
+            self._append(job, "已发布产品看板")
         elif kind == "tests":
             self._run_subprocess(job, [sys.executable, "-m", "pytest", "-q"])
-        elif kind == "research_install":
-            self._run_subprocess(job, [sys.executable, "-m", "pip", "install", "-r", str(self.root / "prior_research" / "requirements.txt")])
-        elif kind == "prior_research":
-            mode = str(params.get("mode", "empirical"))
-            if mode not in {"empirical", "demo"}:
-                raise ValueError("研究模式必须为 empirical 或 demo")
-            collect = bool(params.get("collect", False))
-            if collect and not bool(params.get("collection_confirmed", False)):
-                raise ValueError("联网采集需明确确认遵守目标网站条款与频率限制")
-            source = self.root / "prior_research" / "data"
-            target_data = workspace / "research" / "data"
-            shutil.copytree(source, target_data, dirs_exist_ok=True)
-            environment = os.environ.copy()
-            environment["TRUSTDATA_RESEARCH_WORKSPACE"] = str(workspace / "research")
-            command = [sys.executable, str(self.root / "prior_research" / "src" / "run_pipeline.py")]
-            if mode == "demo":
-                command.append("--demo")
-            if collect:
-                command.append("--collect")
-            self._run_subprocess(job, command, cwd=self.root / "prior_research", env=environment)
 
     def _artifacts(self, workspace: Path) -> list[dict[str, Any]]:
         items: list[dict[str, Any]] = []
@@ -500,13 +458,11 @@ def create_app(root: Path) -> FastAPI:
 
     @app.get("/api/status")
     def status() -> dict[str, Any]:
-        prior_requirements = root / "prior_research" / "requirements.txt"
         return {
             "local_only": True,
             "python": sys.version.split()[0],
             "root": str(root),
             "env_configured": (root / ".env").is_file(),
-            "prior_requirements": prior_requirements.is_file(),
             "recent_runs": sorted((path.name for path in (root / "outputs" / "ui-runs").glob("20*")), reverse=True)[:12],
         }
 

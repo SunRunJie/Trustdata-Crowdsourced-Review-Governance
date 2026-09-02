@@ -19,7 +19,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the TrustData controlled benchmark.")
     parser.add_argument("--output", type=Path, default=None, help="Optional run-output directory")
     parser.add_argument("--processed", type=Path, default=None, help="Optional processed-data directory")
-    parser.add_argument("--publish", action="store_true", help="Publish dashboard/evidence mirrors (legacy default when omitted)")
+    parser.add_argument("--publish", action="store_true", help="Publish the final dashboard")
     return parser.parse_args()
 
 
